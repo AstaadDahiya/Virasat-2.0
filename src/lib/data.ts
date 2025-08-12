@@ -100,7 +100,7 @@ export const products: Product[] = [
     name: 'Jaipuri Blue Pottery Vase',
     description: 'A classic blue pottery vase from Jaipur, featuring a traditional peacock design. Does not use regular clay, but a mix of quartz stone powder, powdered glass, and other materials.',
     price: 3500.0,
-    images: ['https://placehold.co/600x600.png'],
+    images: ['https://image2url.com/images/1755015366357-3b60ab0f-83d9-4c81-8491-f1860fda8ba6.jpg'],
     artisanId: 'artisan-1',
     category: 'Pottery',
     stock: 10,
