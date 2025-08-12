@@ -71,7 +71,7 @@ export default function DashboardProductsPage() {
                   <TableCell>
                     <Badge variant="outline">{product.category}</Badge>
                   </TableCell>
-                  <TableCell className="hidden md:table-cell text-right">${product.price.toFixed(2)}</TableCell>
+                  <TableCell className="hidden md:table-cell text-right">₹{product.price.toFixed(2)}</TableCell>
                   <TableCell className="hidden md:table-cell text-right">{product.stock}</TableCell>
                   <TableCell>
                     <DropdownMenu>
