@@ -9,7 +9,7 @@ export function SiteFooter() {
           <div className="flex flex-col">
             <Link href="/" className="flex items-center space-x-2 mb-4 text-primary">
               <Logo />
-              <span className="font-bold text-lg font-headline">VIRASAT</span>
+              <span className="font-bold text-2xl font-headline">VIRASAT</span>
             </Link>
             <p className="text-sm text-muted-foreground">Connecting you with the world's finest artisans.</p>
           </div>

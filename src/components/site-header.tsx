@@ -19,13 +19,13 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center">
+      <div className="container flex h-20 items-center">
         <div className="mr-4 flex">
           <Link href="/" className="mr-6 flex items-center space-x-2 text-primary">
             <Logo />
-            <span className="font-bold font-headline sm:inline-block">VIRASAT</span>
+            <span className="font-bold text-2xl font-headline sm:inline-block">VIRASAT</span>
           </Link>
-          <nav className="hidden gap-6 text-sm md:flex">
+          <nav className="hidden gap-6 text-sm md:flex items-center">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
@@ -55,7 +55,7 @@ export function SiteHeader() {
             <SheetContent side="left">
               <Link href="/" className="flex items-center space-x-2 mb-6 text-primary">
                 <Logo />
-                <span className="font-bold font-headline">VIRASAT</span>
+                <span className="font-bold text-2xl font-headline">VIRASAT</span>
               </Link>
               <nav className="flex flex-col gap-4">
                 {navLinks.map((link) => (
