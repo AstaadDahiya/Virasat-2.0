@@ -20,9 +20,8 @@ export default function Home() {
           <Image
             src="https://placehold.co/1800x800.png"
             alt="Artisan crafts"
-            layout="fill"
-            objectFit="cover"
-            className="absolute z-0"
+            fill
+            className="absolute z-0 object-cover"
             data-ai-hint="indian market panorama"
           />
           <div className="relative z-10 flex h-full flex-col items-center justify-center bg-black/50 p-4 text-center">
