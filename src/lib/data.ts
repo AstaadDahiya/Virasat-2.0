@@ -33,7 +33,7 @@ export const products: Product[] = [
     name: 'Hand-Blocked Table Runner',
     description: 'A beautifully handcrafted table runner, perfect for adding a touch of Rajasthani elegance to your dining table. Features a classic floral motif in indigo and white.',
     price: 2500.0,
-    images: ['https://placehold.co/600x600.png', 'https://placehold.co/600x600.png', 'https://placehold.co/600x600.png'],
+    images: ['https://image2url.com/images/1755012548151-37da720e-1283-4244-8dca-c47b3c720224.webp', 'https://placehold.co/600x600.png', 'https://placehold.co/600x600.png'],
     artisanId: 'artisan-1',
     category: 'Block-Printing',
     stock: 15,
