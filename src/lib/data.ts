@@ -1,3 +1,4 @@
+
 import type { Product, Artisan } from './types';
 
 export const artisans: Artisan[] = [
@@ -66,7 +67,7 @@ export const products: Product[] = [
     name: 'Sanganeri Print Cushion Covers',
     description: 'Set of two cotton cushion covers with a traditional Sanganeri bootis (small floral motif) print. Brightens up any living space instantly.',
     price: 1800.0,
-    images: ['https://placehold.co/600x600.png'],
+    images: ['https://image2url.com/images/1755012784019-66a06b22-a636-4237-9af6-6be22db539c4.jpg'],
     artisanId: 'artisan-1',
     category: 'Block-Printing',
     stock: 25,
