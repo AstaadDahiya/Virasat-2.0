@@ -5,83 +5,62 @@ export function Logo() {
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="1.5"
+      strokeWidth="1"
       strokeLinecap="round"
       strokeLinejoin="round"
       className="h-8 w-8"
     >
-      {/* Outer Petals (Primary Color) */}
+      {/* Lotus Petals - Primary Color */}
       <path
-        d="M12 2C8.5 2 6 4.5 6 8c0 1.5.5 3 1.5 4.5"
+        d="M12 21c4-4 6-7 6-10A6 6 0 0 0 6 11c0 3 2 6 6 10z"
         stroke="hsl(var(--primary))"
-        strokeWidth="1"
-      />
-      <path
-        d="M12 2C15.5 2 18 4.5 18 8c0 1.5-.5 3-1.5 4.5"
-        stroke="hsl(var(--primary))"
-        strokeWidth="1"
-      />
-      <path
-        d="M6.5 17.5C7.5 16 9 14 12 14s4.5 2 5.5 3.5"
-        stroke="hsl(var(--primary))"
-        strokeWidth="1"
-      />
-      <path
-        d="M3 13.5c1-3.5 4-5 9-5s8 1.5 9 5"
-        stroke="hsl(var(--primary))"
-        strokeWidth="1"
         fill="hsl(var(--primary))"
-        fillOpacity="0.1"
+        fillOpacity="0.2"
       />
-
-      {/* Inner Petal Details (Muted Foreground) */}
-       <path
-        d="M9.5 12.5c.5-1 1.5-2.5 2.5-2.5s2 1.5 2.5 2.5"
-        stroke="hsl(var(--muted-foreground))"
-        strokeWidth="0.5"
-        opacity="0.6"
-      />
-       <path
-        d="M8.5 9.5a3.5 3.5 0 0 1 7 0"
-        stroke="hsl(var(--muted-foreground))"
-        strokeWidth="0.5"
-        opacity="0.6"
-      />
-       <circle cx="12" cy="7.5" r="0.5" fill="hsl(var(--muted-foreground))" opacity="0.6" />
-
-      {/* V Letter (Accent Color) */}
       <path
-        d="M9.5 7 L12 12 l2.5 -5"
+        d="M12 12.5a6.2 6.2 0 0 1 4.5-5.5 5.2 5.2 0 0 1 4.5 5.5c-2.5 2-4.5 4-4.5 4s-2-2-4.5-4z"
+        stroke="hsl(var(--primary))"
+        fill="hsl(var(--primary))"
+        fillOpacity="0.2"
+      />
+      <path
+        d="M12 12.5a6.2 6.2 0 0 0-4.5-5.5A5.2 5.2 0 0 0 3 12.5c2.5 2 4.5 4 4.5 4s2-2 4.5-4z"
+        stroke="hsl(var(--primary))"
+        fill="hsl(var(--primary))"
+        fillOpacity="0.2"
+      />
+       <path
+        d="M8.5 12.5c0-1.5 1-3.5 3.5-3.5s3.5 2 3.5 3.5"
+        stroke="hsl(var(--primary))"
+        fill="none"
+        strokeWidth="0.5"
+      />
+
+
+      {/* Henna Details - Muted Foreground */}
+      <path d="M12 17.5a4 4 0 0 0-2.5-3.5" stroke="hsl(var(--muted-foreground))" strokeWidth="0.5" opacity="0.8" />
+      <path d="M12 17.5a4 4 0 0 1 2.5-3.5" stroke="hsl(var(--muted-foreground))" strokeWidth="0.5" opacity="0.8" />
+      <path d="M7.5 11 a2 2 0 0 1 2 -1" stroke="hsl(var(--muted-foreground))" strokeWidth="0.5" opacity="0.8" />
+       <path d="M16.5 11 a2 2 0 0 0 -2 -1" stroke="hsl(var(--muted-foreground))" strokeWidth="0.5" opacity="0.8" />
+       <circle cx="12" cy="12.5" r="1" fill="hsl(var(--muted-foreground))" opacity="0.5" />
+
+
+      {/* V Letter - Accent Color */}
+      <path
+        d="M9.5 7 L12 13 l2.5 -6"
         stroke="hsl(var(--accent))"
-        strokeWidth="1.5"
+        strokeWidth="2"
         fill="none"
       />
-       <path
-        d="M14.5 7l.5 -1.5"
+      {/* V Flourish */}
+      <path
+        d="M15.5 5.5 a 1 1 0 0 1 1 1"
         stroke="hsl(var(--accent))"
         strokeWidth="1"
         fill="none"
       />
-       <circle cx="15.2" cy="5" r="0.4" fill="hsl(var(--accent))" />
-
-        {/* Base */}
-       <path
-        d="M9 19c-3-2-3-5-1-7"
-        stroke="hsl(var(--primary))"
-        strokeWidth="1"
-      />
-        <path
-        d="M15 19c3-2 3-5 1-7"
-        stroke="hsl(var(--primary))"
-        strokeWidth="1"
-      />
-       <path
-        d="M12 22a4 4 0 0 0-4-4h8a4 4 0 0 0-4 4z"
-        stroke="hsl(var(--primary))"
-        strokeWidth="1"
-        fill="hsl(var(--primary))"
-        fillOpacity="0.1"
-      />
+       <circle cx="17" cy="6" r="0.5" fill="hsl(var(--accent))" />
+       <circle cx="16.2" cy="4.8" r="0.3" fill="hsl(var(--accent))" />
 
     </svg>
   );
