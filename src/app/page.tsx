@@ -19,7 +19,7 @@ export default function Home() {
       <main className="flex-1">
         <section className="relative h-[60vh] w-full text-white">
           <Image
-            src="https://cdn.corenexis.com/file?8941131168.png"
+            src="https://image2url.com/images/1755013518302-cbc2d5b7-60d3-493c-bd70-0894129550e2.png"
             alt="Artisan crafts"
             fill
             className="absolute z-0 object-cover"
