@@ -78,7 +78,7 @@ export const products: Product[] = [
     name: 'Hand-Carved Elephant Figurine',
     description: 'A symbol of wisdom and strength, this elegant elephant figurine is hand-carved from a single block of wood with remarkable detail.',
     price: 2800.0,
-    images: ['https://image2url.com/images/1755015366357-3b60ab0f-83d9-4c81-8491-f1860fda8ba6.jpg'],
+    images: ['https://image2url.com/images/1755015650198-5f686942-17c1-43a9-9cda-25f82ea6756a.jpg'],
     artisanId: 'artisan-2',
     category: 'Wood Carving',
     stock: 12,
