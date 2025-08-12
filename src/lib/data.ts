@@ -111,7 +111,7 @@ export const products: Product[] = [
     name: 'Wooden Jharokha Wall Decor',
     description: 'A miniature, intricately carved "jharokha" (ornate window) that brings a piece of Rajasthani palaces to your wall. A stunning piece of craftsmanship.',
     price: 7500.0,
-    images: ['https://placehold.co/600x600.png'],
+    images: ['https://image2url.com/images/1755015585603-2034804a-c6fc-4547-8bfe-659efb18f352.jpg'],
     artisanId: 'artisan-2',
     category: 'Wood Carving',
     stock: 7,
