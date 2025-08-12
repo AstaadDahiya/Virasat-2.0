@@ -14,7 +14,7 @@ export const artisans: Artisan[] = [
     id: 'artisan-2',
     name: 'Rohan Mehra',
     bio: 'From his workshop in Saharanpur, Rohan Mehra practices the art of wood carving, a skill passed down through generations. He specializes in creating intricate home goods from Sheesham wood, using traditional techniques. His philosophy is to let the natural beauty of the wood speak for itself.',
-    profileImage: 'https://placehold.co/400x400.png',
+    profileImage: 'https://image2url.com/images/1755015058938-f2672261-043e-4567-ba9e-d3104222a788.png',
     location: 'Saharanpur, Uttar Pradesh',
     craft: 'Wood Carving',
   },
