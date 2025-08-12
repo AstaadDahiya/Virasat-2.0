@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { ProductCard } from "@/components/product-card";
 import { ArtisanCard } from "@/components/artisan-card";
@@ -18,7 +19,7 @@ export default function Home() {
       <main className="flex-1">
         <section className="relative h-[60vh] w-full text-white">
           <Image
-            src="https://cdn.corenexis.com/file/?77636412160.png"
+            src="https://cdn.corenexis.com/file?8941131168.png"
             alt="Artisan crafts"
             fill
             className="absolute z-0 object-cover"
