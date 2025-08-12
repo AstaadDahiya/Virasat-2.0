@@ -22,7 +22,7 @@ export const artisans: Artisan[] = [
     id: 'artisan-3',
     name: 'Aisha Begum',
     bio: 'Aisha is a master of Chikankari embroidery from Lucknow. Her delicate and precise needlework brings traditional Mughal-era designs to life on fine fabrics. Each garment tells a story, stitched with threads of history and culture.',
-    profileImage: 'https://placehold.co/400x400.png',
+    profileImage: 'https://image2url.com/images/1755015144032-3afa0c70-9c71-45f2-aefa-784b813d46a6.png',
     location: 'Lucknow, Uttar Pradesh',
     craft: 'Embroidery',
   },
