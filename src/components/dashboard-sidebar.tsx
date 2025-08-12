@@ -21,6 +21,7 @@ import {
   Cog,
   DollarSign,
   Megaphone,
+  Camera,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -55,6 +56,11 @@ const toolsItems = [
     href: "/dashboard/tools/marketing-suite",
     label: "Marketing Suite",
     icon: Megaphone,
+  },
+  {
+    href: "/dashboard/tools/visual-enhancer",
+    label: "Visual Enhancer",
+    icon: Camera,
   },
 ];
 
