@@ -6,7 +6,7 @@ export const artisans: Artisan[] = [
     id: 'artisan-1',
     name: 'Priya Sharma',
     bio: 'Priya is a third-generation block-printer from Jaipur, a city renowned for its vibrant textiles. She finds inspiration in the intricate patterns of Rajasthani architecture and nature. Each piece is a testament to the timeless tradition of Sanganeri block-printing, crafted with passion and precision.',
-    profileImage: 'https://placehold.co/400x400.png',
+    profileImage: 'https://image2url.com/images/1755014190052-e7330edb-abfe-45c3-af51-543a4ea9fddf.png',
     location: 'Jaipur, Rajasthan',
     craft: 'Block-Printing',
   },
