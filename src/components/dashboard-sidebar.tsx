@@ -22,6 +22,7 @@ import {
   DollarSign,
   Megaphone,
   Camera,
+  TrendingUp,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -61,6 +62,11 @@ const toolsItems = [
     href: "/dashboard/tools/visual-enhancer",
     label: "Visual Enhancer",
     icon: Camera,
+  },
+  {
+    href: "/dashboard/tools/trend-harmonizer",
+    label: "Trend Harmonizer",
+    icon: TrendingUp,
   },
 ];
 
