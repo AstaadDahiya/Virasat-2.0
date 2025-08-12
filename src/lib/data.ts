@@ -55,7 +55,7 @@ export const products: Product[] = [
     name: 'Chikankari Cotton Kurta',
     description: 'A luxuriously soft cotton kurta featuring delicate Chikankari embroidery. The timeless floral patterns make it a versatile piece for any occasion.',
     price: 4500.0,
-    images: ['https://placehold.co/600x600.png'],
+    images: ['https://image2url.com/images/1755012612654-0119e2d3-3168-4b58-800f-e27475e1889a.jpg'],
     artisanId: 'artisan-3',
     category: 'Embroidery',
     stock: 5,
