@@ -23,7 +23,7 @@ export function SiteHeader() {
         <div className="mr-4 flex">
           <Link href="/" className="mr-6 flex items-center space-x-2 text-primary">
             <Logo />
-            <span className="font-bold font-headline sm:inline-block">Virasat</span>
+            <span className="font-bold font-headline sm:inline-block">VIRASAT</span>
           </Link>
           <nav className="hidden gap-6 text-sm md:flex">
             {navLinks.map((link) => (
@@ -55,7 +55,7 @@ export function SiteHeader() {
             <SheetContent side="left">
               <Link href="/" className="flex items-center space-x-2 mb-6 text-primary">
                 <Logo />
-                <span className="font-bold font-headline">Virasat</span>
+                <span className="font-bold font-headline">VIRASAT</span>
               </Link>
               <nav className="flex flex-col gap-4">
                 {navLinks.map((link) => (

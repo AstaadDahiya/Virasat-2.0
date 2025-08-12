@@ -87,7 +87,7 @@ export function DashboardSidebar() {
           </Link>
           {state === "expanded" && (
             <Link href="/">
-              <h1 className="font-bold text-lg font-headline text-primary">Virasat</h1>
+              <h1 className="font-bold text-lg font-headline text-primary">VIRASAT</h1>
             </Link>
           )}
         </div>

@@ -4,7 +4,7 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "Virasat",
+  title: "VIRASAT",
   description: "A platform for artisans to showcase and sell their handmade crafts.",
   icons: {
     icon: "/favicon.ico",

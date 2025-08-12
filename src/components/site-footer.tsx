@@ -9,7 +9,7 @@ export function SiteFooter() {
           <div className="flex flex-col">
             <Link href="/" className="flex items-center space-x-2 mb-4 text-primary">
               <Logo />
-              <span className="font-bold text-lg font-headline">Virasat</span>
+              <span className="font-bold text-lg font-headline">VIRASAT</span>
             </Link>
             <p className="text-sm text-muted-foreground">Connecting you with the world's finest artisans.</p>
           </div>
@@ -33,13 +33,13 @@ export function SiteFooter() {
           <div>
             <h3 className="font-semibold mb-4 font-headline">For Artisans</h3>
             <ul className="space-y-2">
-              <li><Link href="/dashboard" className="text-sm hover:underline">Sell on Virasat</Link></li>
+              <li><Link href="/dashboard" className="text-sm hover:underline">Sell on VIRASAT</Link></li>
               <li><Link href="#" className="text-sm hover:underline">Artisan Handbook</Link></li>
             </ul>
           </div>
         </div>
         <div className="mt-8 border-t pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} Virasat. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} VIRASAT. All rights reserved.</p>
           <div className="flex space-x-4 mt-4 md:mt-0">
             <Link href="#" className="hover:underline">Terms of Service</Link>
             <Link href="#" className="hover:underline">Privacy Policy</Link>
