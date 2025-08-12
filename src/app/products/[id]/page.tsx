@@ -33,7 +33,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
                 <Badge variant="secondary">{product.category}</Badge>
                 <h1 className="font-headline text-3xl md:text-4xl font-bold mt-2">{product.name}</h1>
                 <div className="mt-4 flex items-center gap-4">
-                  <p className="text-3xl font-bold text-primary">${product.price.toFixed(2)}</p>
+                  <p className="text-3xl font-bold text-primary">₹{product.price.toFixed(2)}</p>
                   <div className="flex items-center gap-1">
                     {[...Array(5)].map((_, i) => <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />)}
                     <span className="text-muted-foreground text-sm ml-1">(12 reviews)</span>
@@ -58,7 +58,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
                 {artisan && (
                   <div className="mt-6 bg-secondary p-4 rounded-lg flex items-center gap-4">
                     <Avatar className="h-16 w-16">
-                      <AvatarImage src={artisan.profileImage} alt={artisan.name} data-ai-hint="artisan portrait" />
+                      <AvatarImage src={artisan.profileImage} alt={artisan.name} data-ai-hint="indian artisan portrait" />
                       <AvatarFallback>{artisan.name.charAt(0)}</AvatarFallback>
                     </Avatar>
                     <div>

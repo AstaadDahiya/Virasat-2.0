@@ -73,7 +73,7 @@ export function PricingToolForm() {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Product Name</FormLabel>
-                <FormControl><Input placeholder="e.g., Earthenware Serving Bowl" {...field} /></FormControl>
+                <FormControl><Input placeholder="e.g., Hand-painted Blue Pottery Vase" {...field} /></FormControl>
                 <FormMessage />
               </FormItem>
             )}
@@ -84,8 +84,8 @@ export function PricingToolForm() {
                 name="materialsCost"
                 render={({ field }) => (
                 <FormItem>
-                    <FormLabel>Materials Cost ($)</FormLabel>
-                    <FormControl><Input type="number" placeholder="15.50" {...field} /></FormControl>
+                    <FormLabel>Materials Cost (₹)</FormLabel>
+                    <FormControl><Input type="number" placeholder="500" {...field} /></FormControl>
                     <FormMessage />
                 </FormItem>
                 )}
@@ -95,8 +95,8 @@ export function PricingToolForm() {
                 name="laborCost"
                 render={({ field }) => (
                 <FormItem>
-                    <FormLabel>Labor Cost ($)</FormLabel>
-                    <FormControl><Input type="number" placeholder="25.00" {...field} /></FormControl>
+                    <FormLabel>Labor Cost (₹)</FormLabel>
+                    <FormControl><Input type="number" placeholder="1200" {...field} /></FormControl>
                     <FormMessage />
                 </FormItem>
                 )}
@@ -132,7 +132,7 @@ export function PricingToolForm() {
           <div className="grid md:grid-cols-2 gap-6">
             <div className="text-center bg-primary text-primary-foreground p-6 rounded-lg">
                 <h3 className="text-lg font-semibold font-headline mb-2">Suggested Price</h3>
-                <p className="text-5xl font-bold">${result.suggestedPrice.toFixed(2)}</p>
+                <p className="text-5xl font-bold">₹{result.suggestedPrice.toFixed(2)}</p>
             </div>
             <div className="p-6 rounded-md bg-secondary">
                 <h3 className="text-lg font-semibold font-headline mb-2">Reasoning</h3>

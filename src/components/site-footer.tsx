@@ -17,9 +17,9 @@ export function SiteFooter() {
             <h3 className="font-semibold mb-4 font-headline">Shop</h3>
             <ul className="space-y-2">
               <li><Link href="/products" className="text-sm hover:underline">All Products</Link></li>
-              <li><Link href="/products?category=Ceramics" className="text-sm hover:underline">Ceramics</Link></li>
-              <li><Link href="/products?category=Textiles" className="text-sm hover:underline">Textiles</Link></li>
-              <li><Link href="/products?category=Woodworking" className="text-sm hover:underline">Woodworking</Link></li>
+              <li><Link href="/products?category=Block-Printing" className="text-sm hover:underline">Block-Printing</Link></li>
+              <li><Link href="/products?category=Wood Carving" className="text-sm hover:underline">Wood Carving</Link></li>
+              <li><Link href="/products?category=Embroidery" className="text-sm hover:underline">Embroidery</Link></li>
             </ul>
           </div>
           <div>

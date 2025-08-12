@@ -19,7 +19,7 @@ export function ArtisanCard({ artisan }: ArtisanCardProps) {
             alt={artisan.name}
             fill
             className="object-cover rounded-full"
-            data-ai-hint="artisan portrait"
+            data-ai-hint="indian artisan portrait"
           />
         </div>
       </CardHeader>

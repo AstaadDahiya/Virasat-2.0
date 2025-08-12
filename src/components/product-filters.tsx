@@ -16,7 +16,7 @@ interface ProductFiltersProps {
 export function ProductFilters({ products, categories }: ProductFiltersProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [category, setCategory] = useState('all');
-  const maxPrice = useMemo(() => Math.max(...products.map(p => p.price), 100), [products]);
+  const maxPrice = useMemo(() => Math.max(...products.map(p => p.price), 10000), [products]);
   const [priceRange, setPriceRange] = useState([0, maxPrice]);
 
   const filteredProducts = useMemo(() => {
@@ -57,12 +57,12 @@ export function ProductFilters({ products, categories }: ProductFiltersProps) {
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
             <span>Price Range</span>
-            <span className="font-medium text-primary">${priceRange[0]} - ${priceRange[1]}</span>
+            <span className="font-medium text-primary">₹{priceRange[0]} - ₹{priceRange[1]}</span>
           </div>
           <Slider
             min={0}
             max={maxPrice}
-            step={1}
+            step={100}
             value={[priceRange[1]]}
             onValueChange={(value) => setPriceRange([0, value[0]])}
           />

@@ -24,7 +24,7 @@ export default function ArtisanDetailPage({ params }: { params: { id: string } }
         <div className="container mx-auto px-4 py-12 md:py-20">
           <Card className="overflow-hidden">
             <div className="relative h-48 md:h-64 w-full">
-              <Image src="https://placehold.co/1200x400.png" alt={`${artisan.name}'s workshop`} fill className="object-cover" data-ai-hint="artisan workshop" />
+              <Image src="https://placehold.co/1200x400.png" alt={`${artisan.name}'s workshop`} fill className="object-cover" data-ai-hint="indian artisan workshop" />
             </div>
             <CardContent className="p-6 md:p-8">
               <div className="flex flex-col md:flex-row gap-8 -mt-20 md:-mt-24 items-start">
@@ -34,7 +34,7 @@ export default function ArtisanDetailPage({ params }: { params: { id: string } }
                     alt={artisan.name}
                     fill
                     className="object-cover rounded-full"
-                    data-ai-hint="artisan portrait"
+                    data-ai-hint="indian artisan portrait"
                   />
                 </div>
                 <div className="pt-4">

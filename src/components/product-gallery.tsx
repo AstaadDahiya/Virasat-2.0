@@ -24,7 +24,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
               fill
               className="object-cover transition-opacity duration-300"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              data-ai-hint="product image"
+              data-ai-hint="indian craft product"
             />
           </div>
         </CardContent>
@@ -47,7 +47,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
                   fill
                   className="object-cover"
                   sizes="20vw"
-                  data-ai-hint="product thumbnail"
+                  data-ai-hint="indian product thumbnail"
                 />
               </div>
             </button>

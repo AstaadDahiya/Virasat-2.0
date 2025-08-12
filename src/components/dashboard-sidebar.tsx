@@ -151,13 +151,13 @@ export function DashboardSidebar() {
         </SidebarMenu>
         <div className="p-2 flex items-center gap-2 mt-2 border-t">
           <Avatar className="h-10 w-10">
-            <AvatarImage src="https://placehold.co/100x100.png" alt="User" />
-            <AvatarFallback>A</AvatarFallback>
+            <AvatarImage src="https://placehold.co/100x100.png" alt="User" data-ai-hint="indian man portrait"/>
+            <AvatarFallback>P</AvatarFallback>
           </Avatar>
           {state === 'expanded' && (
             <div className="flex-1">
-              <p className="text-sm font-semibold">Artisan User</p>
-              <p className="text-xs text-muted-foreground">artisan@email.com</p>
+              <p className="text-sm font-semibold">Priya Sharma</p>
+              <p className="text-xs text-muted-foreground">priya.sharma@example.com</p>
             </div>
           )}
           <Button variant="ghost" size="icon" className="group-data-[collapsible=icon]:hidden">

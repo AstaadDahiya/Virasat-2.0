@@ -23,7 +23,7 @@ export default function Home() {
             layout="fill"
             objectFit="cover"
             className="absolute z-0"
-            data-ai-hint="artisan crafts"
+            data-ai-hint="indian artisan crafts"
           />
           <div className="relative z-10 flex h-full flex-col items-center justify-center bg-black/50 p-4 text-center">
             <h1 className="font-headline text-5xl font-bold md:text-7xl">

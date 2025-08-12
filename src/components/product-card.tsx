@@ -23,7 +23,7 @@ export function ProductCard({ product }: ProductCardProps) {
               alt={product.name}
               fill
               className="object-cover"
-              data-ai-hint="product image"
+              data-ai-hint="indian craft product"
             />
           </div>
         </CardHeader>
@@ -40,7 +40,7 @@ export function ProductCard({ product }: ProductCardProps) {
         )}
       </CardContent>
       <CardFooter className="p-4 pt-0 flex justify-between items-center">
-        <p className="text-lg font-semibold text-primary">${product.price.toFixed(2)}</p>
+        <p className="text-lg font-semibold text-primary">₹{product.price.toFixed(2)}</p>
         <Button asChild size="sm">
           <Link href={`/products/${product.id}`}>View Details</Link>
         </Button>
