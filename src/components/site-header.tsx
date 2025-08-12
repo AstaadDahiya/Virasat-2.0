@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Menu } from "lucide-react";
+import { Menu, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Logo } from "./logo";
 
@@ -41,7 +41,13 @@ export function SiteHeader() {
           </nav>
         </div>
 
-        <div className="flex flex-1 items-center justify-end space-x-4">
+        <div className="flex flex-1 items-center justify-end space-x-2">
+          <Button variant="ghost" size="icon" asChild>
+             <Link href="/products/search">
+                <Search />
+                <span className="sr-only">Search</span>
+             </Link>
+          </Button>
           <Button asChild>
             <Link href="/dashboard">Artisan Dashboard</Link>
           </Button>
