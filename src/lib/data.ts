@@ -89,7 +89,7 @@ export const products: Product[] = [
     name: 'Embroidered Silk Potli Bag',
     description: 'A vibrant silk potli (drawstring) bag, exquisitely embroidered with Zardozi work. The perfect accessory for weddings and festive occasions.',
     price: 2200.0,
-    images: ['https://placehold.co/600x600.png'],
+    images: ['https://image2url.com/images/1755015552322-cc35871d-e350-4d58-ade2-4ef746cfe6d2.jpg'],
     artisanId: 'artisan-3',
     category: 'Embroidery',
     stock: 20,
