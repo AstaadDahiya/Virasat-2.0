@@ -44,7 +44,7 @@ export const products: Product[] = [
     name: 'Sheesham Wood Spice Box',
     description: 'An intricately carved "masala dabba" made from durable Sheesham wood. It features multiple compartments and a small spoon for your essential spices.',
     price: 3200.0,
-    images: ['https://i.ibb.co/6n261yB/spice-box.png', 'https://placehold.co/600x600.png'],
+    images: ['https://image2url.com/images/1755012697263-f3ecde05-3747-4697-81f3-54a09b3f9fc6.png', 'https://placehold.co/600x600.png'],
     artisanId: 'artisan-2',
     category: 'Wood Carving',
     stock: 8,
