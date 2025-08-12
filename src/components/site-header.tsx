@@ -4,8 +4,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Menu, Sprout } from "lucide-react";
+import { Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Logo } from "./logo";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -20,8 +21,8 @@ export function SiteHeader() {
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center">
         <div className="mr-4 flex">
-          <Link href="/" className="mr-6 flex items-center space-x-2">
-            <Sprout className="h-6 w-6 text-accent" />
+          <Link href="/" className="mr-6 flex items-center space-x-2 text-accent">
+            <Logo />
             <span className="font-bold font-headline sm:inline-block">Virasat</span>
           </Link>
           <nav className="hidden gap-6 text-sm md:flex">
@@ -52,8 +53,8 @@ export function SiteHeader() {
               </Button>
             </SheetTrigger>
             <SheetContent side="left">
-              <Link href="/" className="flex items-center space-x-2 mb-6">
-                <Sprout className="h-6 w-6 text-accent" />
+              <Link href="/" className="flex items-center space-x-2 mb-6 text-accent">
+                <Logo />
                 <span className="font-bold font-headline">Virasat</span>
               </Link>
               <nav className="flex flex-col gap-4">

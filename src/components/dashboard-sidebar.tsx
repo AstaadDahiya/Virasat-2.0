@@ -14,7 +14,6 @@ import {
   Box,
   WandSparkles,
   CircleHelp,
-  Sprout,
   User,
   LogOut,
   Home,
@@ -28,6 +27,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "./ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { Logo } from "./logo";
 
 const menuItems = [
   {
@@ -83,7 +83,7 @@ export function DashboardSidebar() {
       <SidebarHeader>
         <div className="flex items-center gap-2">
           <Link href="/" className="flex items-center space-x-2 text-accent">
-            <Sprout className="h-6 w-6" />
+            <Logo />
           </Link>
           {state === "expanded" && (
             <Link href="/">
