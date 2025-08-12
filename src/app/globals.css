@@ -10,13 +10,13 @@
     --card-foreground: 24 10% 10%;
     --popover: 24 43% 95%;
     --popover-foreground: 24 10% 10%;
-    --primary: 24 90% 58%;
+    --primary: 24 90% 58%; /* Saffron/Marigold Orange */
     --primary-foreground: 24 10% 98%;
     --secondary: 24 20% 90%;
     --secondary-foreground: 24 10% 25%;
     --muted: 24 20% 90%;
     --muted-foreground: 24 10% 45%;
-    --accent: 200 60% 40%;
+    --accent: 195 53% 43%; /* Teal/Petrol Blue */
     --accent-foreground: 24 10% 98%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
@@ -38,13 +38,13 @@
     --card-foreground: 24 43% 95%;
     --popover: 24 10% 10%;
     --popover-foreground: 24 43% 95%;
-    --primary: 24 85% 65%;
+    --primary: 24 85% 65%; /* Saffron/Marigold Orange */
     --primary-foreground: 24 10% 98%;
     --secondary: 24 10% 18%;
     --secondary-foreground: 24 43% 95%;
     --muted: 24 10% 18%;
     --muted-foreground: 24 43% 85%;
-    --accent: 200 60% 50%;
+    --accent: 195 53% 53%; /* Teal/Petrol Blue */
     --accent-foreground: 24 10% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;

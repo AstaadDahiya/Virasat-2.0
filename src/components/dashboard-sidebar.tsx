@@ -82,12 +82,12 @@ export function DashboardSidebar() {
     <>
       <SidebarHeader>
         <div className="flex items-center gap-2">
-          <Link href="/" className="flex items-center space-x-2 text-accent">
+          <Link href="/" className="flex items-center space-x-2 text-primary">
             <Logo />
           </Link>
           {state === "expanded" && (
             <Link href="/">
-              <h1 className="font-bold text-lg font-headline text-accent">Virasat</h1>
+              <h1 className="font-bold text-lg font-headline text-primary">Virasat</h1>
             </Link>
           )}
         </div>

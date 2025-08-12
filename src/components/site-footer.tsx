@@ -7,7 +7,7 @@ export function SiteFooter() {
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="flex flex-col">
-            <Link href="/" className="flex items-center space-x-2 mb-4 text-accent">
+            <Link href="/" className="flex items-center space-x-2 mb-4 text-primary">
               <Logo />
               <span className="font-bold text-lg font-headline">Virasat</span>
             </Link>
