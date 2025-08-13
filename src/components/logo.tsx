@@ -1,9 +1,17 @@
-import React from 'react';
+"use client";
+
+import React, { useState, useEffect } from 'react';
 
 export const Logo: React.FC<{ size?: number; className?: string }> = ({
   size = 40,
   className = '',
 }) => {
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   return (
     <div
       className={`flex justify-center items-center ${className}`}
@@ -55,7 +63,7 @@ export const Logo: React.FC<{ size?: number; className?: string }> = ({
         </defs>
 
         <g transform="translate(100, 100)" filter="url(#drop-shadow)">
-          {[0, 60, 120, 180, 240, 300].map((angle, index) => (
+          {isClient && [0, 60, 120, 180, 240, 300].map((angle, index) => (
             <g key={index} transform={`rotate(${angle})`}>
               <path
                 d="M0 -65 C-15 -75, -25 -60, -20 -42 C-25 -25, -15 -15, 0 -20 C15 -15, 25 -25, 20 -42 C25 -60, 15 -75, 0 -65 Z"
@@ -73,7 +81,7 @@ export const Logo: React.FC<{ size?: number; className?: string }> = ({
             </g>
           ))}
 
-          {[30, 90, 150, 210, 270, 330].map((angle, index) => (
+          {isClient && [30, 90, 150, 210, 270, 330].map((angle, index) => (
             <g key={index} transform={`rotate(${angle})`}>
               <path
                 d="M0 -42 C-12 -50, -18 -38, -15 -26 C-18 -14, -12 -8, 0 -12 C12 -8, 18 -14, 15 -26 C18 -38, 12 -50, 0 -42 Z"
@@ -107,7 +115,7 @@ export const Logo: React.FC<{ size?: number; className?: string }> = ({
           >
             <circle cx="0" cy="0" r="18" />
             <circle cx="0" cy="0" r="12" />
-            {[0, 45, 90, 135, 180, 225, 270, 315].map((angle, index) => (
+            {isClient && [0, 45, 90, 135, 180, 225, 270, 315].map((angle, index) => (
               <line
                 key={index}
                 x1={12 * Math.cos((angle * Math.PI) / 180)}
@@ -119,7 +127,7 @@ export const Logo: React.FC<{ size?: number; className?: string }> = ({
           </g>
 
           <g fill="hsl(var(--accent))" opacity="0.7">
-            {[0, 60, 120, 180, 240, 300].map((angle, index) => (
+            {isClient && [0, 60, 120, 180, 240, 300].map((angle, index) => (
               <circle
                 key={index}
                 cx={48 * Math.cos((angle * Math.PI) / 180)}
