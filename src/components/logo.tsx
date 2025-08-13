@@ -1,71 +1,135 @@
-export function Logo() {
+import React from 'react';
+
+export const Logo: React.FC<{ size?: number; className?: string }> = ({
+  size = 40,
+  className = '',
+}) => {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 260 200"
-      className="h-10 w-auto"
-      fill="none"
+    <div
+      className={`flex justify-center items-center ${className}`}
+      style={{ width: size, height: size }}
     >
-      <defs>
-        <linearGradient id="petalGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="hsl(var(--primary))" />
-          <stop offset="100%" stopColor="hsl(var(--accent))" />
-        </linearGradient>
-        <linearGradient id="centerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="hsl(var(--accent))" />
-          <stop offset="100%" stopColor="hsl(var(--primary))" />
-        </linearGradient>
-        <radialGradient id="mandalaGradient" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="hsl(var(--primary))" />
-          <stop offset="100%" stopColor="hsl(var(--accent))" />
-        </radialGradient>
-      </defs>
-      <g transform="translate(130, 100)">
-        <circle
-          cx="0"
-          cy="0"
-          r="85"
-          fill="none"
-          stroke="url(#mandalaGradient)"
-          strokeWidth="3"
-          opacity="0.3"
-        />
-        <g>
-          {[0, 45, 90, 135, 180, 225, 270, 315].map((angle) => (
-            <g key={angle} transform={`rotate(${angle})`}>
+      <svg
+        width={size}
+        height={size}
+        viewBox="0 0 200 200"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className="h-10 w-auto"
+      >
+        <defs>
+          <linearGradient id="petalGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="hsl(var(--primary))" />
+            <stop offset="100%" stopColor="hsl(var(--accent))" />
+          </linearGradient>
+          <linearGradient
+            id="darkPetalGradient"
+            x1="0%"
+            y1="0%"
+            x2="100%"
+            y2="100%"
+          >
+            <stop offset="0%" stopColor="hsl(var(--accent))" />
+            <stop offset="100%" stopColor="hsl(var(--primary))" />
+          </linearGradient>
+          <linearGradient
+            id="centerGradient"
+            x1="0%"
+            y1="0%"
+            x2="100%"
+            y2="100%"
+          >
+            <stop offset="0%" stopColor="hsl(var(--accent))" />
+            <stop offset="100%" stopColor="hsl(var(--primary))" />
+          </linearGradient>
+
+          <filter id="drop-shadow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow
+              dx="0"
+              dy="4"
+              stdDeviation="8"
+              floodColor="hsl(var(--primary))"
+              floodOpacity="0.3"
+            />
+          </filter>
+        </defs>
+
+        <g transform="translate(100, 100)" filter="url(#drop-shadow)">
+          {[0, 60, 120, 180, 240, 300].map((angle, index) => (
+            <g key={index} transform={`rotate(${angle})`}>
               <path
-                d="M0 -65 C-15 -75, -25 -60, -20 -45 C-25 -30, -15 -20, 0 -25 C15 -20, 25 -30, 20 -45 C25 -60, 15 -75, 0 -65 Z"
+                d="M0 -65 C-15 -75, -25 -60, -20 -42 C-25 -25, -15 -15, 0 -20 C15 -15, 25 -25, 20 -42 C25 -60, 15 -75, 0 -65 Z"
                 fill="url(#petalGradient)"
                 stroke="hsl(var(--background))"
-                strokeWidth="1.5"
+                strokeWidth="1"
+                opacity="0.95"
+              />
+              <path
+                d="M0 -58 Q0 -45 0 -32"
+                stroke="hsl(var(--background))"
+                strokeWidth="0.5"
+                opacity="0.4"
+              />
+            </g>
+          ))}
+
+          {[30, 90, 150, 210, 270, 330].map((angle, index) => (
+            <g key={index} transform={`rotate(${angle})`}>
+              <path
+                d="M0 -42 C-12 -50, -18 -38, -15 -26 C-18 -14, -12 -8, 0 -12 C12 -8, 18 -14, 15 -26 C18 -38, 12 -50, 0 -42 Z"
+                fill="url(#darkPetalGradient)"
+                stroke="hsl(var(--background))"
+                strokeWidth="0.5"
                 opacity="0.9"
               />
             </g>
           ))}
-          {[22.5, 67.5, 112.5, 157.5, 202.5, 247.5, 292.5, 337.5].map(
-            (angle) => (
-              <g key={angle} transform={`rotate(${angle})`}>
-                <path
-                  d="M0 -45 C-12 -52, -18 -40, -15 -30 C-18 -18, -12 -12, 0 -15 C12 -12, 18 -18, 15 -30 C18 -40, 12 -52, 0 -45 Z"
-                  fill="hsl(var(--primary))"
-                  stroke="hsl(var(--background))"
-                  strokeWidth="1"
-                  opacity="0.8"
-                />
-              </g>
-            )
-          )}
+
+          <circle cx="0" cy="0" r="22" fill="url(#centerGradient)" />
+
+          <g transform="translate(0, 2)">
+            <path
+              d="M-12 -14 L-3 10 L3 10 L12 -14 L7 -14 L0 4 L-7 -14 Z"
+              fill="hsl(var(--primary))"
+            />
+            <path
+              d="M0 -8 L2 -6 L4 -8 L2 -10 Z"
+              fill="hsl(var(--background))"
+              opacity="0.8"
+            />
+          </g>
+
+          <g
+            stroke="hsl(var(--primary))"
+            strokeWidth="0.6"
+            fill="none"
+            opacity="0.6"
+          >
+            <circle cx="0" cy="0" r="18" />
+            <circle cx="0" cy="0" r="12" />
+            {[0, 45, 90, 135, 180, 225, 270, 315].map((angle, index) => (
+              <line
+                key={index}
+                x1={12 * Math.cos((angle * Math.PI) / 180)}
+                y1={12 * Math.sin((angle * Math.PI) / 180)}
+                x2={18 * Math.cos((angle * Math.PI) / 180)}
+                y2={18 * Math.sin((angle * Math.PI) / 180)}
+              />
+            ))}
+          </g>
+
+          <g fill="hsl(var(--accent))" opacity="0.7">
+            {[0, 60, 120, 180, 240, 300].map((angle, index) => (
+              <circle
+                key={index}
+                cx={48 * Math.cos((angle * Math.PI) / 180)}
+                cy={48 * Math.sin((angle * Math.PI) / 180)}
+                r="2"
+              />
+            ))}
+          </g>
         </g>
-        <circle cx="0" cy="0" r="18" fill="url(#centerGradient)" />
-        <g fill="hsl(var(--primary-foreground))" opacity="0.9">
-          {[0, 45, 90, 135, 180, 225, 270, 315].map((angle) => (
-            <g key={angle} transform={`rotate(${angle})`}>
-              <path d="M0 -12 C-3 -15, -6 -12, -4 -8 C-6 -4, -3 -2, 0 -4 C3 -2, 6 -4, 4 -8 C6 -12, 3 -15, 0 -12 Z" />
-            </g>
-          ))}
-          <circle cx="0" cy="0" r="3" fill="hsl(var(--background))" />
-        </g>
-      </g>
-    </svg>
+      </svg>
+    </div>
   );
-}
+};
