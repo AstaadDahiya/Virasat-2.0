@@ -83,7 +83,7 @@ export function DashboardSidebar() {
       <SidebarHeader>
         <div className="flex items-center gap-2">
           <Link href="/" className="flex items-center space-x-2 text-primary">
-            <Logo size={50}/>
+            <Logo size={40}/>
           </Link>
           {state === "expanded" && (
             <Link href="/">
