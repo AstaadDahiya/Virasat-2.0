@@ -8,7 +8,7 @@ export function SiteFooter() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="flex flex-col">
             <Link href="/" className="flex items-center space-x-2 mb-4 text-primary">
-              <Logo size={60} />
+              <Logo size={80} />
               <span className="font-bold text-2xl font-headline">VIRASAT</span>
             </Link>
             <p className="text-sm text-muted-foreground">Connecting you with the world's finest artisans.</p>
