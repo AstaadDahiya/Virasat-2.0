@@ -19,7 +19,7 @@ import { useLanguage } from "@/context/language-context";
 import { Loader2, Upload, X } from "lucide-react";
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { addProduct } from "@/services/firestore";
+import { addProduct } from "@/services/supabase";
 import Image from "next/image";
 
 

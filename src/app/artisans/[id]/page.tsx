@@ -11,7 +11,7 @@ import { ContactArtisanForm } from "@/components/contact-artisan-form";
 import { useLanguage } from "@/context/language-context";
 import { useState, useEffect } from "react";
 import { Product, Artisan } from "@/lib/types";
-import { getArtisan, getProducts } from "@/services/firestore";
+import { getArtisan, getProducts } from "@/services/supabase";
 
 export default function ArtisanDetailPage({ params }: { params: { id: string } }) {
   const { t, language } = useLanguage();

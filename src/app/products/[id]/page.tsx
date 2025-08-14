@@ -14,7 +14,7 @@ import { ShoppingCart, Star, Loader2 } from "lucide-react";
 import { useLanguage } from "@/context/language-context";
 import { useEffect, useState } from "react";
 import { Product, Artisan } from "@/lib/types";
-import { getProduct, getArtisan } from "@/services/firestore";
+import { getProduct, getArtisan } from "@/services/supabase";
 
 export default function ProductDetailPage({ params }: { params: { id: string } }) {
   const { t, language } = useLanguage();

@@ -2,7 +2,7 @@
 
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import { Product, Artisan } from '@/lib/types';
-import { getProducts, getArtisans } from '@/services/firestore';
+import { getProducts, getArtisans } from '@/services/supabase';
 
 interface DataContextType {
   products: Product[];
