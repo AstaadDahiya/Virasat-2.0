@@ -53,38 +53,34 @@ export default function DashboardPage() {
        <div className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
             <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
                     <div>
                         <CardTitle>{t('totalRevenue')}</CardTitle>
                         <CardDescription>
                             {t('revenueLastMonth')}
                         </CardDescription>
                     </div>
-                    <Button variant="outline" size="sm">
-                        View Report
-                    </Button>
-                </CardHeader>
-                <CardContent>
-                    <div className="flex items-baseline gap-2">
-                         <p className="text-4xl font-bold">₹3,56,787.50</p>
+                     <div className="flex items-baseline gap-2">
+                         <p className="text-3xl font-bold">₹3,56,787</p>
                          <div className="flex items-center gap-1 text-sm text-emerald-500">
                              <TrendingUp className="h-4 w-4"/>
                              <span>+20.1%</span>
                          </div>
                     </div>
-                    <div className="h-[250px] w-full mt-4">
+                </CardHeader>
+                <CardContent className="pb-0">
+                    <div className="h-[250px] w-full -ml-4">
                          <ChartContainer config={chartConfig}>
                             <AreaChart
                                 accessibilityLayer
                                 data={chartData}
                                 margin={{
-                                    left: 0,
-                                    right: 24,
-                                    top: 10,
-                                    bottom: 0,
+                                    left: 12,
+                                    right: 12,
+                                    top: 5,
                                 }}
                             >
-                                <CartesianGrid vertical={false} strokeDasharray="3 3"/>
+                                <CartesianGrid vertical={false} strokeDasharray="3 3" />
                                 <XAxis
                                     dataKey="month"
                                     tickLine={false}
@@ -226,3 +222,5 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+    
