@@ -45,10 +45,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signIn = async (email, password) => {
     const response = await supabase.auth.signInWithPassword({ email, password });
     if (response.error) throw response.error;
-    if (response.data.user) {
-        // This ensures a profile exists on login, in case it was missed at sign-up
-        await ensureArtisanProfile(response.data.user);
-    }
+    // The ensureArtisanProfile call has been removed from here.
+    // It should only be called upon sign-up.
     return response;
   };
 
