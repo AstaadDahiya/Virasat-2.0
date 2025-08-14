@@ -33,20 +33,21 @@ const seedDatabase = async () => {
             
             const { data: seededArtisans, error: artisanInsertError } = await supabase
                 .from('artisans')
-                .insert(seedDataArtisans)
-                .select('id');
+                .insert(seedDataArtisans.map(a => ({...a, id: undefined}))) // Ensure id is not passed
+                .select('id, name');
             
             if (artisanInsertError) {
                 console.error("Error seeding artisans:", artisanInsertError);
                 throw artisanInsertError;
             }
             console.log("Artisans seeded successfully.");
-
+            
             const artisanRefMap = new Map<string, string>();
-            seedDataArtisans.forEach((artisan, index) => {
-                 const tempId = `artisan-${index + 1}`;
-                 if(seededArtisans?.[index]?.id) {
-                    artisanRefMap.set(tempId, seededArtisans[index].id);
+             seedDataArtisans.forEach((artisan, index) => {
+                 const seeded = seededArtisans?.find(sa => sa.name === artisan.name);
+                 if (seeded?.id) {
+                    const tempId = `artisan-${index + 1}`;
+                    artisanRefMap.set(tempId, seeded.id);
                  }
             });
 
@@ -136,6 +137,7 @@ export const addProduct = async (productData: ProductFormData): Promise<string> 
             .single();
 
         if (artisanError || !artisan) {
+            console.log("No artisan profile found for user, creating one...");
              const newArtisan = await createArtisanForNewUser(user.id, user.email);
             if (!newArtisan) {
                 throw new Error("Could not find or create a matching artisan for the logged-in user.");
