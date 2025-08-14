@@ -5,8 +5,6 @@ import { supabase } from "@/lib/supabase";
 import { Product, Artisan } from "@/lib/types";
 import { User } from "@supabase/supabase-js";
 
-type ProductInsertData = Omit<Product, 'id' | 'images'>;
-
 const uploadImages = async (images: File[], artisanId: string): Promise<string[]> => {
     const imageUrls: string[] = [];
     for (const image of images) {
@@ -29,7 +27,9 @@ const uploadImages = async (images: File[], artisanId: string): Promise<string[]
     return imageUrls;
 };
 
-export const addProduct = async (productData: ProductInsertData, images: File[], artisanId: string): Promise<string> => {
+export const addProduct = async (productData: Omit<Product, 'id' | 'images'>, images: File[]): Promise<string> => {
+    const { artisanId } = productData;
+
     if (!artisanId) {
         throw new Error("You must be logged in to add a product.");
     }
@@ -38,19 +38,17 @@ export const addProduct = async (productData: ProductInsertData, images: File[],
     }
     
     try {
-        await ensureArtisanProfile({ id: artisanId });
         const imageUrls = await uploadImages(images, artisanId);
         
         const productToAdd = {
             ...productData,
             images: imageUrls,
-            artisanId: artisanId,
         };
         
         const { data: newProduct, error } = await supabase
             .from('products')
-            .insert(productToAdd)
-            .select('id')
+            .insert([productToAdd]) // Pass an array of objects
+            .select()
             .single();
 
         if (error) {
@@ -158,5 +156,3 @@ export const ensureArtisanProfile = async (user: { id: string; email?: string })
         throw error;
     }
 };
-
-    

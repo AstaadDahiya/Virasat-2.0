@@ -108,11 +108,12 @@ export function AddProductForm() {
         
         const productDataForDb = {
             ...productInfo,
+            artisanId: user.id,
             materials: values.materials.split(',').map(m => m.trim()),
             materials_hi: values.materials_hi.split(',').map(m => m.trim()),
         };
 
-        await addProduct(productDataForDb, images, user.id);
+        await addProduct(productDataForDb, images);
         
         toast({
             title: t('toastProductAddedTitle'),
@@ -285,5 +286,3 @@ export function AddProductForm() {
     </Form>
   );
 }
-
-    
