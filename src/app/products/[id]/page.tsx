@@ -17,7 +17,8 @@ import { useEffect, useState } from "react";
 import { Product, Artisan } from "@/lib/types";
 import { getProduct, getArtisan } from "@/services/supabase";
 
-export default function ProductDetailPage({ params: { id } }: { params: { id: string } }) {
+export default function ProductDetailPage({ params }: { params: { id: string } }) {
+  const { id } = params;
   const { t, language } = useLanguage();
   const [product, setProduct] = useState<Product | null>(null);
   const [artisan, setArtisan] = useState<Artisan | null>(null);
