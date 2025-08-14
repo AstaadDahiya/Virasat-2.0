@@ -3,7 +3,7 @@
 
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Box, IndianRupee, Users, Loader2, TrendingUp, Star, ShoppingCart, MessageSquare } from "lucide-react";
+import { Box, IndianRupee, Users, Loader2, TrendingUp, Star, ShoppingCart, MessageSquare, LineChart } from "lucide-react";
 import Link from "next/link";
 import {
   Table,
@@ -16,24 +16,6 @@ import {
 import { useLanguage } from "@/context/language-context";
 import { useData } from "@/context/data-context";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
-
-const chartData = [
-  { month: "January", desktop: 186 },
-  { month: "February", desktop: 305 },
-  { month: "March", desktop: 237 },
-  { month: "April", desktop: 73 },
-  { month: "May", desktop: 209 },
-  { month: "June", desktop: 214 },
-];
-
-const chartConfig = {
-  desktop: {
-    label: "Revenue",
-    color: "hsl(var(--primary))",
-  },
-};
 
 
 export default function DashboardPage() {
@@ -50,90 +32,47 @@ export default function DashboardPage() {
         <p className="text-muted-foreground">{t('dashboardOverviewSubtitle')}</p>
       </div>
 
-       <div className="grid gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2">
-            <Card>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                    <div>
-                        <CardTitle>{t('totalRevenue')}</CardTitle>
-                        <CardDescription>
-                            {t('revenueLastMonth')}
-                        </CardDescription>
-                    </div>
-                     <div className="flex items-baseline gap-2">
-                         <p className="text-3xl font-bold">₹3,56,787</p>
-                         <div className="flex items-center gap-1 text-sm text-emerald-500">
-                             <TrendingUp className="h-4 w-4"/>
-                             <span>+20.1%</span>
-                         </div>
-                    </div>
-                </CardHeader>
-                <CardContent className="pb-0">
-                    <div className="h-[250px] w-full">
-                        <ChartContainer config={chartConfig}>
-                            <AreaChart
-                                accessibilityLayer
-                                data={chartData}
-                                margin={{
-                                    left: 12,
-                                    right: 12,
-                                    top: 10,
-                                    bottom: 10,
-                                }}
-                            >
-                                <defs>
-                                    <linearGradient id="fillDesktop" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="var(--color-desktop)" stopOpacity={0.8}/>
-                                        <stop offset="95%" stopColor="var(--color-desktop)" stopOpacity={0.1}/>
-                                    </linearGradient>
-                                </defs>
-                                <CartesianGrid vertical={false} strokeDasharray="3 3" />
-                                <XAxis
-                                    dataKey="month"
-                                    tickLine={false}
-                                    axisLine={false}
-                                    tickMargin={8}
-                                    tickFormatter={(value) => value.slice(0, 3)}
-                                />
-                                <ChartTooltip
-                                    cursor={false}
-                                    content={<ChartTooltipContent indicator="dot" />}
-                                />
-                                <Area
-                                    dataKey="desktop"
-                                    type="natural"
-                                    fill="url(#fillDesktop)"
-                                    stroke="var(--color-desktop)"
-                                    stackId="a"
-                                />
-                            </AreaChart>
-                        </ChartContainer>
-                    </div>
-                </CardContent>
-            </Card>
-        </div>
-        <div className="space-y-6">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">{t('totalProducts')}</CardTitle>
-                <Box className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                 {loading ? <Loader2 className="h-6 w-6 animate-spin" /> : <div className="text-2xl font-bold">{products.length}</div>}
-                <p className="text-xs text-muted-foreground">{t('productsLastMonth')}</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">{t('profileViews')}</CardTitle>
-                <Users className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">+1,302</div>
-                <p className="text-xs text-muted-foreground">{t('viewsLastMonth')}</p>
-              </CardContent>
-            </Card>
-        </div>
+       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">{t('totalRevenue')}</CardTitle>
+            <IndianRupee className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">₹3,56,787</div>
+            <p className="text-xs text-muted-foreground">+20.1% from last month</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Sales</CardTitle>
+            <ShoppingCart className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">+1,234</div>
+            <p className="text-xs text-muted-foreground">+19% from last month</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">New Customers</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">+89</div>
+            <p className="text-xs text-muted-foreground">32 new this month</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Average Rating</CardTitle>
+            <Star className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">4.8 / 5</div>
+            <p className="text-xs text-muted-foreground">Based on 215 reviews</p>
+          </CardContent>
+        </Card>
       </div>
 
 
@@ -229,6 +168,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-    
-    
