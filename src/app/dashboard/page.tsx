@@ -68,40 +68,45 @@ export default function DashboardPage() {
                          </div>
                     </div>
                 </CardHeader>
-                <CardContent className="pb-0">
-                    <div className="h-[250px] w-full -ml-4">
-                         <ChartContainer config={chartConfig}>
-                            <AreaChart
-                                accessibilityLayer
-                                data={chartData}
-                                margin={{
-                                    left: 12,
-                                    right: 12,
-                                    top: 5,
-                                }}
-                            >
-                                <CartesianGrid vertical={false} strokeDasharray="3 3" />
-                                <XAxis
-                                    dataKey="month"
-                                    tickLine={false}
-                                    axisLine={false}
-                                    tickMargin={8}
-                                    tickFormatter={(value) => value.slice(0, 3)}
-                                />
-                                <ChartTooltip
-                                    cursor={false}
-                                    content={<ChartTooltipContent indicator="dot" />}
-                                />
-                                <Area
-                                    dataKey="desktop"
-                                    type="natural"
-                                    fill="var(--color-desktop)"
-                                    fillOpacity={0.4}
-                                    stroke="var(--color-desktop)"
-                                />
-                            </AreaChart>
-                        </ChartContainer>
-                    </div>
+                <CardContent className="h-[250px] w-full p-0">
+                    <ChartContainer config={chartConfig}>
+                        <AreaChart
+                            accessibilityLayer
+                            data={chartData}
+                            margin={{
+                                left: 0,
+                                right: 0,
+                                top: 0,
+                                bottom: 0,
+                            }}
+                        >
+                            <defs>
+                                <linearGradient id="fillDesktop" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stopColor="var(--color-desktop)" stopOpacity={0.8}/>
+                                    <stop offset="95%" stopColor="var(--color-desktop)" stopOpacity={0.1}/>
+                                </linearGradient>
+                            </defs>
+                            <CartesianGrid vertical={false} strokeDasharray="3 3" />
+                            <XAxis
+                                dataKey="month"
+                                tickLine={false}
+                                axisLine={false}
+                                tickMargin={8}
+                                tickFormatter={(value) => value.slice(0, 3)}
+                                padding={{ left: 20, right: 20 }}
+                            />
+                            <ChartTooltip
+                                cursor={false}
+                                content={<ChartTooltipContent indicator="dot" />}
+                            />
+                            <Area
+                                dataKey="desktop"
+                                type="natural"
+                                fill="url(#fillDesktop)"
+                                stroke="var(--color-desktop)"
+                            />
+                        </AreaChart>
+                    </ChartContainer>
                 </CardContent>
             </Card>
         </div>
