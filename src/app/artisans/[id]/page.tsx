@@ -1,7 +1,7 @@
 
 "use client";
 
-import { notFound } from "next/navigation";
+import { notFound, useParams } from "next/navigation";
 import Image from "next/image";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
@@ -14,8 +14,9 @@ import { useState, useEffect } from "react";
 import { Product, Artisan } from "@/lib/types";
 import { getArtisan, getProducts } from "@/services/supabase";
 
-export default function ArtisanDetailPage({ params }: { params: { id: string } }) {
-  const { id } = params;
+export default function ArtisanDetailPage() {
+  const params = useParams();
+  const id = Array.isArray(params.id) ? params.id[0] : params.id;
   const { t, language } = useLanguage();
   const [artisan, setArtisan] = useState<Artisan | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
@@ -23,6 +24,7 @@ export default function ArtisanDetailPage({ params }: { params: { id: string } }
 
   useEffect(() => {
     const fetchData = async () => {
+      if (!id) return;
       try {
         setLoading(true);
         const artisanData = await getArtisan(id);
@@ -42,9 +44,7 @@ export default function ArtisanDetailPage({ params }: { params: { id: string } }
       }
     };
 
-    if (id) {
-        fetchData();
-    }
+    fetchData();
   }, [id]);
 
    if (loading) {
