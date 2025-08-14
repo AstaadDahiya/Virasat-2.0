@@ -1,123 +1,122 @@
+-- Virasat Supabase Schema
+-- Version 1.1
 --
--- Virasat Application Database Schema
+-- This script sets up the necessary tables, storage, and security policies
+-- for the Virasat application.
 --
--- This script sets up the entire database structure, including tables,
--- storage, row-level security (RLS), and helper functions.
---
--- How to use:
--- 1. Navigate to the SQL Editor in your Supabase project dashboard.
--- 2. Copy and paste the entire content of this file into the editor.
--- 3. Run the query.
---
+-- To use this script:
+-- 1. Navigate to the "SQL Editor" in your Supabase project dashboard.
+-- 2. Create a "New query".
+-- 3. Copy and paste the entire content of this file into the editor.
+-- 4. Click "Run".
 
--- ==== 1. Create Tables ====
+-- 1. Create Tables
+-- =============================================
 
--- Artisans Table: Stores information about the artisans.
--- The `id` column is linked to the `auth.users.id` via a foreign key.
+-- Artisans table to store information about the craftspeople.
+-- The ID is linked to the auth.users table.
 CREATE TABLE IF NOT EXISTS public.artisans (
-    id uuid NOT NULL PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-    name text NOT NULL,
-    name_hi text,
-    bio text,
-    bio_hi text,
-    "profileImage" text,
-    location text,
-    location_hi text,
-    craft text,
-    craft_hi text,
-    created_at timestamp with time zone DEFAULT now() NOT NULL
+    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    name_hi TEXT NOT NULL,
+    bio TEXT NOT NULL,
+    bio_hi TEXT NOT NULL,
+    "profileImage" TEXT NOT NULL,
+    location TEXT NOT NULL,
+    location_hi TEXT NOT NULL,
+    craft TEXT NOT NULL,
+    craft_hi TEXT NOT NULL,
+    "createdAt" TIMESTAMPTZ DEFAULT NOW() NOT NULL
 );
-COMMENT ON TABLE public.artisans IS 'Stores artisan profiles, linked to authenticated users.';
+COMMENT ON TABLE public.artisans IS 'Stores artisan profile information, linked to authenticated users.';
 
--- Products Table: Stores product information.
--- The `artisanId` column links to the `artisans` table.
+-- Products table to store all product details.
 CREATE TABLE IF NOT EXISTS public.products (
-    id uuid DEFAULT gen_random_uuid() NOT NULL PRIMARY KEY,
-    "artisanId" uuid NOT NULL REFERENCES public.artisans(id) ON DELETE CASCADE,
-    name text NOT NULL,
-    name_hi text,
-    description text,
-    description_hi text,
-    price numeric NOT NULL,
-    images text[],
-    category text,
-    category_hi text,
-    stock integer NOT NULL,
-    materials text[],
-    materials_hi text[],
-    created_at timestamp with time zone DEFAULT now() NOT NULL
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name TEXT NOT NULL,
+    name_hi TEXT NOT NULL,
+    description TEXT NOT NULL,
+    description_hi TEXT NOT NULL,
+    price REAL NOT NULL,
+    images TEXT[] NOT NULL,
+    "artisanId" UUID NOT NULL REFERENCES public.artisans(id) ON DELETE CASCADE,
+    category TEXT NOT NULL,
+    category_hi TEXT NOT NULL,
+    stock INTEGER NOT NULL,
+    materials TEXT[] NOT NULL,
+    materials_hi TEXT[] NOT NULL,
+    "createdAt" TIMESTAMPTZ DEFAULT NOW() NOT NULL
 );
-COMMENT ON TABLE public.products IS 'Stores products created by artisans.';
+COMMENT ON TABLE public.products IS 'Contains all product information, linked to an artisan.';
+CREATE INDEX IF NOT EXISTS "idx_products_artisanId" ON public.products("artisanId");
 
--- ==== 2. Set up Storage ====
 
--- Create a public bucket for product images if it doesn't exist.
--- The app will upload product images here.
+-- 2. Create Storage Bucket
+-- =============================================
+-- This bucket will store all public images for products.
+-- Make sure the bucket name matches the one used in the application code.
 INSERT INTO storage.buckets (id, name, public)
-VALUES ('product-images', 'product-images', true)
+VALUES ('product-images', 'product-images', TRUE)
 ON CONFLICT (id) DO NOTHING;
-COMMENT ON BUCKET "product-images" IS 'Stores public images for products.';
 
 
--- ==== 3. Enable Row-Level Security (RLS) ====
--- RLS is a critical security feature that ensures users can only access data they are permitted to.
-
+-- 3. Set up Row-Level Security (RLS)
+-- =============================================
 ALTER TABLE public.artisans ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
 
-
--- ==== 4. Create RLS Policies ====
+-- 4. Define Security Policies
+-- =============================================
 
 -- Artisans Table Policies
--- Allow public read access to all artisan profiles.
-DROP POLICY IF EXISTS "Public can read all artisans" ON public.artisans;
-CREATE POLICY "Public can read all artisans" ON public.artisans FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Public can view all artisans" ON public.artisans;
+CREATE POLICY "Public can view all artisans"
+ON public.artisans
+FOR SELECT USING (true);
 
--- Allow users to update their own artisan profile.
-DROP POLICY IF EXISTS "Users can update their own artisan profile" ON public.artisans;
-CREATE POLICY "Users can update their own artisan profile" ON public.artisans FOR UPDATE USING (auth.uid() = id);
+DROP POLICY IF EXISTS "Artisans can create their own profile" ON public.artisans;
+CREATE POLICY "Artisans can create their own profile"
+ON public.artisans
+FOR INSERT WITH CHECK (auth.uid() = id);
 
--- The `create_artisan_for_new_user` function handles inserts.
+DROP POLICY IF EXISTS "Artisans can update their own profile" ON public.artisans;
+CREATE POLICY "Artisans can update their own profile"
+ON public.artisans
+FOR UPDATE USING (auth.uid() = id);
 
 -- Products Table Policies
--- Allow public read access to all products.
-DROP POLICY IF EXISTS "Public can read all products" ON public.products;
-CREATE POLICY "Public can read all products" ON public.products FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Public can view all products" ON public.products;
+CREATE POLICY "Public can view all products"
+ON public.products
+FOR SELECT USING (true);
 
--- Allow artisans to insert new products for themselves.
-DROP POLICY IF EXISTS "Artisans can insert their own products" ON public.products;
-CREATE POLICY "Artisans can insert their own products" ON public.products FOR INSERT WITH CHECK (auth.uid() = "artisanId");
+DROP POLICY IF EXISTS "Artisans can add their own products" ON public.products;
+CREATE POLICY "Artisans can add their own products"
+ON public.products
+FOR INSERT WITH CHECK (auth.uid() = "artisanId");
 
--- Allow artisans to update their own products.
 DROP POLICY IF EXISTS "Artisans can update their own products" ON public.products;
-CREATE POLICY "Artisans can update their own products" ON public.products FOR UPDATE USING (auth.uid() = "artisanId");
+CREATE POLICY "Artisans can update their own products"
+ON public.products
+FOR UPDATE USING (auth.uid() = "artisanId");
 
--- Allow artisans to delete their own products.
 DROP POLICY IF EXISTS "Artisans can delete their own products" ON public.products;
-CREATE POLICY "Artisans can delete their own products" ON public.products FOR DELETE USING (auth.uid() = "artisanId");
-
+CREATE POLICY "Artisans can delete their own products"
+ON public.products
+FOR DELETE USING (auth.uid() = "artisanId");
 
 -- Storage Policies
--- Allow public read access to images in the `product-images` bucket.
-DROP POLICY IF EXISTS "Anyone can view product images" on storage.objects;
-CREATE POLICY "Anyone can view product images" ON storage.objects FOR SELECT USING ( bucket_id = 'product-images' );
-
--- Allow authenticated users (artisans) to upload images to the `product-images` bucket.
-DROP POLICY IF EXISTS "Authenticated users can upload product images" on storage.objects;
-CREATE POLICY "Authenticated users can upload product images" ON storage.objects FOR INSERT WITH CHECK ( bucket_id = 'product-images' AND auth.role() = 'authenticated' );
-
--- Allow artisans to update their own images.
-DROP POLICY IF EXISTS "Artisans can update their own product images" on storage.objects;
-CREATE POLICY "Artisans can update their own product images" ON storage.objects FOR UPDATE with check ( bucket_id = 'product-images' and auth.uid() = owner);
-
--- Allow artisans to delete their own images.
-DROP POLICY IF EXISTS "Artisans can delete their own product images" on storage.objects;
-CREATE POLICY "Artisans can delete their own product images" ON storage.objects FOR DELETE with check ( bucket_id = 'product-images' and auth.uid() = owner);
+DROP POLICY IF EXISTS "Artisans can upload to product-images bucket" ON storage.objects;
+CREATE POLICY "Artisans can upload to product-images bucket"
+ON storage.objects
+FOR INSERT
+TO authenticated
+WITH CHECK (bucket_id = 'product-images');
 
 
--- ==== 5. Create Helper Function ====
-
--- This function is called from the application to automatically create
+-- 5. Create Helper Function for New User Onboarding
+-- =============================================
+-- This function is called by the application to automatically create
 -- an artisan profile when a new user signs up.
 CREATE OR REPLACE FUNCTION public.create_artisan_for_new_user(user_id uuid, user_email text)
 RETURNS void
@@ -142,12 +141,6 @@ BEGIN
   ON CONFLICT (id) DO NOTHING;
 END;
 $$;
-COMMENT ON FUNCTION public.create_artisan_for_new_user IS 'Creates a new artisan profile for a newly signed-up user.';
 
--- Grant execute permission on the function to the 'authenticated' role.
+-- Grant execution rights to the function for authenticated users
 GRANT EXECUTE ON FUNCTION public.create_artisan_for_new_user(uuid, text) TO authenticated;
-
--- Grant permission to the 'postgres' user to run this function.
-GRANT EXECUTE ON FUNCTION public.create_artisan_for_new_user(uuid, text) TO postgres;
-
--- End of script
