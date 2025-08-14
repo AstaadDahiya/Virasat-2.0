@@ -1,3 +1,4 @@
+
 import type { Metadata } from "next";
 import { Alegreya } from 'next/font/google';
 import { Toaster } from "@/components/ui/toaster";
@@ -5,6 +6,7 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import { LanguageProvider } from "@/context/language-context";
 import { DataProvider } from "@/context/data-context";
+import { AuthProvider } from "@/context/auth-context";
 
 export const metadata: Metadata = {
   title: "VIRASAT",
@@ -29,11 +31,13 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={cn("min-h-screen bg-background font-body antialiased", alegreya.variable)}>
-        <LanguageProvider>
-          <DataProvider>
-            {children}
-          </DataProvider>
-        </LanguageProvider>
+        <AuthProvider>
+          <LanguageProvider>
+            <DataProvider>
+              {children}
+            </DataProvider>
+          </LanguageProvider>
+        </AuthProvider>
         <Toaster />
       </body>
     </html>

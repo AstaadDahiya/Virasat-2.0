@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -30,11 +31,14 @@ import { Button } from "./ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Logo } from "./logo";
 import { useLanguage } from "@/context/language-context";
+import { useAuth } from "@/context/auth-context";
 
 export function DashboardSidebar() {
   const pathname = usePathname();
   const { state } = useSidebar();
   const { t } = useLanguage();
+  const { user, signOut } = useAuth();
+
 
   const menuItems = [
     {
@@ -155,15 +159,14 @@ export function DashboardSidebar() {
         <div className="p-2 flex items-center gap-2 mt-2 border-t">
           <Avatar className="h-10 w-10">
             <AvatarImage src="https://placehold.co/100x100.png" alt="User" data-ai-hint="indian man portrait"/>
-            <AvatarFallback>P</AvatarFallback>
+            <AvatarFallback>{user?.email?.charAt(0).toUpperCase()}</AvatarFallback>
           </Avatar>
-          {state === 'expanded' && (
+          {state === 'expanded' && user && (
             <div className="flex-1">
-              <p className="text-sm font-semibold">Priya Sharma</p>
-              <p className="text-xs text-muted-foreground">priya.sharma@example.com</p>
+              <p className="text-sm font-semibold truncate">{user.email}</p>
             </div>
           )}
-          <Button variant="ghost" size="icon" className="group-data-[collapsible=icon]:hidden">
+          <Button variant="ghost" size="icon" className="group-data-[collapsible=icon]:hidden" onClick={signOut}>
             <LogOut className="h-5 w-5"/>
           </Button>
         </div>
