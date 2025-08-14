@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { LanguageProvider } from "@/context/language-context";
 import { DataProvider } from "@/context/data-context";
 import { AuthProvider } from "@/context/auth-context";
+import { ThemeProvider } from "@/components/theme-provider";
 
 export const metadata: Metadata = {
   title: "VIRASAT",
@@ -31,14 +32,21 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={cn("min-h-screen bg-background font-body antialiased", alegreya.variable)}>
-        <AuthProvider>
-          <LanguageProvider>
-            <DataProvider>
-              {children}
-            </DataProvider>
-          </LanguageProvider>
-        </AuthProvider>
-        <Toaster />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <AuthProvider>
+            <LanguageProvider>
+              <DataProvider>
+                {children}
+              </DataProvider>
+            </LanguageProvider>
+          </AuthProvider>
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );

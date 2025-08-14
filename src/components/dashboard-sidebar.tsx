@@ -32,6 +32,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Logo } from "./logo";
 import { useLanguage } from "@/context/language-context";
 import { useAuth } from "@/context/auth-context";
+import { ThemeToggle } from "./theme-toggle";
 
 export function DashboardSidebar() {
   const pathname = usePathname();
@@ -140,12 +141,15 @@ export function DashboardSidebar() {
       <SidebarFooter className="p-2">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild tooltip={{ children: t('settings') }}>
-              <Link href="#">
-                <Cog />
-                <span>{t('settings')}</span>
-              </Link>
-            </SidebarMenuButton>
+            <div className="flex justify-between items-center w-full">
+              <SidebarMenuButton asChild tooltip={{ children: t('settings') }} className="flex-grow">
+                <Link href="#">
+                  <Cog />
+                  <span>{t('settings')}</span>
+                </Link>
+              </SidebarMenuButton>
+               {state === 'expanded' && <ThemeToggle />}
+            </div>
           </SidebarMenuItem>
            <SidebarMenuItem>
             <SidebarMenuButton asChild tooltip={{ children: t('backToSite') }}>
