@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Menu, Search, Globe } from "lucide-react";
+import { Menu, Search, Languages } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Logo } from "./logo";
 import { useLanguage } from "@/context/language-context";
@@ -56,7 +56,7 @@ export function SiteHeader() {
            <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon">
-                <Globe />
+                <Languages />
                 <span className="sr-only">Change language</span>
               </Button>
             </DropdownMenuTrigger>
