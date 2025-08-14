@@ -104,12 +104,12 @@ export function AddProductForm() {
     setLoading(true);
     
     try {
-        const { images, materials, materials_hi, ...productInfo } = values;
+        const { images, ...productInfo } = values;
         
         const productDataForDb = {
             ...productInfo,
-            materials: materials.split(',').map(m => m.trim()),
-            materials_hi: materials_hi.split(',').map(m => m.trim()),
+            materials: values.materials.split(',').map(m => m.trim()),
+            materials_hi: values.materials_hi.split(',').map(m => m.trim()),
         };
 
         await addProduct(productDataForDb, images, user.id);
@@ -285,3 +285,5 @@ export function AddProductForm() {
     </Form>
   );
 }
+
+    

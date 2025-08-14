@@ -5,13 +5,11 @@ import { supabase } from "@/lib/supabase";
 import { Product, Artisan } from "@/lib/types";
 import { User } from "@supabase/supabase-js";
 
-// This is the type of data coming from the form, simplified for insertion.
-type ProductInsertData = Omit<Product, 'id' | 'images' | 'artisanId'>;
+type ProductInsertData = Omit<Product, 'id' | 'images'>;
 
 const uploadImages = async (images: File[], artisanId: string): Promise<string[]> => {
     const imageUrls: string[] = [];
     for (const image of images) {
-        // Create a more organized file path
         const filePath = `${artisanId}/${Date.now()}-${image.name}`;
         const { error: uploadError } = await supabase.storage
             .from('product-images')
@@ -40,7 +38,7 @@ export const addProduct = async (productData: ProductInsertData, images: File[],
     }
     
     try {
-        await ensureArtisanProfile({ id: artisanId }); // Ensure profile exists before adding product
+        await ensureArtisanProfile({ id: artisanId });
         const imageUrls = await uploadImages(images, artisanId);
         
         const productToAdd = {
@@ -60,10 +58,13 @@ export const addProduct = async (productData: ProductInsertData, images: File[],
             throw new Error(`Database error: ${error.message}`);
         }
         
+        if (!newProduct) {
+             throw new Error("Product creation failed, no ID returned.");
+        }
+        
         return newProduct.id;
     } catch (e) {
         console.error("Error adding product: ", e);
-        // Re-throw the original error if it's specific, otherwise a generic one
         throw e instanceof Error ? e : new Error("Failed to add product due to an unexpected error.");
     }
 };
@@ -157,3 +158,5 @@ export const ensureArtisanProfile = async (user: { id: string; email?: string })
         throw error;
     }
 };
+
+    
