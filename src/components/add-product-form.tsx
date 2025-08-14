@@ -80,7 +80,7 @@ export function AddProductForm() {
             });
             return;
         }
-        form.setValue("images", combined);
+        form.setValue("images", combined, { shouldValidate: true });
         const newPreviews = combined.map(file => URL.createObjectURL(file));
         setPreviews(newPreviews);
     }
@@ -89,7 +89,7 @@ export function AddProductForm() {
   const removeImage = (index: number) => {
     const currentImages = form.getValues("images");
     const newImages = currentImages.filter((_, i) => i !== index);
-    form.setValue("images", newImages);
+    form.setValue("images", newImages, { shouldValidate: true });
 
     const newPreviews = newImages.map(file => URL.createObjectURL(file));
     setPreviews(newPreviews);
@@ -107,15 +107,22 @@ export function AddProductForm() {
         const { images, ...productInfo } = values;
         
         const productData = {
-            ...productInfo,
-            artisanId: user.id,
+            name: productInfo.name,
+            name_hi: productInfo.name_hi,
+            description: productInfo.description,
+            description_hi: productInfo.description_hi,
+            price: productInfo.price,
+            stock: productInfo.stock,
+            category: productInfo.category,
+            category_hi: productInfo.category_hi,
             materials: values.materials.split(',').map(m => m.trim()),
             materials_hi: values.materials_hi.split(',').map(m => m.trim()),
+            artisanId: user.id,
         };
 
-        console.log('About to call addProduct with:', { productData, images });
+        console.log('About to call addProduct');
         const result = await addProduct(productData, images);
-        console.log('Result from addProduct:', result);
+        console.log('Result:', result);
         
         toast({
             title: t('toastProductAddedTitle'),
@@ -226,7 +233,7 @@ export function AddProductForm() {
          <FormField
             control={form.control}
             name="images"
-            render={({ field }) => (
+            render={() => (
                 <FormItem>
                     <FormLabel>{t('productImages')}</FormLabel>
                     <FormControl>
@@ -288,5 +295,3 @@ export function AddProductForm() {
     </Form>
   );
 }
-
-    

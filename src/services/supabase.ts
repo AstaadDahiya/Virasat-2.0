@@ -5,6 +5,8 @@ import { supabase } from "@/lib/supabase";
 import type { Artisan, Product } from "@/lib/types";
 import type { User } from '@supabase/supabase-js';
 
+// Defines the shape of the data coming from the form, excluding fields that are handled separately.
+type ProductInsertData = Omit<Product, 'id' | 'images'>;
 
 const uploadImages = async (images: File[], artisanId: string): Promise<string[]> => {
     const imageUrls: string[] = [];
@@ -32,7 +34,7 @@ const uploadImages = async (images: File[], artisanId: string): Promise<string[]
 };
 
 
-export const addProduct = async (productData: Omit<Product, 'id' | 'images'>, images: File[]): Promise<string> => {
+export const addProduct = async (productData: ProductInsertData, images: File[]): Promise<string> => {
     const { artisanId } = productData;
 
     if (!artisanId) {
@@ -48,7 +50,6 @@ export const addProduct = async (productData: Omit<Product, 'id' | 'images'>, im
         const productToAdd = {
             ...productData,
             images: imageUrls,
-            artisanId: artisanId, 
         };
         
         const { data: newProduct, error } = await supabase
