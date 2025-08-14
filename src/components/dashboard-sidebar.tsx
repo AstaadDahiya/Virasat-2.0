@@ -143,8 +143,8 @@ export function DashboardSidebar() {
         <SidebarMenu>
           <SidebarMenuItem>
             <div className="flex justify-between items-center w-full">
-              <SidebarMenuButton asChild tooltip={{ children: t('settings') }} className="flex-grow">
-                <Link href="#">
+              <SidebarMenuButton asChild isActive={pathname === '/dashboard/settings'} tooltip={{ children: t('settings') }} className="flex-grow">
+                <Link href="/dashboard/settings">
                   <Cog />
                   <span>{t('settings')}</span>
                 </Link>
@@ -179,5 +179,3 @@ export function DashboardSidebar() {
     </>
   );
 }
-
-    

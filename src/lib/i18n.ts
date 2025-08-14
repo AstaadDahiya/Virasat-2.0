@@ -72,7 +72,6 @@ export const translations: LanguageTranslations = {
     noProductsFound: 'No Products Found',
     noProductsFoundSubtitle: 'Try adjusting your search or filters.',
     allArtisans: 'All Artisans',
-    productSearchPlaceholder: 'Search by product name or description...',
     noProductsFoundFilterSubtitle: "Try adjusting your search or filters to find what you're looking for.",
 
 
@@ -142,6 +141,31 @@ export const translations: LanguageTranslations = {
     aiTools: 'AI Tools',
     settings: 'Settings',
     backToSite: 'Back to Site',
+
+    // Dashboard - Settings
+    settingsTitle: 'Settings',
+    settingsSubtitle: 'Manage your profile, account, and notification settings.',
+    artisanProfile: 'Artisan Profile',
+    artisanProfileDescription: 'Update your public-facing information.',
+    artisanNameLabel: 'Artisan Name',
+    bioLabel: 'Bio',
+    craftLabel: 'Craft',
+    locationLabel: 'Location',
+    profilePictureLabel: 'Profile Picture',
+    updateProfile: 'Update Profile',
+    updatingProfile: 'Updating...',
+    toastProfileUpdated: 'Profile Updated!',
+    accountSettings: 'Account Settings',
+    accountSettingsDescription: 'Manage your login details and account preferences.',
+    emailLabel: 'Email Address',
+    passwordLabel: 'Password',
+    changePassword: 'Change Password',
+    notifications: 'Notifications',
+    notificationsDescription: 'Choose how you want to be notified.',
+    notificationEmailLabel: 'Email Notifications',
+    notificationEmailDescription: 'Receive emails about new sales, messages, and platform updates.',
+    notificationPushLabel: 'Push Notifications',
+    notificationPushDescription: 'Get real-time alerts on your devices. (Coming soon)',
 
     // AI Storyteller
     aiStorytellerTitle: 'AI Storyteller',
@@ -308,7 +332,6 @@ export const translations: LanguageTranslations = {
     noProductsFound: 'कोई उत्पाद नहीं मिला',
     noProductsFoundSubtitle: 'अपनी खोज या फ़िल्टर समायोजित करने का प्रयास करें।',
     allArtisans: 'सभी कारीगर',
-    productSearchPlaceholder: 'उत्पाद के नाम या विवरण से खोजें...',
     noProductsFoundFilterSubtitle: "आप जो खोज रहे हैं उसे खोजने के लिए अपनी खोज या फ़िल्टर समायोजित करने का प्रयास करें।",
 
 
@@ -378,6 +401,31 @@ export const translations: LanguageTranslations = {
     aiTools: 'एआई उपकरण',
     settings: 'समायोजन',
     backToSite: 'साइट पर वापस',
+
+    // Dashboard - Settings
+    settingsTitle: 'समायोजन',
+    settingsSubtitle: 'अपनी प्रोफ़ाइल, खाता और अधिसूचना सेटिंग्स प्रबंधित करें।',
+    artisanProfile: 'कारीगर प्रोफ़ाइल',
+    artisanProfileDescription: 'अपनी सार्वजनिक जानकारी अपडेट करें।',
+    artisanNameLabel: 'कारीगर का नाम',
+    bioLabel: 'बायो',
+    craftLabel: 'शिल्प',
+    locationLabel: 'स्थान',
+    profilePictureLabel: 'प्रोफ़ाइल चित्र',
+    updateProfile: 'प्रोफ़ाइल अपडेट करें',
+    updatingProfile: 'अपडेट हो रहा है...',
+    toastProfileUpdated: 'प्रोफ़ाइल अपडेट हो गई!',
+    accountSettings: 'खाता समायोजन',
+    accountSettingsDescription: 'अपने लॉगिन विवरण और खाता प्राथमिकताएं प्रबंधित करें।',
+    emailLabel: 'ईमेल पता',
+    passwordLabel: 'पासवर्ड',
+    changePassword: 'पासवर्ड बदलें',
+    notifications: 'सूचनाएं',
+    notificationsDescription: 'आप कैसे सूचित होना चाहते हैं चुनें।',
+    notificationEmailLabel: 'ईमेल सूचनाएं',
+    notificationEmailDescription: 'नई बिक्री, संदेशों और प्लेटफ़ॉर्म अपडेट के बारे में ईमेल प्राप्त करें।',
+    notificationPushLabel: 'पुश सूचनाएं',
+    notificationPushDescription: 'अपने उपकरणों पर रीयल-टाइम अलर्ट प्राप्त करें। (जल्द आ रहा है)',
 
     // AI Storyteller
     aiStorytellerTitle: 'एआई कथाकार',
