@@ -14,11 +14,12 @@ import { useState, useEffect } from "react";
 import { Product, Artisan } from "@/lib/types";
 import { getArtisan, getProducts } from "@/services/supabase";
 
-export default function ArtisanDetailPage({ params: { id } }: { params: { id: string } }) {
+export default function ArtisanDetailPage({ params }: { params: { id: string } }) {
   const { t, language } = useLanguage();
   const [artisan, setArtisan] = useState<Artisan | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const { id } = params;
 
   useEffect(() => {
     const fetchData = async () => {
