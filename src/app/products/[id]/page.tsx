@@ -21,12 +21,13 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
   const [product, setProduct] = useState<Product | null>(null);
   const [artisan, setArtisan] = useState<Artisan | null>(null);
   const [loading, setLoading] = useState(true);
+  const { id } = params;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const productData = await getProduct(params.id);
+        const productData = await getProduct(id);
         if (productData) {
           setProduct(productData);
           const artisanData = await getArtisan(productData.artisanId);
@@ -43,7 +44,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
     };
 
     fetchData();
-  }, [params.id]);
+  }, [id]);
   
   if (loading) {
     return (

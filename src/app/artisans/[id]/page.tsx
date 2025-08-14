@@ -18,16 +18,17 @@ export default function ArtisanDetailPage({ params }: { params: { id: string } }
   const [artisan, setArtisan] = useState<Artisan | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const { id } = params;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const artisanData = await getArtisan(params.id);
+        const artisanData = await getArtisan(id);
         if (artisanData) {
           setArtisan(artisanData);
           const allProducts = await getProducts();
-          const artisanProducts = allProducts.filter(p => p.artisanId === params.id);
+          const artisanProducts = allProducts.filter(p => p.artisanId === id);
           setProducts(artisanProducts);
         } else {
           notFound();
@@ -41,7 +42,7 @@ export default function ArtisanDetailPage({ params }: { params: { id: string } }
     };
 
     fetchData();
-  }, [params.id]);
+  }, [id]);
 
    if (loading) {
     return (
