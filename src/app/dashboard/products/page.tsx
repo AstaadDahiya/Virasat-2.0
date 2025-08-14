@@ -22,9 +22,10 @@ import {
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/context/language-context";
+import Link from "next/link";
 
 export default function DashboardProductsPage() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   return (
     <div className="space-y-8">
        <div className="flex items-center justify-between">
@@ -32,8 +33,10 @@ export default function DashboardProductsPage() {
             <h1 className="text-3xl font-bold font-headline">{t('myProducts')}</h1>
             <p className="text-muted-foreground">{t('myProductsSubtitle')}</p>
         </div>
-        <Button>
+        <Button asChild>
+          <Link href="/dashboard/products/new">
             <PlusCircle className="mr-2 h-4 w-4" /> {t('addProduct')}
+          </Link>
         </Button>
       </div>
 
@@ -63,7 +66,7 @@ export default function DashboardProductsPage() {
                 <TableRow key={product.id}>
                   <TableCell className="hidden sm:table-cell">
                     <Image
-                      alt={product.name}
+                      alt={language === 'hi' ? product.name_hi : product.name}
                       className="aspect-square rounded-md object-cover"
                       height="64"
                       src={product.images[0]}
@@ -71,9 +74,9 @@ export default function DashboardProductsPage() {
                       data-ai-hint="product image"
                     />
                   </TableCell>
-                  <TableCell className="font-medium">{product.name}</TableCell>
+                  <TableCell className="font-medium">{language === 'hi' ? product.name_hi : product.name}</TableCell>
                   <TableCell>
-                    <Badge variant="outline">{product.category}</Badge>
+                    <Badge variant="outline">{language === 'hi' ? product.category_hi : product.category}</Badge>
                   </TableCell>
                   <TableCell className="hidden md:table-cell text-right">₹{product.price.toFixed(2)}</TableCell>
                   <TableCell className="hidden md:table-cell text-right">{product.stock}</TableCell>

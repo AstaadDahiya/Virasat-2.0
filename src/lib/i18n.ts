@@ -119,6 +119,19 @@ export const translations: LanguageTranslations = {
     edit: 'Edit',
     delete: 'Delete',
     
+    // Dashboard - Add Product
+    addProductSubtitle: "Fill in the details below to add a new product to your store.",
+    productDetails: "Product Details",
+    productDetailsDescription: "Provide both English and Hindi details for a wider reach.",
+    productName: "Product Name",
+    productDescription: "Product Description",
+    productImages: "Product Images",
+    imageUploadPlaceholder: "Image upload functionality coming soon!",
+    saveProduct: "Save Product",
+    savingProduct: "Saving...",
+    toastProductAddedTitle: "Product Added!",
+    toastProductAddedDescription: "Your new product has been successfully added.",
+    
     // Dashboard - Sidebar
     aiTools: 'AI Tools',
     settings: 'Settings',
@@ -162,7 +175,6 @@ export const translations: LanguageTranslations = {
     pricingOptimizerSubtitle: 'Get competitive and profitable price suggestions for your products.',
     suggestPrice: 'Suggest a Price',
     suggestPriceDescription: 'Provide details about your product to receive a suggested price and the reasoning behind it.',
-    productName: 'Product Name',
     productNamePlaceholder: 'e.g., Hand-painted Blue Pottery Vase',
     materialsCostLabel: 'Materials Cost (₹)',
     laborCostLabel: 'Labor Cost (₹)',
@@ -337,6 +349,19 @@ export const translations: LanguageTranslations = {
     edit: 'संपादित करें',
     delete: 'हटाएं',
 
+    // Dashboard - Add Product
+    addProductSubtitle: "अपने स्टोर में एक नया उत्पाद जोड़ने के लिए नीचे दिए गए विवरण भरें।",
+    productDetails: "उत्पाद विवरण",
+    productDetailsDescription: "व्यापक पहुंच के लिए अंग्रेजी और हिंदी दोनों में विवरण प्रदान करें।",
+    productName: "उत्पाद का नाम",
+    productDescription: "उत्पाद विवरण",
+    productImages: "उत्पाद छवियाँ",
+    imageUploadPlaceholder: "छवि अपलोड कार्यक्षमता जल्द ही आ रही है!",
+    saveProduct: "उत्पाद सहेजें",
+    savingProduct: "सहेजा जा रहा है...",
+    toastProductAddedTitle: "उत्पाद जोड़ा गया!",
+    toastProductAddedDescription: "आपका नया उत्पाद सफलतापूर्वक जोड़ा गया है।",
+    
     // Dashboard - Sidebar
     aiTools: 'एआई उपकरण',
     settings: 'समायोजन',
@@ -380,7 +405,6 @@ export const translations: LanguageTranslations = {
     pricingOptimizerSubtitle: 'अपने उत्पादों के लिए प्रतिस्पर्धी और लाभदायक मूल्य सुझाव प्राप्त करें।',
     suggestPrice: 'एक मूल्य सुझाएं',
     suggestPriceDescription: 'एक सुझाए गए मूल्य और उसके पीछे के तर्क को प्राप्त करने के लिए अपने उत्पाद के बारे में विवरण प्रदान करें।',
-    productName: 'उत्पाद का नाम',
     productNamePlaceholder: 'उदा., हाथ से पेंट किया हुआ नीला मिट्टी का फूलदान',
     materialsCostLabel: 'सामग्री लागत (₹)',
     laborCostLabel: 'श्रम लागत (₹)',
