@@ -15,7 +15,7 @@ import { ShoppingCart, Star } from "lucide-react";
 import { useLanguage } from "@/context/language-context";
 
 export default function ProductDetailPage({ params }: { params: { id: string } }) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const product = products.find(p => p.id === params.id);
 
   if (!product) {
@@ -23,6 +23,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
   }
 
   const artisan = artisans.find(a => a.id === product.artisanId);
+  const productName = language === 'hi' ? product.name_hi : product.name;
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -30,12 +31,12 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
       <main className="flex-1 py-12 md:py-20">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-8 lg:gap-16">
-            <ProductGallery images={product.images} productName={product.name} />
+            <ProductGallery images={product.images} productName={productName} />
             
             <div className="flex flex-col">
               <div>
-                <Badge variant="secondary">{product.category}</Badge>
-                <h1 className="font-headline text-3xl md:text-4xl font-bold mt-2">{product.name}</h1>
+                <Badge variant="secondary">{language === 'hi' ? product.category_hi : product.category}</Badge>
+                <h1 className="font-headline text-3xl md:text-4xl font-bold mt-2">{productName}</h1>
                 <div className="mt-4 flex items-center gap-4">
                   <p className="text-3xl font-bold text-primary">₹{product.price.toFixed(2)}</p>
                   <div className="flex items-center gap-1">
@@ -43,7 +44,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
                     <span className="text-muted-foreground text-sm ml-1">{t('productReviews')}</span>
                   </div>
                 </div>
-                <p className="text-muted-foreground mt-4 leading-relaxed">{product.description}</p>
+                <p className="text-muted-foreground mt-4 leading-relaxed">{language === 'hi' ? product.description_hi : product.description}</p>
               </div>
 
               <Separator className="my-6" />
@@ -51,7 +52,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
               <div>
                 <h3 className="font-headline text-lg font-semibold mb-2">{t('productMaterials')}</h3>
                 <ul className="list-disc list-inside text-muted-foreground space-y-1">
-                  {product.materials.map(material => <li key={material}>{material}</li>)}
+                  {(language === 'hi' ? product.materials_hi : product.materials).map(material => <li key={material}>{material}</li>)}
                 </ul>
               </div>
 
@@ -63,11 +64,11 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
                   <div className="mt-6 bg-secondary p-4 rounded-lg flex items-center gap-4">
                     <Avatar className="h-16 w-16">
                       <AvatarImage src={artisan.profileImage} alt={artisan.name} data-ai-hint="indian artisan portrait" />
-                      <AvatarFallback>{artisan.name.charAt(0)}</AvatarFallback>
+                      <AvatarFallback>{(language === 'hi' ? artisan.name_hi : artisan.name).charAt(0)}</AvatarFallback>
                     </Avatar>
                     <div>
                       <p className="text-sm text-muted-foreground">{t('soldBy')}</p>
-                      <Link href={`/artisans/${artisan.id}`} className="font-semibold text-accent hover:underline font-headline text-lg">{artisan.name}</Link>
+                      <Link href={`/artisans/${artisan.id}`} className="font-semibold text-accent hover:underline font-headline text-lg">{language === 'hi' ? artisan.name_hi : artisan.name}</Link>
                     </div>
                   </div>
                 )}

@@ -30,7 +30,7 @@ const formSchema = z.object({
 
 export function TrendHarmonizerForm() {
   const { toast } = useToast();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<HarmonizeTrendsOutput | null>(null);
 
@@ -50,8 +50,8 @@ export function TrendHarmonizerForm() {
       }
 
       const output = await harmonizeTrends({
-          productCategory: product.category,
-          productDescription: product.description,
+          productCategory: language === 'hi' ? product.category_hi : product.category,
+          productDescription: language === 'hi' ? product.description_hi : product.description,
       });
       setResult(output);
     } catch (error) {
@@ -73,7 +73,7 @@ export function TrendHarmonizerForm() {
           <FormField control={form.control} name="productId" render={({ field }) => (
               <FormItem><FormLabel>{t('product')}</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder={t('selectProductToAnalyze')} /></SelectTrigger></FormControl><SelectContent><SelectContent>
                 {products.map(product => (
-                    <SelectItem key={product.id} value={product.id}>{product.name}</SelectItem>
+                    <SelectItem key={product.id} value={product.id}>{language === 'hi' ? product.name_hi : product.name}</SelectItem>
                 ))}
               </SelectContent></SelectContent></Select><FormMessage /></FormItem>
           )}/>

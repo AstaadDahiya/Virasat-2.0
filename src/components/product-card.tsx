@@ -15,7 +15,7 @@ interface ProductCardProps {
 
 export function ProductCard({ product }: ProductCardProps) {
   const artisan = artisans.find(a => a.id === product.artisanId);
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   return (
     <Card className="flex flex-col overflow-hidden rounded-lg shadow-md transition-shadow hover:shadow-xl h-full">
@@ -33,13 +33,13 @@ export function ProductCard({ product }: ProductCardProps) {
         </CardHeader>
       </Link>
       <CardContent className="p-4 flex-grow">
-        <Badge variant="secondary" className="mb-2">{product.category}</Badge>
+        <Badge variant="secondary" className="mb-2">{language === 'hi' ? product.category_hi : product.category}</Badge>
         <CardTitle className="text-lg font-headline leading-tight mb-1">
-          <Link href={`/products/${product.id}`}>{product.name}</Link>
+          <Link href={`/products/${product.id}`}>{language === 'hi' ? product.name_hi : product.name}</Link>
         </CardTitle>
         {artisan && (
           <p className="text-sm text-muted-foreground">
-            by <Link href={`/artisans/${artisan.id}`} className="hover:underline text-accent">{artisan.name}</Link>
+            by <Link href={`/artisans/${artisan.id}`} className="hover:underline text-accent">{language === 'hi' ? artisan.name_hi : artisan.name}</Link>
           </p>
         )}
       </CardContent>

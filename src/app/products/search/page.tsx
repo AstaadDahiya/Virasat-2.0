@@ -9,9 +9,7 @@ import { useLanguage } from "@/context/language-context";
 
 export default function ProductsSearchPage() {
   const { t } = useLanguage();
-  const categories = [...new Set(products.map(p => p.category))];
-  const artisanNames = [...new Set(artisans.map(a => a.name))];
-
+  
   return (
     <div className="flex min-h-screen flex-col">
       <SiteHeader />
@@ -28,7 +26,7 @@ export default function ProductsSearchPage() {
                 </p>
             </div>
           </div>
-          <ProductSearch products={products} categories={categories} artisans={artisanNames} />
+          <ProductSearch products={products} />
         </div>
       </main>
       <SiteFooter />

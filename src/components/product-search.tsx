@@ -13,28 +13,40 @@ import { useLanguage } from '@/context/language-context';
 
 interface ProductSearchProps {
   products: Product[];
-  categories: string[];
-  artisans: string[];
 }
 
-export function ProductSearch({ products, categories, artisans: artisanNames }: ProductSearchProps) {
-  const { t } = useLanguage();
+export function ProductSearch({ products }: ProductSearchProps) {
+  const { t, language } = useLanguage();
   const [searchTerm, setSearchTerm] = useState('');
   const [category, setCategory] = useState('all');
   const [artisan, setArtisan] = useState('all');
   const maxPrice = useMemo(() => Math.max(...products.map(p => p.price), 10000), [products]);
   const [priceRange, setPriceRange] = useState([0, maxPrice]);
 
+  const categories = useMemo(() => {
+    return [...new Set(products.map(p => language === 'hi' ? p.category_hi : p.category))]
+  }, [products, language]);
+
+  const artisanNames = useMemo(() => {
+    return [...new Set(artisans.map(a => language === 'hi' ? a.name_hi : a.name))]
+  }, [artisans, language]);
+
+
   const filteredProducts = useMemo(() => {
     return products.filter(product => {
       const productArtisan = artisans.find(a => a.id === product.artisanId);
-      const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) || product.description.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesCategory = category === 'all' || product.category === category;
-      const matchesArtisan = artisan === 'all' || productArtisan?.name === artisan;
+      const name = language === 'hi' ? product.name_hi : product.name;
+      const description = language === 'hi' ? product.description_hi : product.description;
+      const productCategory = language === 'hi' ? product.category_hi : product.category;
+      const artisanName = language === 'hi' ? productArtisan?.name_hi : productArtisan?.name;
+
+      const matchesSearch = name.toLowerCase().includes(searchTerm.toLowerCase()) || description.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory = category === 'all' || productCategory === category;
+      const matchesArtisan = artisan === 'all' || artisanName === artisan;
       const matchesPrice = product.price >= priceRange[0] && product.price <= priceRange[1];
       return matchesSearch && matchesCategory && matchesArtisan && matchesPrice;
     });
-  }, [products, searchTerm, category, artisan, priceRange]);
+  }, [products, searchTerm, category, artisan, priceRange, language]);
 
   return (
     <div>

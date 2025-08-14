@@ -32,7 +32,7 @@ const formSchema = z.object({
 
 export function MarketingSuiteForm() {
   const { toast } = useToast();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<GenerateMarketingContentOutput | null>(null);
 
@@ -55,8 +55,8 @@ export function MarketingSuiteForm() {
       }
 
       const output = await generateMarketingContent({
-          productName: product.name,
-          productDescription: product.description,
+          productName: language === 'hi' ? product.name_hi : product.name,
+          productDescription: language === 'hi' ? product.description_hi : product.description,
           targetAudience: values.targetAudience
       });
       setResult(output);
@@ -86,7 +86,7 @@ export function MarketingSuiteForm() {
           <FormField control={form.control} name="productId" render={({ field }) => (
               <FormItem><FormLabel>{t('product')}</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder={t('selectAProduct')} /></SelectTrigger></FormControl><SelectContent><SelectContent>
                 {products.map(product => (
-                    <SelectItem key={product.id} value={product.id}>{product.name}</SelectItem>
+                    <SelectItem key={product.id} value={product.id}>{language === 'hi' ? product.name_hi : product.name}</SelectItem>
                 ))}
               </SelectContent></SelectContent></Select><FormMessage /></FormItem>
           )}/>

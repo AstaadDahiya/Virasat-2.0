@@ -2,7 +2,6 @@
 
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { ProductCard } from "@/components/product-card";
 import { products } from "@/lib/data";
 import { ProductFilters } from "@/components/product-filters";
 import { useLanguage } from "@/context/language-context";

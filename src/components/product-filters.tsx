@@ -14,21 +14,30 @@ interface ProductFiltersProps {
   categories: string[];
 }
 
-export function ProductFilters({ products, categories }: ProductFiltersProps) {
-  const { t } = useLanguage();
+export function ProductFilters({ products, categories: englishCategories }: ProductFiltersProps) {
+  const { t, language } = useLanguage();
   const [searchTerm, setSearchTerm] = useState('');
   const [category, setCategory] = useState('all');
   const maxPrice = useMemo(() => Math.max(...products.map(p => p.price), 10000), [products]);
   const [priceRange, setPriceRange] = useState([0, maxPrice]);
 
+  const categories = useMemo(() => {
+    return [...new Set(products.map(p => language === 'hi' ? p.category_hi : p.category))]
+  }, [products, language]);
+
+
   const filteredProducts = useMemo(() => {
     return products.filter(product => {
-      const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) || product.description.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesCategory = category === 'all' || product.category === category;
+      const name = language === 'hi' ? product.name_hi : product.name;
+      const description = language === 'hi' ? product.description_hi : product.description;
+      const productCategory = language === 'hi' ? product.category_hi : product.category;
+
+      const matchesSearch = name.toLowerCase().includes(searchTerm.toLowerCase()) || description.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory = category === 'all' || productCategory === category;
       const matchesPrice = product.price >= priceRange[0] && product.price <= priceRange[1];
       return matchesSearch && matchesCategory && matchesPrice;
     });
-  }, [products, searchTerm, category, priceRange]);
+  }, [products, searchTerm, category, priceRange, language]);
 
   return (
     <div>
