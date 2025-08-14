@@ -4,7 +4,9 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import { Product } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
-import { useLanguage, translate } from './language-context';
+import { useLanguage } from './language-context';
+import { translate } from '@/lib/i18n';
+
 
 export interface CartItem extends Product {
   quantity: number;
@@ -90,21 +92,26 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       removeFromCart(productId);
       return;
     }
+    
+    const itemToUpdate = cartItems.find(item => item.id === productId);
+    if (itemToUpdate && quantity > itemToUpdate.stock) {
+        toast({
+            variant: 'destructive',
+            title: t('toastNotEnoughStockTitle'),
+            description: translate('toastNotEnoughStockDescription', language, { stock: itemToUpdate.stock.toString() }),
+        });
+        setCartItems(prevItems =>
+            prevItems.map(item =>
+                item.id === productId ? { ...item, quantity: item.stock } : item
+            )
+        );
+        return;
+    }
+
     setCartItems(prevItems =>
-      prevItems.map(item => {
-          if (item.id === productId) {
-               if (quantity > item.stock) {
-                 toast({
-                    variant: 'destructive',
-                    title: t('toastNotEnoughStockTitle'),
-                    description: translate('toastNotEnoughStockDescription', language, { stock: item.stock.toString() }),
-                 });
-                 return { ...item, quantity: item.stock };
-               }
-               return { ...item, quantity };
-          }
-        return item;
-      })
+      prevItems.map(item =>
+        item.id === productId ? { ...item, quantity } : item
+      )
     );
   };
   
