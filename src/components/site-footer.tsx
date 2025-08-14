@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Logo } from './logo';
@@ -22,9 +23,9 @@ export function SiteFooter() {
             <h3 className="font-semibold mb-4 font-headline">{t('shop')}</h3>
             <ul className="space-y-2">
               <li><Link href="/products" className="text-sm hover:underline">{t('allProducts')}</Link></li>
-              <li><Link href="/products?category=Block-Printing" className="text-sm hover:underline">Block-Printing</Link></li>
-              <li><Link href="/products?category=Wood Carving" className="text-sm hover:underline">Wood Carving</Link></li>
-              <li><Link href="/products?category=Embroidery" className="text-sm hover:underline">Embroidery</Link></li>
+              <li><Link href="/products?category=Block-Printing" className="text-sm hover:underline">{t('categoryBlockPrinting')}</Link></li>
+              <li><Link href="/products?category=Wood Carving" className="text-sm hover:underline">{t('categoryWoodCarving')}</Link></li>
+              <li><Link href="/products?category=Embroidery" className="text-sm hover:underline">{t('categoryEmbroidery')}</Link></li>
             </ul>
           </div>
           <div>

@@ -1,3 +1,4 @@
+
 type Translations = {
   [key: string]: string;
 };
@@ -44,6 +45,11 @@ export const translations: LanguageTranslations = {
     allRightsReserved: 'All rights reserved.',
     termsOfService: 'Terms of Service',
     privacyPolicy: 'Privacy Policy',
+
+    // Categories
+    categoryBlockPrinting: 'Block-Printing',
+    categoryWoodCarving: 'Wood Carving',
+    categoryEmbroidery: 'Embroidery',
 
     // Product Page
     viewDetails: 'View Details',
@@ -275,6 +281,11 @@ export const translations: LanguageTranslations = {
     allRightsReserved: 'सर्वाधिकार सुरक्षित।',
     termsOfService: 'सेवा की शर्तें',
     privacyPolicy: 'गोपनीयता नीति',
+
+    // Categories
+    categoryBlockPrinting: 'ब्लॉक-प्रिंटिंग',
+    categoryWoodCarving: 'लकड़ी की नक्काशी',
+    categoryEmbroidery: 'कढ़ाई',
 
     // Product Page
     viewDetails: 'विवरण देखें',
