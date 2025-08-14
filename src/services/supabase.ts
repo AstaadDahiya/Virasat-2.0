@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabase";
 import type { Artisan, Product } from "@/lib/types";
 import type { User } from '@supabase/supabase-js';
 
+
 const uploadImages = async (images: File[], artisanId: string): Promise<string[]> => {
     const imageUrls: string[] = [];
     for (const image of images) {
@@ -16,7 +17,7 @@ const uploadImages = async (images: File[], artisanId: string): Promise<string[]
         if (uploadError) {
             console.error('Error uploading image:', uploadError);
             if (uploadError.message.includes('permission') || uploadError.message.includes('policy')) {
-                 throw new Error(`Failed to upload image due to a permissions issue. Please check that your 'product-images' bucket in Supabase allows public inserts.`);
+                 throw new Error(`Storage permission error. Please check that your 'product-images' bucket in Supabase allows public inserts. Original error: ${uploadError.message}`);
             }
             throw new Error(`Failed to upload image: ${image.name}. Reason: ${uploadError.message}`);
         }
@@ -47,7 +48,7 @@ export const addProduct = async (productData: Omit<Product, 'id' | 'images'>, im
         const productToAdd = {
             ...productData,
             images: imageUrls,
-            artisanId: artisanId,
+            artisanId: artisanId, 
         };
         
         const { data: newProduct, error } = await supabase
