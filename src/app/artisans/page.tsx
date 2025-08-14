@@ -4,30 +4,12 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { ArtisanCard } from "@/components/artisan-card";
 import { useLanguage } from "@/context/language-context";
-import { useState, useEffect } from "react";
-import { Artisan } from "@/lib/types";
-import { getArtisans } from "@/services/firestore";
+import { useData } from "@/context/data-context";
 import { Loader2 } from "lucide-react";
 
 export default function ArtisansPage() {
   const { t } = useLanguage();
-  const [artisans, setArtisans] = useState<Artisan[]>([]);
-  const [loading, setLoading] = useState(true);
-
-   useEffect(() => {
-    const fetchArtisans = async () => {
-      try {
-        setLoading(true);
-        const artisansData = await getArtisans();
-        setArtisans(artisansData);
-      } catch (error) {
-        console.error("Failed to fetch artisans:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchArtisans();
-  }, []);
+  const { artisans, loading } = useData();
 
   return (
     <div className="flex min-h-screen flex-col">

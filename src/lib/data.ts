@@ -3,7 +3,10 @@
 
 import type { Product, Artisan } from './types';
 
-export const artisans: Omit<Artisan,'id'>[] = [
+// The ID property is not needed here as Firestore will generate it.
+// However, to maintain the relationship, we use a temporary, predictable ID
+// that will be replaced during the actual seeding process in firestore.ts.
+export const artisans: Omit<Artisan, 'id'>[] = [
   {
     name: 'Priya Sharma',
     name_hi: 'प्रिया शर्मा',
@@ -47,7 +50,7 @@ export const products: Omit<Product, 'id'>[] = [
     description_hi: 'एक खूबसूरती से दस्तकारी टेबल रनर, जो आपके डाइनिंग टेबल में राजस्थानी लालित्य का स्पर्श जोड़ने के लिए एकदम सही है। इसमें इंडिगो और सफेद रंग में एक क्लासिक पुष्प रूपांकन है।',
     price: 2500.0,
     images: ['https://image2url.com/images/1755012548151-37da720e-1283-4244-8dca-c47b3c720224.webp', 'https://placehold.co/600x600.png', 'https://placehold.co/600x600.png'],
-    artisanId: 'artisan-1',
+    artisanId: 'artisan-1', // This will be replaced with real ID after seeding
     category: 'Block-Printing',
     category_hi: 'ब्लॉक-प्रिंटिंग',
     stock: 15,

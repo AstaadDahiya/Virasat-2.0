@@ -9,32 +9,12 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { ArrowRight, Loader2 } from "lucide-react";
 import { useLanguage } from "@/context/language-context";
-import { useEffect, useState } from "react";
-import { Product, Artisan } from "@/lib/types";
-import { getProducts, getArtisans } from "@/services/firestore";
+import { useData } from "@/context/data-context";
 
 
 export default function Home() {
   const { t } = useLanguage();
-  const [products, setProducts] = useState<Product[]>([]);
-  const [artisans, setArtisans] = useState<Artisan[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const [productsData, artisansData] = await Promise.all([getProducts(), getArtisans()]);
-        setProducts(productsData);
-        setArtisans(artisansData);
-      } catch (error) {
-        console.error("Failed to fetch data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
+  const { products, artisans, loading } = useData();
 
   const featuredProducts = products.slice(0, 4);
   const featuredArtisans = artisans.slice(0, 3);

@@ -22,29 +22,11 @@ import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/context/language-context";
 import Link from "next/link";
-import { useState, useEffect } from "react";
-import { Product } from "@/lib/types";
-import { getProducts } from "@/services/firestore";
+import { useData } from "@/context/data-context";
 
 export default function DashboardProductsPage() {
   const { t, language } = useLanguage();
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-
-   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        setLoading(true);
-        const productsData = await getProducts();
-        setProducts(productsData);
-      } catch (error) {
-        console.error("Failed to fetch products:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProducts();
-  }, []);
+  const { products, loading } = useData();
 
   return (
     <div className="space-y-8">

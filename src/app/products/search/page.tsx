@@ -5,31 +5,11 @@ import { SiteFooter } from "@/components/site-footer";
 import { ProductSearch } from "@/components/product-search";
 import { Loader2, Search } from "lucide-react";
 import { useLanguage } from "@/context/language-context";
-import { useState, useEffect } from "react";
-import { Product, Artisan } from "@/lib/types";
-import { getProducts, getArtisans } from "@/services/firestore";
+import { useData } from "@/context/data-context";
 
 export default function ProductsSearchPage() {
   const { t } = useLanguage();
-  const [products, setProducts] = useState<Product[]>([]);
-  const [artisans, setArtisans] = useState<Artisan[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const [productsData, artisansData] = await Promise.all([getProducts(), getArtisans()]);
-        setProducts(productsData);
-        setArtisans(artisansData);
-      } catch (error) {
-        console.error("Failed to fetch data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
+  const { products, artisans, loading } = useData();
   
   return (
     <div className="flex min-h-screen flex-col">

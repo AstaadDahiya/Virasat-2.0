@@ -4,6 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { LanguageProvider } from "@/context/language-context";
+import { DataProvider } from "@/context/data-context";
 
 export const metadata: Metadata = {
   title: "VIRASAT",
@@ -29,7 +30,9 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={cn("min-h-screen bg-background font-body antialiased", alegreya.variable)}>
         <LanguageProvider>
-          {children}
+          <DataProvider>
+            {children}
+          </DataProvider>
         </LanguageProvider>
         <Toaster />
       </body>

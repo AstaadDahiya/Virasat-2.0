@@ -8,7 +8,7 @@ import { Slider } from '@/components/ui/slider';
 import { ProductCard } from './product-card';
 import { Search } from 'lucide-react';
 import { useLanguage } from '@/context/language-context';
-import { getArtisans } from '@/services/firestore';
+import { useData } from '@/context/data-context';
 
 interface ProductFiltersProps {
   products: Product[];
@@ -16,9 +16,9 @@ interface ProductFiltersProps {
 
 export function ProductFilters({ products }: ProductFiltersProps) {
   const { t, language } = useLanguage();
+  const { artisans } = useData();
   const [searchTerm, setSearchTerm] = useState('');
   const [category, setCategory] = useState('all');
-  const [artisans, setArtisans] = useState<Artisan[]>([]);
   
   const maxPrice = useMemo(() => {
       if(products.length === 0) return 10000;
@@ -32,14 +32,6 @@ export function ProductFilters({ products }: ProductFiltersProps) {
         setPriceRange([0, maxPrice]);
       }
   }, [products, maxPrice]);
-
-  useEffect(() => {
-    const fetchArtisans = async () => {
-        const artisansData = await getArtisans();
-        setArtisans(artisansData);
-    }
-    fetchArtisans();
-  }, []);
 
   const categories = useMemo(() => {
     return [...new Set(products.map(p => language === 'hi' ? p.category_hi : p.category))]

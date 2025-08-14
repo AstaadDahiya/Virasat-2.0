@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -22,8 +22,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { useLanguage } from "@/context/language-context";
-import { Product } from "@/lib/types";
-import { getProducts } from "@/services/firestore";
+import { useData } from "@/context/data-context";
 
 const formSchema = z.object({
   productId: z.string({ required_error: "Please select a product." }),
@@ -32,18 +31,9 @@ const formSchema = z.object({
 export function TrendHarmonizerForm() {
   const { toast } = useToast();
   const { t, language } = useLanguage();
+  const { products } = useData();
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<HarmonizeTrendsOutput | null>(null);
-  const [products, setProducts] = useState<Product[]>([]);
-
-  useEffect(() => {
-    const fetchProducts = async () => {
-        const productsData = await getProducts();
-        setProducts(productsData);
-    }
-    fetchProducts();
-  }, []);
-
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),

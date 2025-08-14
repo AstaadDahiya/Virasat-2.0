@@ -13,29 +13,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useLanguage } from "@/context/language-context";
-import { useState, useEffect } from "react";
-import { Product } from "@/lib/types";
-import { getProducts } from "@/services/firestore";
+import { useData } from "@/context/data-context";
 
 export default function DashboardPage() {
   const { t, language } = useLanguage();
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-
-   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        setLoading(true);
-        const productsData = await getProducts();
-        setProducts(productsData);
-      } catch (error) {
-        console.error("Failed to fetch products:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProducts();
-  }, []);
+  const { products, loading } = useData();
   
   const recentProducts = products.slice(0, 5);
 

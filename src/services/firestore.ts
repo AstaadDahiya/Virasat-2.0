@@ -2,7 +2,7 @@ import { db, storage } from "@/lib/firebase";
 import { Product, ProductFormData, Artisan } from "@/lib/types";
 import { collection, addDoc, getDocs, doc, getDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { products, artisans } from "@/lib/data"; // for seeding
+import { products as seedDataProducts, artisans as seedDataArtisans } from "@/lib/data"; // for seeding
 
 // Function to upload images to Firebase Storage and get their URLs
 const uploadImages = async (images: File[]): Promise<string[]> => {
@@ -38,7 +38,7 @@ export const getProducts = async (): Promise<Product[]> => {
     try {
         const querySnapshot = await getDocs(collection(db, "products"));
         if (querySnapshot.empty) {
-            // If no products, seed the database
+            console.log("No products found, seeding database...");
             await seedProducts();
             const seededSnapshot = await getDocs(collection(db, "products"));
             return seededSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Product));
@@ -58,6 +58,7 @@ export const getProduct = async (id: string): Promise<Product | null> => {
         if (docSnap.exists()) {
             return { id: docSnap.id, ...docSnap.data() } as Product;
         } else {
+            console.log("No such product!");
             return null;
         }
     } catch (e) {
@@ -71,6 +72,7 @@ export const getArtisans = async (): Promise<Artisan[]> => {
     try {
         const querySnapshot = await getDocs(collection(db, "artisans"));
          if (querySnapshot.empty) {
+            console.log("No artisans found, seeding database...");
             await seedArtisans();
             const seededSnapshot = await getDocs(collection(db, "artisans"));
             return seededSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Artisan));
@@ -91,6 +93,7 @@ export const getArtisan = async (id: string): Promise<Artisan | null> => {
         if (docSnap.exists()) {
             return { id: docSnap.id, ...docSnap.data() } as Artisan;
         } else {
+             console.log("No such artisan!");
             return null;
         }
     } catch (e) {
@@ -105,11 +108,9 @@ export const getArtisan = async (id: string): Promise<Artisan | null> => {
 
 const seedProducts = async () => {
     console.log("Seeding products...");
-    for (const product of products) {
-        // We remove the id because Firestore will generate one
-        const { id, ...productData } = product; 
+    for (const product of seedDataProducts) {
         try {
-            await addDoc(collection(db, "products"), productData);
+            await addDoc(collection(db, "products"), product);
         } catch (error) {
             console.error("Error seeding product:", product.name, error);
         }
@@ -119,11 +120,10 @@ const seedProducts = async () => {
 
 const seedArtisans = async () => {
     console.log("Seeding artisans...");
-    for (const artisan of artisans) {
-         // We remove the id because Firestore will generate one
-        const { id, ...artisanData } = artisan;
+    for (const artisan of seedDataArtisans) {
         try {
-            await addDoc(collection(db, "artisans"), artisanData);
+            // Firestore will auto-generate an ID if we don't specify one
+            await addDoc(collection(db, "artisans"), artisan);
         } catch (error) {
             console.error("Error seeding artisan:", artisan.name, error);
         }
