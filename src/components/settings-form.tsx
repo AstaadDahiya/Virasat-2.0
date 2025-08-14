@@ -23,6 +23,7 @@ import { useAuth } from "@/context/auth-context";
 import { supabase } from "@/lib/supabase";
 import { Artisan } from "@/lib/types";
 import Image from "next/image";
+import { ensureArtisanProfile } from "@/services/supabase";
 
 const formSchema = z.object({
   name: z.string().min(2, "Name is required"),
@@ -40,7 +41,7 @@ export function SettingsForm() {
   const { toast } = useToast();
   const { t } = useLanguage();
   const { user, loading: authLoading } = useAuth();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [artisan, setArtisan] = useState<Artisan | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -56,26 +57,34 @@ export function SettingsForm() {
   });
 
   useEffect(() => {
-    if (user) {
-      const fetchArtisan = async () => {
-        setLoading(true);
+    const fetchArtisan = async () => {
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+      setLoading(true);
+      try {
+        await ensureArtisanProfile(user); // Make sure profile exists
         const { data, error } = await supabase
           .from('artisans')
           .select('*')
           .eq('id', user.id)
           .single();
 
-        if (data) {
-          setArtisan(data);
-          form.reset(data);
-          if (data.profileImage) {
-            setPreview(data.profileImage)
-          }
-        } else if (error && error.code !== 'PGRST116') {
-            toast({ variant: 'destructive', title: t('toastErrorTitle'), description: error.message });
+        if (error) throw error;
+        
+        setArtisan(data);
+        form.reset(data);
+        if (data.profileImage) {
+          setPreview(data.profileImage);
         }
+      } catch (error: any) {
+        toast({ variant: 'destructive', title: t('toastErrorTitle'), description: error.message });
+      } finally {
         setLoading(false);
-      };
+      }
+    };
+    if (user) {
       fetchArtisan();
     }
   }, [user, form, t, toast]);
@@ -97,7 +106,7 @@ export function SettingsForm() {
         const newImageFile = values.profileImage;
 
         if (newImageFile && newImageFile instanceof File) {
-             const filePath = `public/${user.id}/${Date.now()}-${newImageFile.name}`;
+             const filePath = `${user.id}/${Date.now()}-${newImageFile.name}`;
              const { error: uploadError } = await supabase.storage.from('product-images').upload(filePath, newImageFile, { upsert: true });
              if (uploadError) throw uploadError;
              const { data: urlData } = supabase.storage.from('product-images').getPublicUrl(filePath);
@@ -178,3 +187,5 @@ export function SettingsForm() {
     </Form>
   );
 }
+
+    

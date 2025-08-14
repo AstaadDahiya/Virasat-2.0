@@ -1,3 +1,4 @@
+
 export type Product = {
   id: string;
   name: string;
@@ -30,3 +31,5 @@ export type Artisan = {
 export type ProductFormData = Omit<Product, 'id' | 'images' | 'artisanId'> & {
   images: File[];
 }
+
+    

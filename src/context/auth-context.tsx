@@ -3,15 +3,16 @@
 
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Session, User } from '@supabase/supabase-js';
+import { AuthError, AuthResponse, Session, User } from '@supabase/supabase-js';
+import { ensureArtisanProfile } from '@/services/supabase';
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  signIn: (email, password) => Promise<any>;
-  signOut: () => Promise<any>;
-  signUp: (email, password) => Promise<any>;
-  updatePassword: (password: string) => Promise<any>;
+  signIn: (email, password) => Promise<AuthResponse>;
+  signOut: () => Promise<{ error: AuthError | null }>;
+  signUp: (email, password) => Promise<AuthResponse>;
+  updatePassword: (password: string) => Promise<AuthResponse>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -42,26 +43,32 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const signIn = async (email, password) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) throw error;
+    const response = await supabase.auth.signInWithPassword({ email, password });
+    if (response.error) throw response.error;
+    if (response.data.user) {
+        // This ensures a profile exists on login, in case it was missed at sign-up
+        await ensureArtisanProfile(response.data.user);
+    }
+    return response;
   };
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
+    return await supabase.auth.signOut();
   };
 
   const signUp = async (email, password) => {
-    const { error } = await supabase.auth.signUp({
+    const response = await supabase.auth.signUp({
       email,
       password,
     });
-    if (error) throw error;
+    if (response.error) throw response.error;
+    return response;
   };
 
   const updatePassword = async (password: string) => {
-    const { error } = await supabase.auth.updateUser({ password });
-    if (error) throw error;
+    const response = await supabase.auth.updateUser({ password });
+    if (response.error) throw response.error;
+    return response;
   }
 
   const value = {
@@ -83,3 +90,5 @@ export const useAuth = (): AuthContextType => {
   }
   return context;
 };
+
+    

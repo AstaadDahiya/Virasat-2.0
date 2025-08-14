@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useForm } from "react-hook-form";
@@ -21,6 +22,7 @@ import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { addProduct } from "@/services/supabase";
 import Image from "next/image";
+import { useAuth } from "@/context/auth-context";
 
 
 const formSchema = z.object({
@@ -41,6 +43,7 @@ export function AddProductForm() {
   const { toast } = useToast();
   const { t } = useLanguage();
   const router = useRouter();
+  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [previews, setPreviews] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -65,8 +68,18 @@ export function AddProductForm() {
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
     if (files.length > 0) {
-        form.setValue("images", files);
-        const newPreviews = files.map(file => URL.createObjectURL(file));
+        const currentImages = form.getValues("images");
+        const combined = [...currentImages, ...files];
+        if (combined.length > 5) {
+            toast({
+                variant: "destructive",
+                title: "Too many images",
+                description: "You can upload a maximum of 5 images.",
+            });
+            return;
+        }
+        form.setValue("images", combined);
+        const newPreviews = combined.map(file => URL.createObjectURL(file));
         setPreviews(newPreviews);
     }
   };
@@ -76,12 +89,16 @@ export function AddProductForm() {
     const newImages = currentImages.filter((_, i) => i !== index);
     form.setValue("images", newImages);
 
-    const newPreviews = previews.filter((_, i) => i !== index);
+    const newPreviews = newImages.map(file => URL.createObjectURL(file));
     setPreviews(newPreviews);
   };
 
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    if (!user) {
+        toast({ variant: "destructive", title: "Authentication Error", description: "You must be logged in to add a product." });
+        return;
+    }
     setLoading(true);
     
     const productData = {
@@ -91,18 +108,19 @@ export function AddProductForm() {
     };
     
     try {
-        await addProduct(productData);
+        await addProduct(productData, user.id);
         toast({
             title: t('toastProductAddedTitle'),
             description: t('toastProductAddedDescription'),
         });
         router.push('/dashboard/products');
+        router.refresh(); // To show the new product in the list
     } catch(error) {
         console.error("Failed to add product:", error);
         toast({
             variant: "destructive",
             title: t('toastErrorTitle'),
-            description: "Failed to add product. Please try again.",
+            description: error instanceof Error ? error.message : "An unknown error occurred.",
         });
     } finally {
         setLoading(false);
@@ -218,7 +236,7 @@ export function AddProductForm() {
                                 type="button"
                                 variant="outline"
                                 onClick={() => fileInputRef.current?.click()}
-                                disabled={loading}
+                                disabled={loading || previews.length >= 5}
                             >
                                 <Upload className="mr-2" /> {t('uploadImage')}
                             </Button>
@@ -262,3 +280,5 @@ export function AddProductForm() {
     </Form>
   );
 }
+
+    

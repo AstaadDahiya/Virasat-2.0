@@ -21,6 +21,7 @@ import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 import { Terminal } from "lucide-react";
+import { ensureArtisanProfile } from "@/services/supabase";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address." }),
@@ -48,7 +49,10 @@ export function SignUpForm() {
     setError(null);
     setSuccess(false);
     try {
-      await signUp(values.email, values.password);
+      const { data } = await signUp(values.email, values.password);
+      if (data.user) {
+        await ensureArtisanProfile(data.user);
+      }
       setSuccess(true);
       toast({
         title: "Sign Up Successful",
@@ -119,3 +123,4 @@ export function SignUpForm() {
   );
 }
 
+    
