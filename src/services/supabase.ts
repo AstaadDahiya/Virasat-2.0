@@ -122,17 +122,29 @@ export const addProduct = async (productData: ProductFormData): Promise<string> 
             .eq('id', user.id)
             .single();
 
-        if (artisanError || !artisan) {
+        // If no artisan profile exists, create one.
+        if (artisanError && artisanError.code === 'PGRST116') {
             console.log("No artisan profile found for user, creating one...");
-             const { error: rpcError } = await supabase.rpc('create_artisan_for_new_user', {
-                user_id: user.id,
-                user_email: user.email
+            const { error: createError } = await supabase.from('artisans').insert({
+                id: user.id,
+                name: user.email?.split('@')[0] || 'New Artisan',
+                name_hi: 'नया कारीगर',
+                bio: 'Please update your bio.',
+                bio_hi: 'कृपया अपनी जीवनी अपडेट करें।',
+                craft: 'Not specified',
+                craft_hi: 'निर्दिष्ट नहीं है',
+                location: 'Not specified',
+                location_hi: 'निर्दिष्ट नहीं है',
+                profileImage: `https://placehold.co/100x100.png`
             });
 
-            if (rpcError) {
-                 console.error("Error creating artisan via RPC:", rpcError);
-                 throw new Error("Could not find or create a matching artisan for the logged-in user.");
+            if (createError) {
+                console.error("Error creating artisan profile:", createError);
+                throw new Error("Could not create a matching artisan for the logged-in user.");
             }
+        } else if (artisanError) {
+            console.error("Error fetching artisan:", artisanError);
+            throw artisanError;
         }
         
         const artisanId = user.id;
