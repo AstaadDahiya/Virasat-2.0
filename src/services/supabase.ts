@@ -1,7 +1,9 @@
 
+
 "use server";
 
-import { supabase } from "@/lib/supabase";
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 import type { Artisan, Product } from "@/lib/types";
 import type { User } from '@supabase/supabase-js';
 
@@ -9,7 +11,7 @@ import type { User } from '@supabase/supabase-js';
 type ProductInsertData = Omit<Product, 'id' | 'images' | 'artisanId'>;
 
 
-const uploadImages = async (images: File[], artisanId: string): Promise<string[]> => {
+const uploadImages = async (supabase: any, images: File[], artisanId: string): Promise<string[]> => {
     const imageUrls: string[] = [];
     for (const image of images) {
         const filePath = `${artisanId}/${Date.now()}-${image.name}`;
@@ -35,6 +37,18 @@ const uploadImages = async (images: File[], artisanId: string): Promise<string[]
 };
 
 export const addProduct = async (productData: ProductInsertData, images: File[]): Promise<string> => {
+    const cookieStore = cookies();
+    const supabase = createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+            cookies: {
+                get(name: string) {
+                    return cookieStore.get(name)?.value;
+                },
+            },
+        }
+    );
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -48,7 +62,7 @@ export const addProduct = async (productData: ProductInsertData, images: File[])
         // First, ensure the user has an artisan profile. This is idempotent.
         await ensureArtisanProfile(user);
 
-        const imageUrls = await uploadImages(images, user.id);
+        const imageUrls = await uploadImages(supabase, images, user.id);
         
         const productToAdd = {
             ...productData,
@@ -80,6 +94,18 @@ export const addProduct = async (productData: ProductInsertData, images: File[])
 
 
 export const getProducts = async (): Promise<Product[]> => {
+    const cookieStore = cookies();
+    const supabase = createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+            cookies: {
+                get(name: string) {
+                    return cookieStore.get(name)?.value;
+                },
+            },
+        }
+    );
     try {
         const { data, error } = await supabase.from('products').select('*').order('name', { ascending: true });
         if (error) throw error;
@@ -91,6 +117,18 @@ export const getProducts = async (): Promise<Product[]> => {
 };
 
 export const getProduct = async (id: string): Promise<Product | null> => {
+     const cookieStore = cookies();
+    const supabase = createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+            cookies: {
+                get(name: string) {
+                    return cookieStore.get(name)?.value;
+                },
+            },
+        }
+    );
     try {
         const { data, error } = await supabase.from('products').select('*').eq('id', id).single();
         if (error) {
@@ -108,6 +146,18 @@ export const getProduct = async (id: string): Promise<Product | null> => {
 };
 
 export const getArtisans = async (): Promise<Artisan[]> => {
+     const cookieStore = cookies();
+    const supabase = createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+            cookies: {
+                get(name: string) {
+                    return cookieStore.get(name)?.value;
+                },
+            },
+        }
+    );
     try {
         const { data, error } = await supabase.from('artisans').select('*').order('name', { ascending: true });
         if (error) throw error;
@@ -119,6 +169,18 @@ export const getArtisans = async (): Promise<Artisan[]> => {
 };
 
 export const getArtisan = async (id: string): Promise<Artisan | null> => {
+    const cookieStore = cookies();
+    const supabase = createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+            cookies: {
+                get(name: string) {
+                    return cookieStore.get(name)?.value;
+                },
+            },
+        }
+    );
     try {
         const { data, error } = await supabase.from('artisans').select('*').eq('id', id).single();
         if (error) {
@@ -136,6 +198,18 @@ export const getArtisan = async (id: string): Promise<Artisan | null> => {
 };
 
 export const ensureArtisanProfile = async (user: User): Promise<void> => {
+    const cookieStore = cookies();
+    const supabase = createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+            cookies: {
+                get(name: string) {
+                    return cookieStore.get(name)?.value;
+                },
+            },
+        }
+    );
     // First, check if a profile already exists.
     const { data: existingProfile, error: selectError } = await supabase
       .from('artisans')
@@ -167,10 +241,7 @@ export const ensureArtisanProfile = async (user: User): Promise<void> => {
       if (insertError) {
         console.error('Error creating artisan profile:', insertError);
         // Check for specific RLS violation error
-        if (insertError.code === '23503' || insertError.message.includes('foreign key constraint')) {
-             throw new Error("Database reference error. Ensure the user exists in 'auth.users' before creating a profile.");
-        }
-         if (insertError.code === '42501' || insertError.message.includes('permission denied') || insertError.message.includes('row-level security')) {
+        if (insertError.code === '42501' || insertError.message.includes('permission denied') || insertError.message.includes('row-level security')) {
             throw new Error("Database permission denied. Please ensure Row Level Security (RLS) is enabled on the 'artisans' table and that a policy allows authenticated users to insert their own profile.");
         }
         throw new Error('Database error creating new user');

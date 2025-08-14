@@ -22,7 +22,6 @@ import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { addProduct } from "@/services/supabase";
 import Image from "next/image";
-import { useAuth } from "@/context/auth-context";
 import { useData } from "@/context/data-context";
 
 
@@ -44,7 +43,6 @@ export function AddProductForm() {
   const { toast } = useToast();
   const { t } = useLanguage();
   const router = useRouter();
-  const { user } = useAuth();
   const { refreshData } = useData();
   const [loading, setLoading] = useState(false);
   const [previews, setPreviews] = useState<string[]>([]);
@@ -97,13 +95,10 @@ export function AddProductForm() {
 
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    if (!user) {
-        toast({ variant: "destructive", title: "Authentication Error", description: "You must be logged in to add a product." });
-        return;
-    }
     setLoading(true);
     
     try {
+        // This is the correct way to separate files from the rest of the data.
         const { images, ...productInfo } = values;
         
         const productData = {
@@ -112,6 +107,7 @@ export function AddProductForm() {
             materials_hi: values.materials_hi.split(',').map(m => m.trim()),
         };
 
+        // Pass the serializable data and the files as separate arguments.
         await addProduct(productData, images);
         
         toast({

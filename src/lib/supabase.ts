@@ -7,4 +7,5 @@ if (!supabaseUrl || !supabaseAnonKey) {
     throw new Error('Supabase URL and anon key are required.');
 }
 
+// This client is fine for client-side code but should not be used in server actions.
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
