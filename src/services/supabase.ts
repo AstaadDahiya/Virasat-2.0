@@ -6,7 +6,8 @@ import type { Artisan, Product } from "@/lib/types";
 import type { User } from '@supabase/supabase-js';
 
 // Defines the shape of the data coming from the form, excluding fields that are handled separately.
-type ProductInsertData = Omit<Product, 'id' | 'images'>;
+type ProductInsertData = Omit<Product, 'id' | 'images' | 'artisanId'>;
+
 
 const uploadImages = async (images: File[], artisanId: string): Promise<string[]> => {
     const imageUrls: string[] = [];
@@ -34,9 +35,7 @@ const uploadImages = async (images: File[], artisanId: string): Promise<string[]
 };
 
 
-export const addProduct = async (productData: ProductInsertData, images: File[]): Promise<string> => {
-    const { artisanId } = productData;
-
+export const addProduct = async (productData: ProductInsertData, images: File[], artisanId: string): Promise<string> => {
     if (!artisanId) {
         throw new Error("You must be logged in to add a product.");
     }
@@ -157,6 +156,10 @@ export const ensureArtisanProfile = async (user: User): Promise<void> => {
 
       if (insertError) {
         console.error('Error creating artisan profile:', insertError);
+        // Check for specific RLS violation error
+        if (insertError.code === '42501') {
+            throw new Error("Database permission denied. Please ensure Row Level Security (RLS) is enabled on the 'artisans' table and that a policy allows authenticated users to insert their own profile.");
+        }
         throw new Error('Database error creating new user');
       }
     } else if (selectError) {
