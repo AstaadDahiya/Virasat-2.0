@@ -1,22 +1,23 @@
+"use server";
+
 import { supabase } from "@/lib/supabase";
 import { Product, ProductFormData, Artisan } from "@/lib/types";
 import { products as seedDataProducts, artisans as seedDataArtisans } from "@/lib/data";
 
 let isSeeding = false;
+let seedingCompleted = false;
 
 // --- Seeding Function ---
 const seedDatabase = async () => {
-    if (isSeeding) return;
+    if (isSeeding || seedingCompleted) return;
     isSeeding = true;
     console.log("Checking if Supabase seeding is needed...");
 
     try {
-        const { data: products, error: productsError } = await supabase.from('products').select('id').limit(1);
-        const { data: artisans, error: artisansError } = await supabase.from('artisans').select('id').limit(1);
+        const { count: productsCount, error: productsError } = await supabase.from('products').select('*', { count: 'exact', head: true });
+        if (productsError) throw productsError;
 
-        if (productsError || artisansError) throw productsError || artisansError;
-
-        if (products.length === 0 && artisans.length === 0) {
+        if (productsCount === 0) {
             console.log("Supabase is empty. Seeding products and artisans...");
             
             // Seed Artisans and get their new IDs
@@ -51,13 +52,14 @@ const seedDatabase = async () => {
                 if (productInsertError) throw productInsertError;
                 console.log("Products seeded.");
             }
-
+            seedingCompleted = true;
             console.log("Database seeding complete.");
         } else {
             console.log("Database already contains data. Seeding not required.");
+            seedingCompleted = true;
         }
     } catch (error) {
-        console.error("Error during seeding process:", error);
+        console.error("Error during seeding process. Have you created the tables and storage bucket in your Supabase project? See the setup instructions.", error);
     } finally {
         isSeeding = false;
     }
@@ -67,7 +69,7 @@ const seedDatabase = async () => {
 const uploadImages = async (images: File[]): Promise<string[]> => {
     const imageUrls: string[] = [];
     for (const image of images) {
-        const filePath = `products/${Date.now()}-${image.name}`;
+        const filePath = `public/${Date.now()}-${image.name}`;
         const { error: uploadError } = await supabase.storage
             .from('product-images')
             .upload(filePath, image);
@@ -91,7 +93,6 @@ const uploadImages = async (images: File[]): Promise<string[]> => {
 export const addProduct = async (productData: ProductFormData): Promise<string> => {
     try {
         const imageUrls = await uploadImages(productData.images);
-        const { images, ...restOfProductData } = productData;
         
         // In a real app, you would get the logged-in user's artisan ID.
         // For now, we fetch the first artisan to associate the product with.
@@ -99,7 +100,16 @@ export const addProduct = async (productData: ProductFormData): Promise<string> 
         if (artisanError || !artisans || artisans.length === 0) throw new Error("Could not find an artisan to associate the product with.");
 
         const productToAdd = {
-            ...restOfProductData,
+            name: productData.name,
+            name_hi: productData.name_hi,
+            description: productData.description,
+            description_hi: productData.description_hi,
+            price: productData.price,
+            stock: productData.stock,
+            category: productData.category,
+            category_hi: productData.category_hi,
+            materials: productData.materials,
+            materials_hi: productData.materials_hi,
             images: imageUrls,
             artisanId: artisans[0].id
         };
@@ -122,7 +132,8 @@ export const addProduct = async (productData: ProductFormData): Promise<string> 
 // Function to get all products from Supabase
 export const getProducts = async (): Promise<Product[]> => {
     try {
-        const { data, error } = await supabase.from('products').select('*');
+        await seedDatabase(); // Ensure seeding is checked before fetching
+        const { data, error } = await supabase.from('products').select('*').order('createdAt', { ascending: false });
         if (error) throw error;
         return data || [];
     } catch (e) {
@@ -152,7 +163,8 @@ export const getProduct = async (id: string): Promise<Product | null> => {
 // Function to get all artisans from Supabase
 export const getArtisans = async (): Promise<Artisan[]> => {
     try {
-        const { data, error } = await supabase.from('artisans').select('*');
+        await seedDatabase(); // Ensure seeding is checked before fetching
+        const { data, error } = await supabase.from('artisans').select('*').order('createdAt', { ascending: false });
         if (error) throw error;
         return data || [];
     } catch (e) {
@@ -179,7 +191,3 @@ export const getArtisan = async (id: string): Promise<Artisan | null> => {
         return null;
     }
 };
-
-
-// Initialize and seed the database
-seedDatabase();
