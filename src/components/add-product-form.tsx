@@ -280,5 +280,3 @@ export function AddProductForm() {
     </Form>
   );
 }
-
-    
