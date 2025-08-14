@@ -2,13 +2,32 @@
 
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { products } from "@/lib/data";
 import { ProductFilters } from "@/components/product-filters";
 import { useLanguage } from "@/context/language-context";
+import { useEffect, useState } from "react";
+import type { Product } from "@/lib/types";
+import { getProducts } from "@/services/firestore";
+import { Loader2 } from "lucide-react";
 
 export default function ProductsPage() {
   const { t } = useLanguage();
-  const categories = [...new Set(products.map(p => p.category))];
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const productsData = await getProducts();
+        setProducts(productsData);
+      } catch (error) {
+        console.error("Failed to fetch products:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProducts();
+  }, []);
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -21,7 +40,13 @@ export default function ProductsPage() {
               {t('ourCollectionSubtitle')}
             </p>
           </div>
-          <ProductFilters products={products} categories={categories} />
+          {loading ? (
+            <div className="flex justify-center items-center p-16">
+              <Loader2 className="h-12 w-12 animate-spin text-primary" />
+            </div>
+          ) : (
+            <ProductFilters products={products} />
+          )}
         </div>
       </main>
       <SiteFooter />

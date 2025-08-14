@@ -2,7 +2,7 @@
 
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Box, IndianRupee, Users } from "lucide-react";
+import { Box, IndianRupee, Users, Loader2 } from "lucide-react";
 import Link from "next/link";
 import {
   Table,
@@ -12,11 +12,31 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { products } from "@/lib/data";
 import { useLanguage } from "@/context/language-context";
+import { useState, useEffect } from "react";
+import { Product } from "@/lib/types";
+import { getProducts } from "@/services/firestore";
 
 export default function DashboardPage() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+   useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const productsData = await getProducts();
+        setProducts(productsData);
+      } catch (error) {
+        console.error("Failed to fetch products:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProducts();
+  }, []);
+  
   const recentProducts = products.slice(0, 5);
 
   return (
@@ -43,7 +63,7 @@ export default function DashboardPage() {
             <Box className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{products.length}</div>
+             {loading ? <Loader2 className="h-6 w-6 animate-spin" /> : <div className="text-2xl font-bold">{products.length}</div>}
             <p className="text-xs text-muted-foreground">{t('productsLastMonth')}</p>
           </CardContent>
         </Card>
@@ -72,26 +92,32 @@ export default function DashboardPage() {
           </div>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>{t('tableHeaderName')}</TableHead>
-                <TableHead>{t('tableHeaderCategory')}</TableHead>
-                <TableHead className="text-right">{t('tableHeaderPrice')}</TableHead>
-                <TableHead className="text-right">{t('tableHeaderStock')}</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {recentProducts.map((product) => (
-                <TableRow key={product.id}>
-                  <TableCell className="font-medium">{product.name}</TableCell>
-                  <TableCell>{product.category}</TableCell>
-                  <TableCell className="text-right">₹{product.price.toFixed(2)}</TableCell>
-                  <TableCell className="text-right">{product.stock}</TableCell>
+          {loading ? (
+             <div className="flex justify-center items-center p-16">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+          ) : (
+            <Table>
+                <TableHeader>
+                <TableRow>
+                    <TableHead>{t('tableHeaderName')}</TableHead>
+                    <TableHead>{t('tableHeaderCategory')}</TableHead>
+                    <TableHead className="text-right">{t('tableHeaderPrice')}</TableHead>
+                    <TableHead className="text-right">{t('tableHeaderStock')}</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                </TableHeader>
+                <TableBody>
+                {recentProducts.map((product) => (
+                    <TableRow key={product.id}>
+                    <TableCell className="font-medium">{language === 'hi' ? product.name_hi : product.name}</TableCell>
+                    <TableCell>{language === 'hi' ? product.category_hi : product.category}</TableCell>
+                    <TableCell className="text-right">₹{product.price.toFixed(2)}</TableCell>
+                    <TableCell className="text-right">{product.stock}</TableCell>
+                    </TableRow>
+                ))}
+                </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
     </div>

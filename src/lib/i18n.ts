@@ -130,7 +130,7 @@ export const translations: LanguageTranslations = {
     saveProduct: "Save Product",
     savingProduct: "Saving...",
     toastProductAddedTitle: "Product Added!",
-    toastProductAddedDescription: "Your new product has been successfully added.",
+    toastProductAddedDescription: "Your new product has been successfully added to the database.",
     
     // Dashboard - Sidebar
     aiTools: 'AI Tools',
@@ -298,7 +298,8 @@ export const translations: LanguageTranslations = {
     noProductsFoundSubtitle: 'अपनी खोज या फ़िल्टर समायोजित करने का प्रयास करें।',
     allArtisans: 'सभी कारीगर',
     productSearchPlaceholder: 'उत्पाद के नाम या विवरण से खोजें...',
-    noProductsFoundFilterSubtitle: 'आप जो खोज रहे हैं उसे खोजने के लिए अपनी खोज या फ़िल्टर समायोजित करने का प्रयास करें।',
+    noProductsFoundFilterSubtitle: "आप जो खोज रहे हैं उसे खोजने के लिए अपनी खोज या फ़िल्टर समायोजित करने का प्रयास करें।",
+
 
     // Artisans Page
     meetOurArtisans: 'हमारे कारीगरों से मिलें',
@@ -360,7 +361,7 @@ export const translations: LanguageTranslations = {
     saveProduct: "उत्पाद सहेजें",
     savingProduct: "सहेजा जा रहा है...",
     toastProductAddedTitle: "उत्पाद जोड़ा गया!",
-    toastProductAddedDescription: "आपका नया उत्पाद सफलतापूर्वक जोड़ा गया है।",
+    toastProductAddedDescription: "आपका नया उत्पाद डेटाबेस में सफलतापूर्वक जोड़ दिया गया है।",
     
     // Dashboard - Sidebar
     aiTools: 'एआई उपकरण',

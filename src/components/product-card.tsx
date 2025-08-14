@@ -2,18 +2,18 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import type { Product } from '@/lib/types';
+import type { Product, Artisan } from '@/lib/types';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { artisans } from '@/lib/data';
 import { useLanguage } from '@/context/language-context';
 
 interface ProductCardProps {
   product: Product;
+  artisans: Artisan[];
 }
 
-export function ProductCard({ product }: ProductCardProps) {
+export function ProductCard({ product, artisans }: ProductCardProps) {
   const artisan = artisans.find(a => a.id === product.artisanId);
   const { t, language } = useLanguage();
 

@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useMemo } from 'react';
-import type { Product } from '@/lib/types';
-import { artisans } from '@/lib/data';
+import { useState, useMemo, useEffect } from 'react';
+import type { Product, Artisan } from '@/lib/types';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
@@ -13,15 +12,28 @@ import { useLanguage } from '@/context/language-context';
 
 interface ProductSearchProps {
   products: Product[];
+  artisans: Artisan[];
 }
 
-export function ProductSearch({ products }: ProductSearchProps) {
+export function ProductSearch({ products, artisans }: ProductSearchProps) {
   const { t, language } = useLanguage();
   const [searchTerm, setSearchTerm] = useState('');
   const [category, setCategory] = useState('all');
   const [artisan, setArtisan] = useState('all');
-  const maxPrice = useMemo(() => Math.max(...products.map(p => p.price), 10000), [products]);
+  
+  const maxPrice = useMemo(() => {
+      if (products.length === 0) return 10000;
+      return Math.max(...products.map(p => p.price), 10000);
+  }, [products]);
+
   const [priceRange, setPriceRange] = useState([0, maxPrice]);
+
+   useEffect(() => {
+      if (products.length > 0) {
+        setPriceRange([0, maxPrice]);
+      }
+  }, [products, maxPrice]);
+
 
   const categories = useMemo(() => {
     return [...new Set(products.map(p => language === 'hi' ? p.category_hi : p.category))]
@@ -46,7 +58,7 @@ export function ProductSearch({ products }: ProductSearchProps) {
       const matchesPrice = product.price >= priceRange[0] && product.price <= priceRange[1];
       return matchesSearch && matchesCategory && matchesArtisan && matchesPrice;
     });
-  }, [products, searchTerm, category, artisan, priceRange, language]);
+  }, [products, searchTerm, category, artisan, priceRange, language, artisans]);
 
   return (
     <div>
@@ -110,7 +122,7 @@ export function ProductSearch({ products }: ProductSearchProps) {
       {filteredProducts.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
           {filteredProducts.map(product => (
-            <ProductCard key={product.id} product={product} />
+            <ProductCard key={product.id} product={product} artisans={artisans} />
           ))}
         </div>
       ) : (

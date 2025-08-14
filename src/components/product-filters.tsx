@@ -1,25 +1,45 @@
 "use client";
 
-import { useState, useMemo } from 'react';
-import type { Product } from '@/lib/types';
+import { useState, useMemo, useEffect } from 'react';
+import type { Product, Artisan } from '@/lib/types';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
 import { ProductCard } from './product-card';
 import { Search } from 'lucide-react';
 import { useLanguage } from '@/context/language-context';
+import { getArtisans } from '@/services/firestore';
 
 interface ProductFiltersProps {
   products: Product[];
-  categories: string[];
 }
 
-export function ProductFilters({ products, categories: englishCategories }: ProductFiltersProps) {
+export function ProductFilters({ products }: ProductFiltersProps) {
   const { t, language } = useLanguage();
   const [searchTerm, setSearchTerm] = useState('');
   const [category, setCategory] = useState('all');
-  const maxPrice = useMemo(() => Math.max(...products.map(p => p.price), 10000), [products]);
+  const [artisans, setArtisans] = useState<Artisan[]>([]);
+  
+  const maxPrice = useMemo(() => {
+      if(products.length === 0) return 10000;
+      return Math.max(...products.map(p => p.price), 10000)
+  }, [products]);
+
   const [priceRange, setPriceRange] = useState([0, maxPrice]);
+
+  useEffect(() => {
+      if (products.length > 0) {
+        setPriceRange([0, maxPrice]);
+      }
+  }, [products, maxPrice]);
+
+  useEffect(() => {
+    const fetchArtisans = async () => {
+        const artisansData = await getArtisans();
+        setArtisans(artisansData);
+    }
+    fetchArtisans();
+  }, []);
 
   const categories = useMemo(() => {
     return [...new Set(products.map(p => language === 'hi' ? p.category_hi : p.category))]
@@ -83,7 +103,7 @@ export function ProductFilters({ products, categories: englishCategories }: Prod
       {filteredProducts.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
           {filteredProducts.map(product => (
-            <ProductCard key={product.id} product={product} />
+            <ProductCard key={product.id} product={product} artisans={artisans} />
           ))}
         </div>
       ) : (

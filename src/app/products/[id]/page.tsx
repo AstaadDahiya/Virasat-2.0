@@ -1,6 +1,5 @@
 "use client";
 
-import { products, artisans } from "@/lib/data";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -11,18 +10,57 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { ProductGallery } from "@/components/product-gallery";
-import { ShoppingCart, Star } from "lucide-react";
+import { ShoppingCart, Star, Loader2 } from "lucide-react";
 import { useLanguage } from "@/context/language-context";
+import { useEffect, useState } from "react";
+import { Product, Artisan } from "@/lib/types";
+import { getProduct, getArtisan } from "@/services/firestore";
 
 export default function ProductDetailPage({ params }: { params: { id: string } }) {
   const { t, language } = useLanguage();
-  const product = products.find(p => p.id === params.id);
+  const [product, setProduct] = useState<Product | null>(null);
+  const [artisan, setArtisan] = useState<Artisan | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const productData = await getProduct(params.id);
+        if (productData) {
+          setProduct(productData);
+          const artisanData = await getArtisan(productData.artisanId);
+          setArtisan(artisanData);
+        } else {
+          notFound();
+        }
+      } catch (error) {
+        console.error("Failed to fetch product data:", error);
+        notFound();
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [params.id]);
+  
+  if (loading) {
+    return (
+        <div className="flex min-h-screen flex-col">
+            <SiteHeader />
+            <main className="flex-1 py-12 md:py-20 flex items-center justify-center">
+                 <Loader2 className="h-16 w-16 animate-spin text-primary" />
+            </main>
+            <SiteFooter />
+        </div>
+    )
+  }
 
   if (!product) {
     notFound();
   }
 
-  const artisan = artisans.find(a => a.id === product.artisanId);
   const productName = language === 'hi' ? product.name_hi : product.name;
 
   return (

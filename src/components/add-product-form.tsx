@@ -16,9 +16,11 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/context/language-context";
-import { Loader2 } from "lucide-react";
-import { useState } from "react";
+import { Loader2, Upload, X } from "lucide-react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { addProduct } from "@/services/firestore";
+import Image from "next/image";
 
 
 const formSchema = z.object({
@@ -32,6 +34,7 @@ const formSchema = z.object({
   category_hi: z.string().min(2, { message: "Hindi category is required." }),
   materials: z.string().min(3, { message: "Please list at least one material." }),
   materials_hi: z.string().min(3, { message: "Please list at least one material in Hindi." }),
+  images: z.array(z.instanceof(File)).min(1, { message: "Please upload at least one image." }).max(5, {message: "You can upload a maximum of 5 images."}),
 });
 
 export function AddProductForm() {
@@ -39,6 +42,8 @@ export function AddProductForm() {
   const { t } = useLanguage();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [previews, setPreviews] = useState<string[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -53,25 +58,55 @@ export function AddProductForm() {
         category_hi: "",
         materials: "",
         materials_hi: "",
+        images: [],
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    setLoading(true);
-    // In a real application, you would send this data to your server/API
-    // to create a new product in the database.
-    console.log("New Product Data:", values);
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || []);
+    if (files.length > 0) {
+        form.setValue("images", files);
+        const newPreviews = files.map(file => URL.createObjectURL(file));
+        setPreviews(newPreviews);
+    }
+  };
 
-    // Simulate API call
-    setTimeout(() => {
-        setLoading(false);
+  const removeImage = (index: number) => {
+    const currentImages = form.getValues("images");
+    const newImages = currentImages.filter((_, i) => i !== index);
+    form.setValue("images", newImages);
+
+    const newPreviews = previews.filter((_, i) => i !== index);
+    setPreviews(newPreviews);
+  };
+
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setLoading(true);
+    
+    const productData = {
+        ...values,
+        materials: values.materials.split(',').map(m => m.trim()),
+        materials_hi: values.materials_hi.split(',').map(m => m.trim()),
+    };
+    
+    try {
+        await addProduct(productData);
         toast({
             title: t('toastProductAddedTitle'),
             description: t('toastProductAddedDescription'),
         });
-        // Redirect back to the products list after successful creation
         router.push('/dashboard/products');
-    }, 1500);
+    } catch(error) {
+        console.error("Failed to add product:", error);
+        toast({
+            variant: "destructive",
+            title: t('toastErrorTitle'),
+            description: "Failed to add product. Please try again.",
+        });
+    } finally {
+        setLoading(false);
+    }
   }
 
   return (
@@ -162,14 +197,62 @@ export function AddProductForm() {
             )}/>
         </div>
         
-        {/* TODO: Image upload functionality */}
-        <div>
-            <FormLabel>{t('productImages')}</FormLabel>
-            <div className="p-4 mt-2 text-center border-2 border-dashed rounded-lg">
-                <p className="text-sm text-muted-foreground">{t('imageUploadPlaceholder')}</p>
+         <FormField
+            control={form.control}
+            name="images"
+            render={({ field }) => (
+                <FormItem>
+                    <FormLabel>{t('productImages')}</FormLabel>
+                    <FormControl>
+                        <div className="flex items-center gap-4">
+                            <Input
+                                type="file"
+                                accept="image/*"
+                                multiple
+                                className="hidden"
+                                ref={fileInputRef}
+                                onChange={handleFileChange}
+                                disabled={loading}
+                            />
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => fileInputRef.current?.click()}
+                                disabled={loading}
+                            >
+                                <Upload className="mr-2" /> {t('uploadImage')}
+                            </Button>
+                        </div>
+                    </FormControl>
+                    <FormMessage />
+                </FormItem>
+            )}
+        />
+        
+        {previews.length > 0 && (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                {previews.map((src, index) => (
+                    <div key={index} className="relative">
+                        <Image
+                            src={src}
+                            alt={`Preview ${index + 1}`}
+                            width={150}
+                            height={150}
+                            className="w-full h-auto aspect-square object-cover rounded-md"
+                        />
+                        <Button
+                            type="button"
+                            variant="destructive"
+                            size="icon"
+                            className="absolute top-1 right-1 h-6 w-6"
+                            onClick={() => removeImage(index)}
+                        >
+                            <X className="h-4 w-4" />
+                        </Button>
+                    </div>
+                ))}
             </div>
-        </div>
-
+        )}
 
         <Button type="submit" disabled={loading} className="w-full md:w-auto">
           {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

@@ -3,19 +3,41 @@
 import { Button } from "@/components/ui/button";
 import { ProductCard } from "@/components/product-card";
 import { ArtisanCard } from "@/components/artisan-card";
-import { products, artisans } from "@/lib/data";
 import Link from "next/link";
 import Image from "next/image";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
 import { useLanguage } from "@/context/language-context";
+import { useEffect, useState } from "react";
+import { Product, Artisan } from "@/lib/types";
+import { getProducts, getArtisans } from "@/services/firestore";
 
 
 export default function Home() {
+  const { t } = useLanguage();
+  const [products, setProducts] = useState<Product[]>([]);
+  const [artisans, setArtisans] = useState<Artisan[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [productsData, artisansData] = await Promise.all([getProducts(), getArtisans()]);
+        setProducts(productsData);
+        setArtisans(artisansData);
+      } catch (error) {
+        console.error("Failed to fetch data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
   const featuredProducts = products.slice(0, 4);
   const featuredArtisans = artisans.slice(0, 3);
-  const { t } = useLanguage();
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -28,6 +50,7 @@ export default function Home() {
             fill
             className="absolute z-0 object-cover"
             data-ai-hint="indian market panorama"
+            priority
           />
           <div className="relative z-10 flex h-full flex-col items-center justify-center bg-black/50 p-4 text-center">
             <h1 className="font-headline text-5xl font-bold md:text-7xl">
@@ -54,11 +77,17 @@ export default function Home() {
                 </Link>
               </Button>
             </div>
-            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
-              {featuredProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
+             {loading ? (
+                <div className="flex justify-center items-center p-16">
+                    <Loader2 className="h-12 w-12 animate-spin text-primary" />
+                </div>
+            ) : (
+                <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+                {featuredProducts.map((product) => (
+                    <ProductCard key={product.id} product={product} artisans={artisans} />
+                ))}
+                </div>
+            )}
           </div>
         </section>
         
@@ -74,11 +103,17 @@ export default function Home() {
                 </Link>
               </Button>
             </div>
-            <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-              {featuredArtisans.map((artisan) => (
-                <ArtisanCard key={artisan.id} artisan={artisan} />
-              ))}
-            </div>
+             {loading ? (
+                <div className="flex justify-center items-center p-16">
+                    <Loader2 className="h-12 w-12 animate-spin text-primary" />
+                </div>
+            ) : (
+                <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+                {featuredArtisans.map((artisan) => (
+                    <ArtisanCard key={artisan.id} artisan={artisan} />
+                ))}
+                </div>
+            )}
           </div>
         </section>
       </main>

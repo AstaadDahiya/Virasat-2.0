@@ -3,11 +3,32 @@
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { ArtisanCard } from "@/components/artisan-card";
-import { artisans } from "@/lib/data";
 import { useLanguage } from "@/context/language-context";
+import { useState, useEffect } from "react";
+import { Artisan } from "@/lib/types";
+import { getArtisans } from "@/services/firestore";
+import { Loader2 } from "lucide-react";
 
 export default function ArtisansPage() {
   const { t } = useLanguage();
+  const [artisans, setArtisans] = useState<Artisan[]>([]);
+  const [loading, setLoading] = useState(true);
+
+   useEffect(() => {
+    const fetchArtisans = async () => {
+      try {
+        setLoading(true);
+        const artisansData = await getArtisans();
+        setArtisans(artisansData);
+      } catch (error) {
+        console.error("Failed to fetch artisans:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchArtisans();
+  }, []);
+
   return (
     <div className="flex min-h-screen flex-col">
       <SiteHeader />
@@ -19,11 +40,17 @@ export default function ArtisansPage() {
               {t('artisansPageSubtitle')}
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {artisans.map(artisan => (
-              <ArtisanCard key={artisan.id} artisan={artisan} />
-            ))}
-          </div>
+          {loading ? (
+             <div className="flex justify-center items-center p-16">
+              <Loader2 className="h-12 w-12 animate-spin text-primary" />
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {artisans.map(artisan => (
+                <ArtisanCard key={artisan.id} artisan={artisan} />
+                ))}
+            </div>
+          )}
         </div>
       </main>
       <SiteFooter />

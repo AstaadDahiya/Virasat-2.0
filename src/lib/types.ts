@@ -26,3 +26,7 @@ export type Artisan = {
   craft: string;
   craft_hi: string;
 };
+
+export type ProductFormData = Omit<Product, 'id' | 'images' | 'artisanId'> & {
+  images: File[];
+}

@@ -1,25 +1,64 @@
 "use client";
 
-import { artisans, products } from "@/lib/data";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { ProductCard } from "@/components/product-card";
 import { Card, CardContent } from "@/components/ui/card";
-import { MapPin } from "lucide-react";
+import { MapPin, Loader2 } from "lucide-react";
 import { ContactArtisanForm } from "@/components/contact-artisan-form";
 import { useLanguage } from "@/context/language-context";
+import { useState, useEffect } from "react";
+import { Product, Artisan } from "@/lib/types";
+import { getArtisan, getProducts } from "@/services/firestore";
 
 export default function ArtisanDetailPage({ params }: { params: { id: string } }) {
   const { t, language } = useLanguage();
-  const artisan = artisans.find(a => a.id === params.id);
+  const [artisan, setArtisan] = useState<Artisan | null>(null);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const artisanData = await getArtisan(params.id);
+        if (artisanData) {
+          setArtisan(artisanData);
+          const allProducts = await getProducts();
+          const artisanProducts = allProducts.filter(p => p.artisanId === params.id);
+          setProducts(artisanProducts);
+        } else {
+          notFound();
+        }
+      } catch (error) {
+        console.error("Failed to fetch artisan data:", error);
+        notFound();
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [params.id]);
+
+   if (loading) {
+    return (
+        <div className="flex min-h-screen flex-col">
+            <SiteHeader />
+            <main className="flex-1 bg-secondary py-12 md:py-20 flex items-center justify-center">
+                 <Loader2 className="h-16 w-16 animate-spin text-primary" />
+            </main>
+            <SiteFooter />
+        </div>
+    )
+  }
 
   if (!artisan) {
     notFound();
   }
-
-  const artisanProducts = products.filter(p => p.artisanId === artisan.id);
+  
   const artisanName = language === 'hi' ? artisan.name_hi : artisan.name;
 
   return (
@@ -67,10 +106,10 @@ export default function ArtisanDetailPage({ params }: { params: { id: string } }
 
           <div className="mt-16">
             <h2 className="font-headline text-3xl font-bold mb-6">{t('artisanDetailProductsBy')} {artisanName}</h2>
-            {artisanProducts.length > 0 ? (
+            {products.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                {artisanProducts.map(product => (
-                  <ProductCard key={product.id} product={product} />
+                {products.map(product => (
+                  <ProductCard key={product.id} product={product} artisans={[artisan]} />
                 ))}
               </div>
             ) : (

@@ -1,9 +1,10 @@
+// This file is now used for seeding the database only.
+// The application fetches data from Firestore.
 
 import type { Product, Artisan } from './types';
 
-export const artisans: Artisan[] = [
+export const artisans: Omit<Artisan,'id'>[] = [
   {
-    id: 'artisan-1',
     name: 'Priya Sharma',
     name_hi: 'प्रिया शर्मा',
     bio: 'Priya is a third-generation block-printer from Jaipur, a city renowned for its vibrant textiles. She finds inspiration in the intricate patterns of Rajasthani architecture and nature. Each piece is a testament to the timeless tradition of Sanganeri block-printing, crafted with passion and precision.',
@@ -15,7 +16,6 @@ export const artisans: Artisan[] = [
     craft_hi: 'ब्लॉक-प्रिंटिंग',
   },
   {
-    id: 'artisan-2',
     name: 'Rohan Mehra',
     name_hi: 'रोहन मेहरा',
     bio: 'From his workshop in Saharanpur, Rohan Mehra practices the art of wood carving, a skill passed down through generations. He specializes in creating intricate home goods from Sheesham wood, using traditional techniques. His philosophy is to let the natural beauty of the wood speak for itself.',
@@ -27,7 +27,6 @@ export const artisans: Artisan[] = [
     craft_hi: 'लकड़ी की नक्काशी',
   },
   {
-    id: 'artisan-3',
     name: 'Aisha Begum',
     name_hi: 'आइशा बेगम',
     bio: 'Aisha is a master of Chikankari embroidery from Lucknow. Her delicate and precise needlework brings traditional Mughal-era designs to life on fine fabrics. Each garment tells a story, stitched with threads of history and culture.',
@@ -40,9 +39,8 @@ export const artisans: Artisan[] = [
   },
 ];
 
-export const products: Product[] = [
+export const products: Omit<Product, 'id'>[] = [
   {
-    id: 'prod-1',
     name: 'Hand-Blocked Table Runner',
     name_hi: 'हैंड-ब्लॉक टेबल रनर',
     description: 'A beautifully handcrafted table runner, perfect for adding a touch of Rajasthani elegance to your dining table. Features a classic floral motif in indigo and white.',
@@ -57,7 +55,6 @@ export const products: Product[] = [
     materials_hi: ['कॉटन कैनवास', 'प्राकृतिक रंग'],
   },
   {
-    id: 'prod-2',
     name: 'Sheesham Wood Spice Box',
     name_hi: 'शीशम लकड़ी मसाला बॉक्स',
     description: 'An intricately carved "masala dabba" made from durable Sheesham wood. It features multiple compartments and a small spoon for your essential spices.',
@@ -72,7 +69,6 @@ export const products: Product[] = [
     materials_hi: ['शीशम (भारतीय शीशम)', 'पीतल की जड़ाई'],
   },
   {
-    id: 'prod-3',
     name: 'Chikankari Cotton Kurta',
     name_hi: 'चिकनकारी कॉटन कुर्ता',
     description: 'A luxuriously soft cotton kurta featuring delicate Chikankari embroidery. The timeless floral patterns make it a versatile piece for any occasion.',
@@ -87,7 +83,6 @@ export const products: Product[] = [
     materials_hi: ['मलमल कॉटन', 'कॉटन थ्रेड'],
   },
   {
-    id: 'prod-4',
     name: 'Sanganeri Print Cushion Covers',
     name_hi: 'सांगानेरी प्रिंट कुशन कवर',
     description: 'Set of two cotton cushion covers with a traditional Sanganeri bootis (small floral motif) print. Brightens up any living space instantly.',
@@ -102,7 +97,6 @@ export const products: Product[] = [
     materials_hi: ['कॉटन डक फैब्रिक', 'प्राकृतिक रंग'],
   },
   {
-    id: 'prod-5',
     name: 'Hand-Carved Elephant Figurine',
     name_hi: 'हाथ से नक्काशीदार हाथी की मूर्ति',
     description: 'A symbol of wisdom and strength, this elegant elephant figurine is hand-carved from a single block of wood with remarkable detail.',
@@ -117,7 +111,6 @@ export const products: Product[] = [
     materials_hi: ['बबूल की लकड़ी', 'मधुमक्खी के मोम की फिनिश'],
   },
   {
-    id: 'prod-6',
     name: 'Embroidered Silk Potli Bag',
     name_hi: 'कढ़ाई वाली सिल्क पोटली बैग',
     description: 'A vibrant silk potli (drawstring) bag, exquisitely embroidered with Zardozi work. The perfect accessory for weddings and festive occasions.',
@@ -132,7 +125,6 @@ export const products: Product[] = [
     materials_hi: ['कच्चा रेशम', 'जरी धागा', 'मोती'],
   },
    {
-    id: 'prod-7',
     name: 'Jaipuri Blue Pottery Vase',
     name_hi: 'जयपुरी ब्लू पॉटरी फूलदान',
     description: 'A classic blue pottery vase from Jaipur, featuring a traditional peacock design. Does not use regular clay, but a mix of quartz stone powder, powdered glass, and other materials.',
@@ -147,7 +139,6 @@ export const products: Product[] = [
     materials_hi: ['क्वार्ट्ज पाउडर', 'सीसा रहित ग्लेज'],
   },
   {
-    id: 'prod-8',
     name: 'Wooden Jharokha Wall Decor',
     name_hi: 'लकड़ी का झरोखा दीवार की सजावट',
     description: 'A miniature, intricately carved "jharokha" (ornate window) that brings a piece of Rajasthani palaces to your wall. A stunning piece of craftsmanship.',

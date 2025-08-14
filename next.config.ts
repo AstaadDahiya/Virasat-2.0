@@ -33,6 +33,12 @@ const nextConfig: NextConfig = {
         hostname: 'cdn.corenexis.com',
         port: '',
         pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'firebasestorage.googleapis.com',
+        port: '',
+        pathname: '/**',
       }
     ],
   },
