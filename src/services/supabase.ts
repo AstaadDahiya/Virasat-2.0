@@ -5,8 +5,8 @@ import { supabase } from "@/lib/supabase";
 import { Product, Artisan } from "@/lib/types";
 import { User } from "@supabase/supabase-js";
 
-// Note: Omit 'images' from the type, as it will be handled separately.
-type ProductInsertData = Omit<Product, 'id' | 'images' | 'artisanId'>;
+// This is the type of data coming from the form, simplified.
+type ProductFormData = Omit<Product, 'id' | 'images' | 'artisanId'>;
 
 const uploadImages = async (images: File[], artisanId: string): Promise<string[]> => {
     const imageUrls: string[] = [];
@@ -31,7 +31,7 @@ const uploadImages = async (images: File[], artisanId: string): Promise<string[]
     return imageUrls;
 };
 
-export const addProduct = async (productData: ProductInsertData, images: File[], artisanId: string): Promise<string> => {
+export const addProduct = async (productData: ProductFormData, images: File[], artisanId: string): Promise<string> => {
     if (!artisanId) {
         throw new Error("You must be logged in to add a product.");
     }
@@ -43,6 +43,7 @@ export const addProduct = async (productData: ProductInsertData, images: File[],
         await ensureArtisanProfile({ id: artisanId }); // Ensure profile exists before adding product
         const imageUrls = await uploadImages(images, artisanId);
         
+        // Construct the final object with all required fields for the database.
         const productToAdd = {
             ...productData,
             images: imageUrls,
@@ -51,7 +52,7 @@ export const addProduct = async (productData: ProductInsertData, images: File[],
         
         const { data: newProduct, error } = await supabase
             .from('products')
-            .insert(productToAdd) // Pass the fully constructed object
+            .insert(productToAdd)
             .select()
             .single();
 
