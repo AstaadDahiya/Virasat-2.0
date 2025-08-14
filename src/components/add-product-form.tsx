@@ -23,6 +23,7 @@ import { useRouter } from "next/navigation";
 import { addProduct } from "@/services/supabase";
 import Image from "next/image";
 import { useAuth } from "@/context/auth-context";
+import { useData } from "@/context/data-context";
 
 
 const formSchema = z.object({
@@ -44,6 +45,7 @@ export function AddProductForm() {
   const { t } = useLanguage();
   const router = useRouter();
   const { user } = useAuth();
+  const { refreshData } = useData();
   const [loading, setLoading] = useState(false);
   const [previews, setPreviews] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -102,20 +104,22 @@ export function AddProductForm() {
     setLoading(true);
     
     try {
-        const { images, ...productData } = values;
-        const productInfo = {
-            ...productData,
+        const { images, ...productInfo } = values;
+        
+        const productDataForDb = {
+            ...productInfo,
             materials: values.materials.split(',').map(m => m.trim()),
             materials_hi: values.materials_hi.split(',').map(m => m.trim()),
-        }
+        };
 
-        await addProduct(productInfo, images, user.id);
+        await addProduct(productDataForDb, images, user.id);
+        
         toast({
             title: t('toastProductAddedTitle'),
             description: t('toastProductAddedDescription'),
         });
+        await refreshData();
         router.push('/dashboard/products');
-        router.refresh(); // To show the new product in the list
     } catch(error) {
         console.error("Failed to add product:", error);
         toast({
@@ -281,3 +285,5 @@ export function AddProductForm() {
     </Form>
   );
 }
+
+    
