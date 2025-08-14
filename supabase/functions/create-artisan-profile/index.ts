@@ -1,7 +1,8 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { corsHeaders } from '../_shared/cors.ts';
 
-// Main function to handle the incoming request.
+console.log("Create Artisan Profile function started.");
+
 Deno.serve(async (req) => {
   // This is needed for the Supabase Auth Hook to work
   if (req.method === 'OPTIONS') {
@@ -9,16 +10,41 @@ Deno.serve(async (req) => {
   }
 
   try {
-    // Create an admin client to bypass RLS
+    // 1. Get the Authorization header from the request
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      throw new Error('Missing authorization header');
+    }
+
+    // 2. Get the service role key from the environment variables
+    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    if (!serviceRoleKey) {
+        throw new Error('Missing SUPABASE_SERVICE_ROLE_KEY');
+    }
+
+    // 3. Verify the token from the header matches the service key
+    const token = authHeader.replace('Bearer ', '');
+    if (token !== serviceRoleKey) {
+      throw new Error('Invalid authorization token');
+    }
+    
+    console.log("Authorization successful.");
+
+    // 4. Create an admin client to bypass RLS
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+      serviceRoleKey
     );
 
-    // Get the new user record from the request body.
+    // 5. Get the new user record from the request body.
     const { record: user } = await req.json();
+    if (!user || !user.id) {
+        throw new Error('User data not found in request body');
+    }
+    
+    console.log(`Processing user: ${user.id}`);
 
-    // The data for the new artisan profile.
+    // 6. Define the new artisan profile data.
     const newArtisan = {
       id: user.id,
       name: user.email?.split('@')[0] || 'New Artisan',
@@ -32,24 +58,29 @@ Deno.serve(async (req) => {
       craft_hi: 'हस्तशिल्प',
     };
 
-    // Insert the new artisan profile into the public.artisans table.
+    // 7. Insert the new artisan profile into the database.
     const { error } = await supabaseAdmin.from('artisans').insert(newArtisan);
-
     if (error) {
-      throw error;
+      console.error("Insert error:", error);
+      throw new Error(`Database insert failed: ${error.message}`);
     }
 
-    // Return a success response.
+    console.log(`Successfully created artisan profile for user: ${user.id}`);
+
+    // 8. Return a success response.
     return new Response(JSON.stringify({ message: `Artisan profile created for ${user.id}` }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,
     });
 
   } catch (error) {
-    // Return an error response.
+    console.error("Function error:", error.message);
+    const isAuthError = error.message.toLowerCase().includes('authorization') || error.message.toLowerCase().includes('token');
+    
+    // 9. Return an error response.
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 400,
+      status: isAuthError ? 401 : 400,
     });
   }
 });
