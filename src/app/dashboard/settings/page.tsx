@@ -10,6 +10,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/context/auth-context";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ChangePasswordForm } from "@/components/change-password-form";
 
 export default function SettingsPage() {
     const { t } = useLanguage();
@@ -48,7 +50,18 @@ export default function SettingsPage() {
                    </div>
                    <div className="space-y-2">
                         <Label htmlFor="password">{t('passwordLabel')}</Label>
-                        <Button variant="outline">{t('changePassword')}</Button>
+                        <Dialog>
+                            <DialogTrigger asChild>
+                                <Button variant="outline">{t('changePassword')}</Button>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-[425px]">
+                                <DialogHeader>
+                                    <DialogTitle>{t('changePassword')}</DialogTitle>
+                                    <DialogDescription>{t('changePasswordDescription')}</DialogDescription>
+                                </DialogHeader>
+                                <ChangePasswordForm />
+                            </DialogContent>
+                        </Dialog>
                    </div>
                 </CardContent>
             </Card>
