@@ -4,18 +4,26 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Menu, Search } from "lucide-react";
+import { Menu, Search, Globe } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Logo } from "./logo";
+import { useLanguage } from "@/context/language-context";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const navLinks = [
-  { href: "/", label: "Home" },
-  { href: "/products", label: "Products" },
-  { href: "/artisans", label: "Artisans" },
+  { href: "/", labelKey: "home" },
+  { href: "/products", labelKey: "products" },
+  { href: "/artisans", labelKey: "artisans" },
 ];
 
 export function SiteHeader() {
   const pathname = usePathname();
+  const { t, setLanguage, language } = useLanguage();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -35,13 +43,29 @@ export function SiteHeader() {
                   pathname === link.href ? "text-foreground" : "text-foreground/60"
                 )}
               >
-                {link.label}
+                {t(link.labelKey)}
               </Link>
             ))}
           </nav>
         </div>
 
         <div className="flex flex-1 items-center justify-end space-x-2">
+           <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <Globe />
+                <span className="sr-only">Change language</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => setLanguage('en')} disabled={language === 'en'}>
+                English
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setLanguage('hi')} disabled={language === 'hi'}>
+                हिंदी (Hindi)
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <Button variant="ghost" size="icon" asChild>
              <Link href="/products/search">
                 <Search />
@@ -49,7 +73,7 @@ export function SiteHeader() {
              </Link>
           </Button>
           <Button asChild>
-            <Link href="/dashboard">Artisan Dashboard</Link>
+            <Link href="/dashboard">{t('artisanDashboard')}</Link>
           </Button>
           <Sheet>
             <SheetTrigger asChild>
@@ -73,7 +97,7 @@ export function SiteHeader() {
                       pathname === link.href ? "text-foreground font-semibold" : "text-foreground/60"
                     )}
                   >
-                    {link.label}
+                    {t(link.labelKey)}
                   </Link>
                 ))}
               </nav>

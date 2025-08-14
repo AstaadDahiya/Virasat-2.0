@@ -1,3 +1,5 @@
+"use client";
+
 import Link from 'next/link';
 import Image from 'next/image';
 import type { Product } from '@/lib/types';
@@ -5,6 +7,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { artisans } from '@/lib/data';
+import { useLanguage } from '@/context/language-context';
 
 interface ProductCardProps {
   product: Product;
@@ -12,6 +15,7 @@ interface ProductCardProps {
 
 export function ProductCard({ product }: ProductCardProps) {
   const artisan = artisans.find(a => a.id === product.artisanId);
+  const { t } = useLanguage();
 
   return (
     <Card className="flex flex-col overflow-hidden rounded-lg shadow-md transition-shadow hover:shadow-xl h-full">
@@ -42,7 +46,7 @@ export function ProductCard({ product }: ProductCardProps) {
       <CardFooter className="p-4 pt-0 flex justify-between items-center">
         <p className="text-lg font-semibold text-primary">₹{product.price.toFixed(2)}</p>
         <Button asChild size="sm">
-          <Link href={`/products/${product.id}`}>View Details</Link>
+          <Link href={`/products/${product.id}`}>{t('viewDetails')}</Link>
         </Button>
       </CardFooter>
     </Card>

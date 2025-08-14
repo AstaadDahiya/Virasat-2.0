@@ -1,3 +1,4 @@
+"use client";
 
 import { Button } from "@/components/ui/button";
 import { ProductCard } from "@/components/product-card";
@@ -8,10 +9,13 @@ import Image from "next/image";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { ArrowRight } from "lucide-react";
+import { useLanguage } from "@/context/language-context";
+
 
 export default function Home() {
   const featuredProducts = products.slice(0, 4);
   const featuredArtisans = artisans.slice(0, 3);
+  const { t } = useLanguage();
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -27,13 +31,13 @@ export default function Home() {
           />
           <div className="relative z-10 flex h-full flex-col items-center justify-center bg-black/50 p-4 text-center">
             <h1 className="font-headline text-5xl font-bold md:text-7xl">
-              Handcrafted Stories, Timeless Treasures
+              {t('heroTitle')}
             </h1>
             <p className="mt-4 max-w-2xl text-lg md:text-xl">
-              Discover unique, handmade goods from skilled artisans around the world.
+              {t('heroSubtitle')}
             </p>
             <Button asChild size="lg" className="mt-8 bg-primary text-primary-foreground hover:bg-primary/90">
-              <Link href="/products">Explore Products</Link>
+              <Link href="/products">{t('exploreProducts')}</Link>
             </Button>
           </div>
         </section>
@@ -42,11 +46,11 @@ export default function Home() {
           <div className="container mx-auto px-4">
             <div className="flex items-center justify-between mb-8">
                <h2 className="font-headline text-3xl font-bold md:text-4xl">
-                Featured Products
+                {t('featuredProducts')}
               </h2>
               <Button variant="ghost" asChild>
                 <Link href="/products" className="flex items-center gap-2">
-                  View All <ArrowRight size={16} />
+                  {t('viewAll')} <ArrowRight size={16} />
                 </Link>
               </Button>
             </div>
@@ -62,11 +66,11 @@ export default function Home() {
           <div className="container mx-auto px-4">
              <div className="flex items-center justify-between mb-8">
                <h2 className="font-headline text-3xl font-bold md:text-4xl">
-                Meet the Artisans
+                {t('meetTheArtisans')}
               </h2>
               <Button variant="ghost" asChild>
                 <Link href="/artisans" className="flex items-center gap-2">
-                  View All <ArrowRight size={16} />
+                  {t('viewAll')} <ArrowRight size={16} />
                 </Link>
               </Button>
             </div>

@@ -3,6 +3,7 @@ import { Alegreya } from 'next/font/google';
 import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
 import { cn } from "@/lib/utils";
+import { LanguageProvider } from "@/context/language-context";
 
 export const metadata: Metadata = {
   title: "VIRASAT",
@@ -27,7 +28,9 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={cn("min-h-screen bg-background font-body antialiased", alegreya.variable)}>
-        {children}
+        <LanguageProvider>
+          {children}
+        </LanguageProvider>
         <Toaster />
       </body>
     </html>
