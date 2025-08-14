@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useForm } from "react-hook-form";
@@ -98,7 +99,6 @@ export function AddProductForm() {
     setLoading(true);
     
     try {
-        // This is the correct way to separate files from the rest of the data.
         const { images, ...productInfo } = values;
         
         const productData = {
@@ -107,7 +107,6 @@ export function AddProductForm() {
             materials_hi: values.materials_hi.split(',').map(m => m.trim()),
         };
 
-        // Pass the serializable data and the files as separate arguments.
         await addProduct(productData, images);
         
         toast({
