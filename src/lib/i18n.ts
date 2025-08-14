@@ -574,3 +574,17 @@ export const translations: LanguageTranslations = {
 };
 
 export type TranslationKey = keyof (typeof translations)['en'];
+
+type InterpolationValues = { [key: string]: string | number };
+
+export function translate(key: TranslationKey, lang: 'en' | 'hi', values?: InterpolationValues): string {
+  let translation = translations[lang][key] || translations['en'][key];
+  
+  if (values) {
+    Object.entries(values).forEach(([placeholder, value]) => {
+      translation = translation.replace(new RegExp(`{{\\s*${placeholder}\\s*}}`, 'g'), String(value));
+    });
+  }
+  
+  return translation;
+}

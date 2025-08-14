@@ -4,7 +4,7 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import { Product } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
-import { useLanguage } from './language-context';
+import { useLanguage, translate } from './language-context';
 
 export interface CartItem extends Product {
   quantity: number;
@@ -25,7 +25,7 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const { toast } = useToast();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   useEffect(() => {
     try {
@@ -44,6 +44,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   }, [cartItems]);
 
   const addToCart = (product: Product, quantity: number = 1) => {
+    const productName = language === 'hi' ? product.name_hi : product.name;
     setCartItems(prevItems => {
       const existingItem = prevItems.find(item => item.id === product.id);
       if (existingItem) {
@@ -52,10 +53,14 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
            toast({
                 variant: 'destructive',
                 title: t('toastNotEnoughStockTitle'),
-                description: t('toastNotEnoughStockDescription', { stock: product.stock }),
+                description: translate('toastNotEnoughStockDescription', language, { stock: product.stock.toString() }),
            });
            return prevItems;
         }
+        toast({
+            title: t('toastItemAddedToCartTitle'),
+            description: translate('toastItemAddedToCartDescription', language, { name: productName }),
+        });
         return prevItems.map(item =>
           item.id === product.id ? { ...item, quantity: newQuantity } : item
         );
@@ -64,15 +69,15 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
            toast({
                 variant: 'destructive',
                 title: t('toastNotEnoughStockTitle'),
-                description: t('toastNotEnoughStockDescription', { stock: product.stock }),
+                description: translate('toastNotEnoughStockDescription', language, { stock: product.stock.toString() }),
            });
            return prevItems;
       }
-      return [...prevItems, { ...product, quantity }];
-    });
-    toast({
+       toast({
         title: t('toastItemAddedToCartTitle'),
-        description: t('toastItemAddedToCartDescription', { name: product.name }),
+        description: translate('toastItemAddedToCartDescription', language, { name: productName }),
+      });
+      return [...prevItems, { ...product, quantity }];
     });
   };
 
@@ -86,9 +91,20 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
     setCartItems(prevItems =>
-      prevItems.map(item =>
-        item.id === productId ? { ...item, quantity } : item
-      )
+      prevItems.map(item => {
+          if (item.id === productId) {
+               if (quantity > item.stock) {
+                 toast({
+                    variant: 'destructive',
+                    title: t('toastNotEnoughStockTitle'),
+                    description: translate('toastNotEnoughStockDescription', language, { stock: item.stock.toString() }),
+                 });
+                 return { ...item, quantity: item.stock };
+               }
+               return { ...item, quantity };
+          }
+        return item;
+      })
     );
   };
   

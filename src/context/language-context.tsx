@@ -1,7 +1,8 @@
+
 "use client";
 
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
-import { translations, TranslationKey } from '@/lib/i18n';
+import { translations, TranslationKey, translate } from '@/lib/i18n';
 
 type Language = 'en' | 'hi';
 
@@ -47,3 +48,5 @@ export const useLanguage = (): LanguageContextType => {
   }
   return context;
 };
+
+export { translate };
