@@ -2,8 +2,7 @@
 "use server";
 
 import { supabase } from "@/lib/supabase";
-import { Product, Artisan } from "@/lib/types";
-import { User } from "@supabase/supabase-js";
+import { Product } from "@/lib/types";
 
 const uploadImages = async (images: File[], artisanId: string): Promise<string[]> => {
     const imageUrls: string[] = [];
@@ -15,9 +14,8 @@ const uploadImages = async (images: File[], artisanId: string): Promise<string[]
         
         if (uploadError) {
             console.error('Error uploading image:', uploadError);
-            // Provide a more helpful error message for the most common issue.
-            if (uploadError.message.includes('permission denied')) {
-                 throw new Error(`Failed to upload image: "${image.name}". This is likely a permissions issue. Please check the Storage policies for the 'product-images' bucket in your Supabase dashboard and ensure inserts are allowed.`);
+            if (uploadError.message.includes('permission') || uploadError.message.includes('policy')) {
+                 throw new Error(`Failed to upload image due to a permissions issue. Please check that your 'product-images' bucket in Supabase allows public inserts.`);
             }
             throw new Error(`Failed to upload image: ${image.name}. Reason: ${uploadError.message}`);
         }
@@ -30,6 +28,7 @@ const uploadImages = async (images: File[], artisanId: string): Promise<string[]
     }
     return imageUrls;
 };
+
 
 export const addProduct = async (productData: Omit<Product, 'id' | 'images'>, images: File[]): Promise<string> => {
     const { artisanId } = productData;
@@ -47,6 +46,7 @@ export const addProduct = async (productData: Omit<Product, 'id' | 'images'>, im
         const productToAdd = {
             ...productData,
             images: imageUrls,
+            artisanId: artisanId, // Ensure artisanId is included in the final object
         };
         
         const { data: newProduct, error } = await supabase
@@ -61,7 +61,7 @@ export const addProduct = async (productData: Omit<Product, 'id' | 'images'>, im
         }
         
         if (!newProduct) {
-             throw new Error("Product creation failed, no ID returned.");
+             throw new Error("Product creation failed, no data returned from database.");
         }
         
         return newProduct.id;
