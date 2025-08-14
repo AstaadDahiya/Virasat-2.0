@@ -17,12 +17,11 @@ import { useEffect, useState } from "react";
 import { Product, Artisan } from "@/lib/types";
 import { getProduct, getArtisan } from "@/services/supabase";
 
-export default function ProductDetailPage({ params }: { params: { id: string } }) {
+export default function ProductDetailPage({ params: { id } }: { params: { id: string } }) {
   const { t, language } = useLanguage();
   const [product, setProduct] = useState<Product | null>(null);
   const [artisan, setArtisan] = useState<Artisan | null>(null);
   const [loading, setLoading] = useState(true);
-  const { id } = params;
 
   useEffect(() => {
     const fetchData = async () => {
