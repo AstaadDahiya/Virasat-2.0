@@ -157,5 +157,3 @@ export const ensureArtisanProfile = async (user: { id: string; email?: string })
         throw error;
     }
 };
-
-    
