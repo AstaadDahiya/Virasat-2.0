@@ -1,3 +1,4 @@
+
 "use server";
 
 import { supabase } from "@/lib/supabase";
@@ -83,7 +84,7 @@ const seedDatabase = async () => {
         console.log("Database seeding check complete.");
 
     } catch (error) {
-        console.error("Error during seeding process. Have you created the tables and storage bucket in your Supabase project? See the setup instructions.", error);
+        console.error("Error during seeding process. Have you created the tables and storage bucket in your Supabase project? See the setup instructions.", error instanceof Error ? error.message : error);
     } finally {
         isSeeding = false; // Always release the lock
     }
@@ -118,22 +119,25 @@ const uploadImages = async (images: File[]): Promise<string[]> => {
 // Function to add a new product to Supabase
 export const addProduct = async (productData: ProductFormData): Promise<string> => {
     try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+            throw new Error("You must be logged in to add a product.");
+        }
+
+        // The user ID from Supabase Auth should correspond to the artisan's ID in the 'artisans' table.
+        const artisanId = user.id;
+
         const imageUrls = await uploadImages(productData.images);
         
-        // In a real app, you would get the logged-in user's artisan ID.
-        // For now, we fetch the first artisan to associate the product with.
-        const { data: artisans, error: artisanError } = await supabase.from('artisans').select('id').limit(1);
-        if (artisanError || !artisans || artisans.length === 0) throw new Error("Could not find an artisan to associate the product with.");
-
         const { images, ...restOfProductData } = productData;
         
         const productToAdd = {
             ...restOfProductData,
             images: imageUrls,
-            artisanId: artisans[0].id
+            artisanId: artisanId,
         };
         
-        const { data, error } = await supabase
+        const { data: newProduct, error } = await supabase
             .from('products')
             .insert([productToAdd])
             .select()
@@ -141,7 +145,7 @@ export const addProduct = async (productData: ProductFormData): Promise<string> 
 
         if (error) throw error;
         
-        return data.id;
+        return newProduct.id;
     } catch (e) {
         console.error("Error adding document: ", e);
         throw new Error("Failed to add product");
@@ -199,7 +203,7 @@ export const getArtisan = async (id: string): Promise<Artisan | null> => {
     try {
         const { data, error } = await supabase.from('artisans').select('*').eq('id', id).single();
         if (error) {
-             if (error.code === 'PGRST116') {
+            if (error.code === 'PGRST116') {
                 console.log("No such artisan!");
                 return null;
             }
