@@ -15,7 +15,11 @@ const uploadImages = async (images: File[], artisanId: string): Promise<string[]
         
         if (uploadError) {
             console.error('Error uploading image:', uploadError);
-            throw new Error(`Failed to upload image: ${image.name}`);
+            // Provide a more helpful error message for the most common issue.
+            if (uploadError.message.includes('permission denied')) {
+                 throw new Error(`Failed to upload image: "${image.name}". This is likely a permissions issue. Please check the Storage policies for the 'product-images' bucket in your Supabase dashboard and ensure inserts are allowed.`);
+            }
+            throw new Error(`Failed to upload image: ${image.name}. Reason: ${uploadError.message}`);
         }
 
         const { data } = supabase.storage
@@ -47,7 +51,7 @@ export const addProduct = async (productData: Omit<Product, 'id' | 'images'>, im
         
         const { data: newProduct, error } = await supabase
             .from('products')
-            .insert([productToAdd]) // Pass an array of objects
+            .insert([productToAdd])
             .select()
             .single();
 
