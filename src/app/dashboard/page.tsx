@@ -3,7 +3,7 @@
 
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Box, IndianRupee, Users, Loader2, TrendingUp, Star, ShoppingCart, MessageSquare, LineChart } from "lucide-react";
+import { Users, Loader2, Star, ShoppingCart, MessageSquare } from "lucide-react";
 import Link from "next/link";
 import {
   Table,
@@ -15,15 +15,23 @@ import {
 } from "@/components/ui/table";
 import { useLanguage } from "@/context/language-context";
 import { useData } from "@/context/data-context";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
+
+const chartData = [
+    { month: "Jan", sales: 186 },
+    { month: "Feb", sales: 305 },
+    { month: "Mar", sales: 237 },
+    { month: "Apr", sales: 173 },
+    { month: "May", sales: 209 },
+    { month: "Jun", sales: 284 },
+];
 
 
 export default function DashboardPage() {
   const { t, language } = useLanguage();
-  const { products, artisans, loading } = useData();
+  const { products, loading } = useData();
   
   const recentProducts = products.slice(0, 5);
-  const artisanProfile = artisans.find(a => a.id === "artisan-1"); // Example, replace with logged in artisan
 
   return (
     <div className="space-y-8">
@@ -35,8 +43,8 @@ export default function DashboardPage() {
        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t('totalRevenue')}</CardTitle>
-            <IndianRupee className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 text-muted-foreground"><path d="M15 8.502a1.5 1.5 0 0 1-2.43.832l-5.584 2.934a1.502 1.502 0 1 1-1.25-2.264l5.583-2.935a1.5 1.5 0 1 1 3.682 1.433Z"/></svg>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">₹3,56,787</div>
@@ -74,10 +82,8 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
       </div>
-
-
-      <div className="grid gap-6 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
+      
+       <Card>
             <CardHeader>
             <div className="flex justify-between items-center">
                 <div>
@@ -117,6 +123,29 @@ export default function DashboardPage() {
                 </Table>
             )}
             </CardContent>
+        </Card>
+
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>Sales Over Time</CardTitle>
+            <CardDescription>A look at your sales performance for the last 6 months.</CardDescription>
+          </CardHeader>
+          <CardContent>
+             <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={chartData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
+                    <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `${value}`} />
+                    <Tooltip
+                        cursor={{ fill: 'hsl(var(--muted))' }}
+                        contentStyle={{ backgroundColor: 'hsl(var(--background))', border: '1px solid hsl(var(--border))' }}
+                    />
+                    <Bar dataKey="sales" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
         </Card>
 
         <Card>
@@ -168,3 +197,5 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+    
