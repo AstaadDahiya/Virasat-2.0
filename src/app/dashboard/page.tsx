@@ -72,7 +72,7 @@ export default function DashboardPage() {
                              <span>+20.1%</span>
                          </div>
                     </div>
-                    <div className="h-[250px] w-full mt-4">
+                    <div className="h-[250px] w-full mt-4 -ml-6">
                          <ChartContainer config={chartConfig}>
                             <AreaChart
                                 accessibilityLayer
@@ -80,7 +80,7 @@ export default function DashboardPage() {
                                 margin={{
                                     left: 12,
                                     right: 12,
-                                    top: 10
+                                    top: 10,
                                 }}
                             >
                                 <CartesianGrid vertical={false} strokeDasharray="3 3"/>
@@ -225,4 +225,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
