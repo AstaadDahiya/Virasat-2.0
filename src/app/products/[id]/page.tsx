@@ -11,11 +11,13 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { ProductGallery } from "@/components/product-gallery";
-import { ShoppingCart, Star, Loader2 } from "lucide-react";
+import { ShoppingCart, Star, Loader2, Minus, Plus } from "lucide-react";
 import { useLanguage } from "@/context/language-context";
 import { useEffect, useState } from "react";
 import { Product, Artisan } from "@/lib/types";
 import { getProduct, getArtisan } from "@/services/supabase";
+import { useCart } from "@/context/cart-context";
+import { Input } from "@/components/ui/input";
 
 export default function ProductDetailPage({ params }: { params: { id: string } }) {
   const { id } = params;
@@ -23,6 +25,8 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
   const [product, setProduct] = useState<Product | null>(null);
   const [artisan, setArtisan] = useState<Artisan | null>(null);
   const [loading, setLoading] = useState(true);
+  const [quantity, setQuantity] = useState(1);
+  const { addToCart } = useCart();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -48,6 +52,12 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
       fetchData();
     }
   }, [id]);
+
+  const handleAddToCart = () => {
+    if (product) {
+      addToCart(product, quantity);
+    }
+  };
   
   if (loading) {
     return (
@@ -99,8 +109,18 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
               </div>
 
               <div className="mt-auto pt-8">
-                 <Button size="lg" className="w-full">
-                    <ShoppingCart className="mr-2 h-5 w-5" /> {t('addToCart')}
+                 <div className="flex items-center gap-4 mb-4">
+                    <div className="flex items-center gap-2">
+                        <Button variant="outline" size="icon" onClick={() => setQuantity(q => Math.max(1, q-1))}><Minus/></Button>
+                        <Input type="number" value={quantity} onChange={e => setQuantity(Number(e.target.value))} className="w-16 text-center" min="1" max={product.stock} />
+                        <Button variant="outline" size="icon" onClick={() => setQuantity(q => Math.min(product.stock, q+1))}><Plus/></Button>
+                    </div>
+                     <p className="text-sm text-muted-foreground">{product.stock} {t('inStock')}</p>
+                 </div>
+
+                 <Button size="lg" className="w-full" onClick={handleAddToCart} disabled={product.stock < 1}>
+                    <ShoppingCart className="mr-2 h-5 w-5" /> 
+                    {product.stock > 0 ? t('addToCart') : t('outOfStock')}
                   </Button>
                 {artisan && (
                   <div className="mt-6 bg-secondary p-4 rounded-lg flex items-center gap-4">

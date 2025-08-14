@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Menu, Search, Languages } from "lucide-react";
+import { Menu, Search, Languages, ShoppingCart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Logo } from "./logo";
 import { useLanguage } from "@/context/language-context";
@@ -16,6 +16,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ThemeToggle } from "./theme-toggle";
+import { useCart } from "@/context/cart-context";
+import { useState } from "react";
+import { CartDrawer } from "./cart-drawer";
 
 const navLinks = [
   { href: "/", labelKey: "home" },
@@ -26,6 +29,8 @@ const navLinks = [
 export function SiteHeader() {
   const pathname = usePathname();
   const { t, setLanguage, language } = useLanguage();
+  const { cartCount } = useCart();
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -75,6 +80,13 @@ export function SiteHeader() {
                 <span className="sr-only">Search</span>
              </Link>
           </Button>
+          <Button variant="ghost" size="icon" className="relative" onClick={() => setIsCartOpen(true)}>
+             <ShoppingCart />
+             <span className="sr-only">{t('shoppingCart')}</span>
+             {cartCount > 0 && (
+                <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">{cartCount}</span>
+             )}
+          </Button>
           <Button asChild>
             <Link href="/dashboard">{t('artisanDashboard')}</Link>
           </Button>
@@ -108,6 +120,7 @@ export function SiteHeader() {
           </Sheet>
         </div>
       </div>
+      <CartDrawer open={isCartOpen} onOpenChange={setIsCartOpen} />
     </header>
   );
 }

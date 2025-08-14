@@ -57,6 +57,8 @@ export const translations: LanguageTranslations = {
     productMaterials: 'Materials',
     addToCart: 'Add to Cart',
     soldBy: 'Sold by',
+    inStock: 'in stock',
+    outOfStock: 'Out of Stock',
     
     // Products Page
     ourCollection: 'Our Collection',
@@ -259,6 +261,19 @@ export const translations: LanguageTranslations = {
     generatingMockupMessage: 'Generating your beautiful mockup... this may take a moment.',
     generatedMockup: 'Generated Mockup:',
     download: 'Download',
+    
+    // Cart
+    shoppingCart: 'Shopping Cart',
+    subtotal: 'Subtotal',
+    checkout: 'Checkout',
+    cartIsEmpty: 'Your cart is empty',
+    cartIsEmptyHint: 'Find something beautiful to add!',
+    continueShopping: 'Continue Shopping',
+    toastItemAddedToCartTitle: 'Item added!',
+    toastItemAddedToCartDescription: 'Added {{name}} to your cart.',
+    toastNotEnoughStockTitle: 'Not enough stock',
+    toastNotEnoughStockDescription: 'You cannot add more than the {{stock}} items available.',
+
 
     // Toasts
     toastErrorTitle: 'An error occurred',
@@ -324,6 +339,8 @@ export const translations: LanguageTranslations = {
     productMaterials: 'सामग्री',
     addToCart: 'कार्ट में जोड़ें',
     soldBy: 'द्वारा बेचा गया',
+    inStock: 'स्टॉक में',
+    outOfStock: 'स्टॉक खत्म',
     
     // Products Page
     ourCollection: 'हमारा संग्रह',
@@ -526,6 +543,18 @@ export const translations: LanguageTranslations = {
     generatingMockupMessage: 'आपका सुंदर मॉकअप उत्पन्न हो रहा है... इसमें कुछ समय लग सकता है।',
     generatedMockup: 'उत्पन्न मॉकअप:',
     download: 'डाउनलोड करें',
+
+    // Cart
+    shoppingCart: 'शॉपिंग कार्ट',
+    subtotal: 'उप-योग',
+    checkout: 'चेकआउट',
+    cartIsEmpty: 'आपकी कार्ट खाली है',
+    cartIsEmptyHint: 'जोड़ने के लिए कुछ सुंदर खोजें!',
+    continueShopping: 'खरीदारी जारी रखें',
+    toastItemAddedToCartTitle: 'आइटम जोड़ा गया!',
+    toastItemAddedToCartDescription: '{{name}} को आपकी कार्ट में जोड़ा गया।',
+    toastNotEnoughStockTitle: 'पर्याप्त स्टॉक नहीं है',
+    toastNotEnoughStockDescription: 'आप उपलब्ध {{stock}} आइटम से अधिक नहीं जोड़ सकते।',
 
     // Toasts
     toastErrorTitle: 'एक त्रुटि हुई',
