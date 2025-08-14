@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Slider } from '@/components/ui/slider';
 import { ProductCard } from './product-card';
 import { Search } from 'lucide-react';
+import { useLanguage } from '@/context/language-context';
 
 interface ProductFiltersProps {
   products: Product[];
@@ -14,6 +15,7 @@ interface ProductFiltersProps {
 }
 
 export function ProductFilters({ products, categories }: ProductFiltersProps) {
+  const { t } = useLanguage();
   const [searchTerm, setSearchTerm] = useState('');
   const [category, setCategory] = useState('all');
   const maxPrice = useMemo(() => Math.max(...products.map(p => p.price), 10000), [products]);
@@ -35,7 +37,7 @@ export function ProductFilters({ products, categories }: ProductFiltersProps) {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
           <Input
             type="text"
-            placeholder="Search for products..."
+            placeholder={t('searchProductsPlaceholder')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10"
@@ -44,10 +46,10 @@ export function ProductFilters({ products, categories }: ProductFiltersProps) {
         <div>
           <Select value={category} onValueChange={setCategory}>
             <SelectTrigger>
-              <SelectValue placeholder="Select a category" />
+              <SelectValue placeholder={t('selectACategory')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Categories</SelectItem>
+              <SelectItem value="all">{t('allCategories')}</SelectItem>
               {categories.map(cat => (
                 <SelectItem key={cat} value={cat}>{cat}</SelectItem>
               ))}
@@ -56,7 +58,7 @@ export function ProductFilters({ products, categories }: ProductFiltersProps) {
         </div>
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
-            <span>Price Range</span>
+            <span>{t('priceRange')}</span>
             <span className="font-medium text-primary">₹{priceRange[0]} - ₹{priceRange[1]}</span>
           </div>
           <Slider
@@ -77,8 +79,8 @@ export function ProductFilters({ products, categories }: ProductFiltersProps) {
         </div>
       ) : (
         <div className="text-center py-16">
-          <h3 className="text-2xl font-headline">No Products Found</h3>
-          <p className="text-muted-foreground mt-2">Try adjusting your search or filters.</p>
+          <h3 className="text-2xl font-headline">{t('noProductsFound')}</h3>
+          <p className="text-muted-foreground mt-2">{t('noProductsFoundSubtitle')}</p>
         </div>
       )}
     </div>

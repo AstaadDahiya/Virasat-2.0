@@ -1,3 +1,5 @@
+"use client";
+
 import { products } from "@/lib/data";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,38 +21,40 @@ import {
 } from "@/components/ui/dropdown-menu";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
+import { useLanguage } from "@/context/language-context";
 
 export default function DashboardProductsPage() {
+  const { t } = useLanguage();
   return (
     <div className="space-y-8">
        <div className="flex items-center justify-between">
          <div>
-            <h1 className="text-3xl font-bold font-headline">My Products</h1>
-            <p className="text-muted-foreground">Manage your inventory and view product details.</p>
+            <h1 className="text-3xl font-bold font-headline">{t('myProducts')}</h1>
+            <p className="text-muted-foreground">{t('myProductsSubtitle')}</p>
         </div>
         <Button>
-            <PlusCircle className="mr-2 h-4 w-4" /> Add Product
+            <PlusCircle className="mr-2 h-4 w-4" /> {t('addProduct')}
         </Button>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>All Products</CardTitle>
-          <CardDescription>A list of all products in your store.</CardDescription>
+          <CardTitle>{t('allProducts')}</CardTitle>
+          <CardDescription>{t('allProductsDescription')}</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead className="hidden w-[100px] sm:table-cell">
-                  Image
+                  {t('tableHeaderImage')}
                 </TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead className="hidden md:table-cell text-right">Price</TableHead>
-                <TableHead className="hidden md:table-cell text-right">Stock</TableHead>
+                <TableHead>{t('tableHeaderName')}</TableHead>
+                <TableHead>{t('tableHeaderCategory')}</TableHead>
+                <TableHead className="hidden md:table-cell text-right">{t('tableHeaderPrice')}</TableHead>
+                <TableHead className="hidden md:table-cell text-right">{t('tableHeaderStock')}</TableHead>
                 <TableHead>
-                  <span className="sr-only">Actions</span>
+                  <span className="sr-only">{t('tableHeaderActions')}</span>
                 </TableHead>
               </TableRow>
             </TableHeader>
@@ -82,13 +86,13 @@ export default function DashboardProductsPage() {
                           variant="ghost"
                         >
                           <MoreHorizontal className="h-4 w-4" />
-                          <span className="sr-only">Toggle menu</span>
+                          <span className="sr-only">{t('toggleMenu')}</span>
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem>Edit</DropdownMenuItem>
-                        <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
+                        <DropdownMenuLabel>{t('tableHeaderActions')}</DropdownMenuLabel>
+                        <DropdownMenuItem>{t('edit')}</DropdownMenuItem>
+                        <DropdownMenuItem className="text-destructive">{t('delete')}</DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>

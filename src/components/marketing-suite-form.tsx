@@ -22,8 +22,8 @@ import { Loader2, Copy } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { products } from "@/lib/data";
-import { Textarea } from "./ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { useLanguage } from "@/context/language-context";
 
 const formSchema = z.object({
   productId: z.string({ required_error: "Please select a product." }),
@@ -32,6 +32,7 @@ const formSchema = z.object({
 
 export function MarketingSuiteForm() {
   const { toast } = useToast();
+  const { t } = useLanguage();
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<GenerateMarketingContentOutput | null>(null);
 
@@ -48,7 +49,7 @@ export function MarketingSuiteForm() {
     try {
       const product = products.find(p => p.id === values.productId);
       if (!product) {
-          toast({ variant: "destructive", title: "Product not found" });
+          toast({ variant: "destructive", title: t('toastProductNotFound') });
           setLoading(false);
           return;
       }
@@ -63,8 +64,8 @@ export function MarketingSuiteForm() {
       console.error(error);
       toast({
         variant: "destructive",
-        title: "An error occurred",
-        description: "Failed to generate content. Please try again.",
+        title: t('toastErrorTitle'),
+        description: t('toastErrorDescription'),
       });
     } finally {
       setLoading(false);
@@ -74,7 +75,7 @@ export function MarketingSuiteForm() {
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text);
     toast({
-      title: "Copied to clipboard!",
+      title: t('toastCopied'),
     });
   };
 
@@ -83,7 +84,7 @@ export function MarketingSuiteForm() {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <FormField control={form.control} name="productId" render={({ field }) => (
-              <FormItem><FormLabel>Product</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Select a product" /></SelectTrigger></FormControl><SelectContent><SelectContent>
+              <FormItem><FormLabel>{t('product')}</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder={t('selectAProduct')} /></SelectTrigger></FormControl><SelectContent><SelectContent>
                 {products.map(product => (
                     <SelectItem key={product.id} value={product.id}>{product.name}</SelectItem>
                 ))}
@@ -94,8 +95,8 @@ export function MarketingSuiteForm() {
             name="targetAudience"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Target Audience</FormLabel>
-                <FormControl><Input placeholder="e.g., Eco-conscious millennials, home decor enthusiasts" {...field} /></FormControl>
+                <FormLabel>{t('targetAudience')}</FormLabel>
+                <FormControl><Input placeholder={t('targetAudiencePlaceholder')} {...field} /></FormControl>
                 <FormMessage />
               </FormItem>
             )}
@@ -103,7 +104,7 @@ export function MarketingSuiteForm() {
 
           <Button type="submit" disabled={loading}>
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {loading ? "Generating..." : "Generate Content"}
+            {loading ? t('generating') : t('generateContent')}
           </Button>
         </form>
       </Form>
@@ -125,7 +126,7 @@ export function MarketingSuiteForm() {
         <div className="pt-6 space-y-6">
             <Card>
                 <CardHeader className="flex flex-row items-center justify-between">
-                    <CardTitle>Social Media Post</CardTitle>
+                    <CardTitle>{t('socialMediaPost')}</CardTitle>
                     <Button variant="ghost" size="icon" onClick={() => handleCopy(result.socialMediaPost)}><Copy className="h-4 w-4" /></Button>
                 </CardHeader>
                 <CardContent>
@@ -134,7 +135,7 @@ export function MarketingSuiteForm() {
             </Card>
             <Card>
                 <CardHeader className="flex flex-row items-center justify-between">
-                    <CardTitle>Email Newsletter</CardTitle>
+                    <CardTitle>{t('emailNewsletter')}</CardTitle>
                     <Button variant="ghost" size="icon" onClick={() => handleCopy(result.emailNewsletter)}><Copy className="h-4 w-4" /></Button>
                 </CardHeader>
                 <CardContent>
@@ -143,7 +144,7 @@ export function MarketingSuiteForm() {
             </Card>
             <Card>
                 <CardHeader className="flex flex-row items-center justify-between">
-                    <CardTitle>Ad Copy</CardTitle>
+                    <CardTitle>{t('adCopy')}</CardTitle>
                      <Button variant="ghost" size="icon" onClick={() => handleCopy(result.adCopy)}><Copy className="h-4 w-4" /></Button>
                 </CardHeader>
                 <CardContent>

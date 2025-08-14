@@ -22,6 +22,7 @@ import { Loader2, Copy, Mic, Square, RotateCw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { useLanguage } from "@/context/language-context";
 
 const formSchema = z.object({
   style: z.string().optional(),
@@ -29,6 +30,7 @@ const formSchema = z.object({
 
 export function AiStoryteller() {
   const { toast } = useToast();
+  const { t } = useLanguage();
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<StoryToDescriptionOutput | null>(null);
   const [isRecording, setIsRecording] = useState(false);
@@ -84,8 +86,8 @@ export function AiStoryteller() {
         setHasMicPermission(false);
         toast({
             variant: "destructive",
-            title: "Microphone Access Denied",
-            description: "Please enable microphone permissions in your browser settings.",
+            title: t('toastMicAccessDeniedTitle'),
+            description: t('toastMicAccessDeniedDescription'),
         });
     }
   };
@@ -110,8 +112,8 @@ export function AiStoryteller() {
     if (!audioUrl) {
       toast({
         variant: "destructive",
-        title: "No audio recorded",
-        description: "Please record your story before generating a description.",
+        title: t('toastNoAudioTitle'),
+        description: t('toastNoAudioDescription'),
       });
       return;
     }
@@ -136,8 +138,8 @@ export function AiStoryteller() {
              console.error(error);
              toast({
                 variant: "destructive",
-                title: "An error occurred",
-                description: "Failed to generate description. Please try again.",
+                title: t('toastErrorTitle'),
+                description: t('toastErrorDescription'),
             });
         } finally {
             setLoading(false);
@@ -148,8 +150,8 @@ export function AiStoryteller() {
       console.error(error);
       toast({
         variant: "destructive",
-        title: "An error occurred",
-        description: "Failed to process audio. Please try again.",
+        title: t('toastErrorTitle'),
+        description: t('toastProcessAudioError'),
       });
       setLoading(false);
     }
@@ -159,7 +161,7 @@ export function AiStoryteller() {
     if (result?.description) {
       navigator.clipboard.writeText(result.description);
       toast({
-        title: "Copied to clipboard!",
+        title: t('toastCopied'),
       });
     }
   };
@@ -167,9 +169,9 @@ export function AiStoryteller() {
   if (hasMicPermission === false) {
       return (
            <Alert variant="destructive">
-              <AlertTitle>Microphone Access Required</AlertTitle>
+              <AlertTitle>{t('micAccessRequiredTitle')}</AlertTitle>
               <AlertDescription>
-                Please allow microphone access in your browser settings to use this feature.
+                {t('micAccessRequiredDescription')}
               </AlertDescription>
             </Alert>
       )
@@ -178,7 +180,7 @@ export function AiStoryteller() {
       return (
         <div className="flex items-center justify-center p-8">
             <Loader2 className="h-6 w-6 animate-spin"/>
-            <p className="ml-2">Checking for microphone...</p>
+            <p className="ml-2">{t('checkingForMicrophone')}</p>
         </div>
       )
   }
@@ -196,15 +198,15 @@ export function AiStoryteller() {
                 disabled={loading}
             >
                 {isRecording ? <Square className="mr-2" /> : <Mic className="mr-2" />}
-                {isRecording ? 'Stop Recording' : 'Start Recording'}
+                {isRecording ? t('stopRecording') : t('startRecording')}
             </Button>
             {audioUrl && !isRecording && (
                 <div className="w-full space-y-4 p-4 bg-secondary rounded-lg">
                      <div className="flex items-center justify-between">
-                         <h3 className="font-semibold text-sm">Your voice note:</h3>
+                         <h3 className="font-semibold text-sm">{t('yourVoiceNote')}</h3>
                          <Button variant="ghost" size="sm" onClick={resetRecording}>
                              <RotateCw className="mr-2 h-4 w-4"/>
-                             Record again
+                             {t('recordAgain')}
                          </Button>
                      </div>
                      <audio src={audioUrl} controls className="w-full" />
@@ -220,9 +222,9 @@ export function AiStoryteller() {
             name="style"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Style/Tone (Optional)</FormLabel>
+                <FormLabel>{t('styleToneLabel')}</FormLabel>
                 <FormControl>
-                  <Input placeholder="e.g., Elegant, Rustic, Modern, Playful" {...field} />
+                  <Input placeholder={t('styleTonePlaceholder')} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -230,7 +232,7 @@ export function AiStoryteller() {
           />
           <Button type="submit" disabled={loading || !audioUrl || isRecording}>
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {loading ? "Generating..." : "Generate Description"}
+            {loading ? t('generating') : t('generateDescription')}
           </Button>
         </form>
       </Form>
@@ -246,7 +248,7 @@ export function AiStoryteller() {
       {result && (
         <div className="pt-4 space-y-4">
           <div>
-            <h3 className="text-lg font-semibold font-headline mb-2">Generated Description:</h3>
+            <h3 className="text-lg font-semibold font-headline mb-2">{t('generatedDescription')}</h3>
             <div className="p-4 rounded-md bg-secondary relative">
                 <Button
                 variant="ghost"
@@ -260,7 +262,7 @@ export function AiStoryteller() {
             </div>
           </div>
            <div>
-            <h3 className="text-lg font-semibold font-headline mb-2">Transcript:</h3>
+            <h3 className="text-lg font-semibold font-headline mb-2">{t('transcript')}</h3>
             <div className="p-4 rounded-md bg-muted/50 border">
                 <p className="text-muted-foreground leading-relaxed text-sm fst-italic">"{result.transcript}"</p>
             </div>

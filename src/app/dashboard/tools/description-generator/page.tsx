@@ -1,8 +1,12 @@
+"use client";
+
 import { AiStoryteller } from "@/components/ai-storyteller";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Mic } from "lucide-react";
+import { useLanguage } from "@/context/language-context";
 
 export default function AiStorytellerPage() {
+  const { t } = useLanguage();
   return (
     <div className="space-y-8 max-w-4xl mx-auto">
       <div className="flex items-start gap-4">
@@ -10,15 +14,15 @@ export default function AiStorytellerPage() {
            <Mic className="h-6 w-6 text-primary" />
         </div>
         <div>
-          <h1 className="text-3xl font-bold font-headline">AI Storyteller</h1>
-          <p className="text-muted-foreground">Tell your product's story with your voice. We'll turn it into a captivating description.</p>
+          <h1 className="text-3xl font-bold font-headline">{t('aiStorytellerTitle')}</h1>
+          <p className="text-muted-foreground">{t('aiStorytellerSubtitle')}</p>
         </div>
       </div>
       
       <Card>
         <CardHeader>
-          <CardTitle>Record a Story</CardTitle>
-          <CardDescription>Share the story, inspiration, and details of your product. Our AI will transform your voice note into a compelling product description.</CardDescription>
+          <CardTitle>{t('recordAStory')}</CardTitle>
+          <CardDescription>{t('recordAStoryDescription')}</CardDescription>
         </CardHeader>
         <CardContent>
           <AiStoryteller />

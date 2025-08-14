@@ -22,57 +22,60 @@ import {
   Megaphone,
   Camera,
   TrendingUp,
+  Languages
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "./ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Logo } from "./logo";
-
-const menuItems = [
-  {
-    href: "/dashboard",
-    label: "Overview",
-    icon: LayoutGrid,
-  },
-  {
-    href: "/dashboard/products",
-    label: "Products",
-    icon: Box,
-  },
-];
-
-const toolsItems = [
-  {
-    href: "/dashboard/tools/description-generator",
-    label: "Description Generator",
-    icon: WandSparkles,
-  },
-  {
-    href: "/dashboard/tools/pricing-optimizer",
-    label: "Pricing Optimizer",
-    icon: DollarSign,
-  },
-  {
-    href: "/dashboard/tools/marketing-suite",
-    label: "Marketing Suite",
-    icon: Megaphone,
-  },
-  {
-    href: "/dashboard/tools/visual-enhancer",
-    label: "Visual Enhancer",
-    icon: Camera,
-  },
-  {
-    href: "/dashboard/tools/trend-harmonizer",
-    label: "Trend Harmonizer",
-    icon: TrendingUp,
-  },
-];
+import { useLanguage } from "@/context/language-context";
 
 export function DashboardSidebar() {
   const pathname = usePathname();
   const { state } = useSidebar();
+  const { t } = useLanguage();
+
+  const menuItems = [
+    {
+      href: "/dashboard",
+      label: t('dashboardOverviewTitle'),
+      icon: LayoutGrid,
+    },
+    {
+      href: "/dashboard/products",
+      label: t('myProducts'),
+      icon: Box,
+    },
+  ];
+
+  const toolsItems = [
+    {
+      href: "/dashboard/tools/description-generator",
+      label: t('aiStorytellerTitle'),
+      icon: WandSparkles,
+    },
+    {
+      href: "/dashboard/tools/pricing-optimizer",
+      label: t('pricingOptimizerTitle'),
+      icon: DollarSign,
+    },
+    {
+      href: "/dashboard/tools/marketing-suite",
+      label: t('marketingSuiteTitle'),
+      icon: Megaphone,
+    },
+    {
+      href: "/dashboard/tools/visual-enhancer",
+      label: t('visualEnhancerTitle'),
+      icon: Camera,
+    },
+    {
+      href: "/dashboard/tools/trend-harmonizer",
+      label: t('trendHarmonizerTitle'),
+      icon: TrendingUp,
+    },
+  ];
 
   const isActive = (href: string) => {
     return pathname === href;
@@ -112,7 +115,7 @@ export function DashboardSidebar() {
         </SidebarMenu>
         
         <SidebarMenu className="mt-4">
-           <p className="px-2 text-xs text-muted-foreground mb-2 group-data-[collapsible=icon]:hidden">AI Tools</p>
+           <p className="px-2 text-xs text-muted-foreground mb-2 group-data-[collapsible=icon]:hidden">{t('aiTools')}</p>
            {toolsItems.map((item) => (
             <SidebarMenuItem key={item.href}>
               <SidebarMenuButton
@@ -133,18 +136,18 @@ export function DashboardSidebar() {
       <SidebarFooter className="p-2">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild tooltip={{ children: 'Settings' }}>
+            <SidebarMenuButton asChild tooltip={{ children: t('settings') }}>
               <Link href="#">
                 <Cog />
-                <span>Settings</span>
+                <span>{t('settings')}</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
            <SidebarMenuItem>
-            <SidebarMenuButton asChild tooltip={{ children: 'Back to Site' }}>
+            <SidebarMenuButton asChild tooltip={{ children: t('backToSite') }}>
               <Link href="/">
                 <Home />
-                <span>Back to Site</span>
+                <span>{t('backToSite')}</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

@@ -1,3 +1,5 @@
+"use client";
+
 import { products, artisans } from "@/lib/data";
 import { notFound } from "next/navigation";
 import Image from "next/image";
@@ -10,8 +12,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { ProductGallery } from "@/components/product-gallery";
 import { ShoppingCart, Star } from "lucide-react";
+import { useLanguage } from "@/context/language-context";
 
 export default function ProductDetailPage({ params }: { params: { id: string } }) {
+  const { t } = useLanguage();
   const product = products.find(p => p.id === params.id);
 
   if (!product) {
@@ -36,7 +40,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
                   <p className="text-3xl font-bold text-primary">₹{product.price.toFixed(2)}</p>
                   <div className="flex items-center gap-1">
                     {[...Array(5)].map((_, i) => <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />)}
-                    <span className="text-muted-foreground text-sm ml-1">(12 reviews)</span>
+                    <span className="text-muted-foreground text-sm ml-1">{t('productReviews')}</span>
                   </div>
                 </div>
                 <p className="text-muted-foreground mt-4 leading-relaxed">{product.description}</p>
@@ -45,7 +49,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
               <Separator className="my-6" />
 
               <div>
-                <h3 className="font-headline text-lg font-semibold mb-2">Materials</h3>
+                <h3 className="font-headline text-lg font-semibold mb-2">{t('productMaterials')}</h3>
                 <ul className="list-disc list-inside text-muted-foreground space-y-1">
                   {product.materials.map(material => <li key={material}>{material}</li>)}
                 </ul>
@@ -53,7 +57,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
 
               <div className="mt-auto pt-8">
                  <Button size="lg" className="w-full">
-                    <ShoppingCart className="mr-2 h-5 w-5" /> Add to Cart
+                    <ShoppingCart className="mr-2 h-5 w-5" /> {t('addToCart')}
                   </Button>
                 {artisan && (
                   <div className="mt-6 bg-secondary p-4 rounded-lg flex items-center gap-4">
@@ -62,7 +66,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
                       <AvatarFallback>{artisan.name.charAt(0)}</AvatarFallback>
                     </Avatar>
                     <div>
-                      <p className="text-sm text-muted-foreground">Sold by</p>
+                      <p className="text-sm text-muted-foreground">{t('soldBy')}</p>
                       <Link href={`/artisans/${artisan.id}`} className="font-semibold text-accent hover:underline font-headline text-lg">{artisan.name}</Link>
                     </div>
                   </div>

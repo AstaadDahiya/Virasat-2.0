@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent } from "./ui/card";
+import { useLanguage } from "@/context/language-context";
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
@@ -25,6 +26,7 @@ const formSchema = z.object({
 
 export function ContactArtisanForm() {
   const { toast } = useToast();
+  const { t } = useLanguage();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -38,8 +40,8 @@ export function ContactArtisanForm() {
     // Simulate sending a message
     console.log("Form submitted:", values);
     toast({
-      title: "Message Sent!",
-      description: "The artisan has been notified and will get back to you soon.",
+      title: t('toastMessageSentTitle'),
+      description: t('toastMessageSentDescription'),
     });
     form.reset();
   }
@@ -54,9 +56,9 @@ export function ContactArtisanForm() {
                 name="name"
                 render={({ field }) => (
                     <FormItem>
-                    <FormLabel>Your Name</FormLabel>
+                    <FormLabel>{t('formLabelYourName')}</FormLabel>
                     <FormControl>
-                        <Input placeholder="Jane Doe" {...field} />
+                        <Input placeholder={t('formPlaceholderYourName')} {...field} />
                     </FormControl>
                     <FormMessage />
                     </FormItem>
@@ -67,9 +69,9 @@ export function ContactArtisanForm() {
                 name="email"
                 render={({ field }) => (
                     <FormItem>
-                    <FormLabel>Your Email</FormLabel>
+                    <FormLabel>{t('formLabelYourEmail')}</FormLabel>
                     <FormControl>
-                        <Input placeholder="jane.doe@example.com" {...field} />
+                        <Input placeholder={t('formPlaceholderYourEmail')} {...field} />
                     </FormControl>
                     <FormMessage />
                     </FormItem>
@@ -80,10 +82,10 @@ export function ContactArtisanForm() {
                 name="message"
                 render={({ field }) => (
                     <FormItem>
-                    <FormLabel>Message</FormLabel>
+                    <FormLabel>{t('formLabelMessage')}</FormLabel>
                     <FormControl>
                         <Textarea
-                        placeholder="Inquire about a custom order or ask a question..."
+                        placeholder={t('formPlaceholderMessage')}
                         className="resize-none"
                         {...field}
                         />
@@ -93,7 +95,7 @@ export function ContactArtisanForm() {
                 )}
                 />
                 <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
-                {form.formState.isSubmitting ? "Sending..." : "Send Message"}
+                {form.formState.isSubmitting ? t('sending') : t('sendMessage')}
                 </Button>
             </form>
             </Form>

@@ -1,15 +1,19 @@
+"use client";
+
 import Link from 'next/link';
 import Image from 'next/image';
 import type { Artisan } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from './ui/button';
 import { MapPin } from 'lucide-react';
+import { useLanguage } from '@/context/language-context';
 
 interface ArtisanCardProps {
   artisan: Artisan;
 }
 
 export function ArtisanCard({ artisan }: ArtisanCardProps) {
+  const { t } = useLanguage();
   return (
     <Card className="overflow-hidden rounded-lg shadow-md transition-shadow hover:shadow-xl text-center">
       <CardHeader className="p-0 items-center">
@@ -34,7 +38,7 @@ export function ArtisanCard({ artisan }: ArtisanCardProps) {
       </CardContent>
       <CardFooter className="p-4 bg-secondary">
         <Button asChild className="w-full">
-          <Link href={`/artisans/${artisan.id}`}>View Profile</Link>
+          <Link href={`/artisans/${artisan.id}`}>{t('viewProfile')}</Link>
         </Button>
       </CardFooter>
     </Card>

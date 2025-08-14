@@ -9,6 +9,7 @@ import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
 import { ProductCard } from './product-card';
 import { SearchIcon } from 'lucide-react';
+import { useLanguage } from '@/context/language-context';
 
 interface ProductSearchProps {
   products: Product[];
@@ -17,6 +18,7 @@ interface ProductSearchProps {
 }
 
 export function ProductSearch({ products, categories, artisans: artisanNames }: ProductSearchProps) {
+  const { t } = useLanguage();
   const [searchTerm, setSearchTerm] = useState('');
   const [category, setCategory] = useState('all');
   const [artisan, setArtisan] = useState('all');
@@ -41,25 +43,25 @@ export function ProductSearch({ products, categories, artisans: artisanNames }: 
             <div className="relative">
                 <Input
                     type="text"
-                    placeholder="Search by product name or description..."
+                    placeholder={t('productSearchPlaceholder')}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pr-16"
                 />
                  <Button className="absolute right-1 top-1/2 -translate-y-1/2 h-8">
                     <SearchIcon className="h-4 w-4 mr-2"/>
-                    Search
+                    {t('search')}
                 </Button>
             </div>
         </div>
         <div>
-          <label className="text-sm font-medium mb-2 block">Category</label>
+          <label className="text-sm font-medium mb-2 block">{t('tableHeaderCategory')}</label>
           <Select value={category} onValueChange={setCategory}>
             <SelectTrigger>
-              <SelectValue placeholder="All Categories" />
+              <SelectValue placeholder={t('allCategories')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Categories</SelectItem>
+              <SelectItem value="all">{t('allCategories')}</SelectItem>
               {categories.map(cat => (
                 <SelectItem key={cat} value={cat}>{cat}</SelectItem>
               ))}
@@ -67,13 +69,13 @@ export function ProductSearch({ products, categories, artisans: artisanNames }: 
           </Select>
         </div>
         <div>
-           <label className="text-sm font-medium mb-2 block">Artisan</label>
+           <label className="text-sm font-medium mb-2 block">{t('artisans')}</label>
            <Select value={artisan} onValueChange={setArtisan}>
             <SelectTrigger>
-              <SelectValue placeholder="All Artisans" />
+              <SelectValue placeholder={t('allArtisans')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Artisans</SelectItem>
+              <SelectItem value="all">{t('allArtisans')}</SelectItem>
               {artisanNames.map(name => (
                 <SelectItem key={name} value={name}>{name}</SelectItem>
               ))}
@@ -81,7 +83,7 @@ export function ProductSearch({ products, categories, artisans: artisanNames }: 
           </Select>
         </div>
         <div className="lg:col-span-2">
-          <label className="text-sm font-medium mb-2 block">Price Range: <span className="font-semibold text-primary">₹{priceRange[0].toLocaleString()} - ₹{priceRange[1].toLocaleString()}</span></label>
+          <label className="text-sm font-medium mb-2 block">{t('priceRange')}: <span className="font-semibold text-primary">₹{priceRange[0].toLocaleString()} - ₹{priceRange[1].toLocaleString()}</span></label>
           <Slider
             min={0}
             max={maxPrice}
@@ -101,8 +103,8 @@ export function ProductSearch({ products, categories, artisans: artisanNames }: 
         </div>
       ) : (
         <div className="text-center py-16 border rounded-lg bg-secondary">
-          <h3 className="text-2xl font-headline font-bold">No Products Found</h3>
-          <p className="text-muted-foreground mt-2">Try adjusting your search or filters to find what you're looking for.</p>
+          <h3 className="text-2xl font-headline font-bold">{t('noProductsFound')}</h3>
+          <p className="text-muted-foreground mt-2">{t('noProductsFoundFilterSubtitle')}</p>
         </div>
       )}
     </div>

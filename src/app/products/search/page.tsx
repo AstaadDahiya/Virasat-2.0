@@ -1,10 +1,14 @@
+"use client";
+
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { products, artisans } from "@/lib/data";
 import { ProductSearch } from "@/components/product-search";
 import { Search } from "lucide-react";
+import { useLanguage } from "@/context/language-context";
 
 export default function ProductsSearchPage() {
+  const { t } = useLanguage();
   const categories = [...new Set(products.map(p => p.category))];
   const artisanNames = [...new Set(artisans.map(a => a.name))];
 
@@ -18,9 +22,9 @@ export default function ProductsSearchPage() {
               <Search className="h-6 w-6 text-primary" />
             </div>
             <div>
-                <h1 className="font-headline text-4xl md:text-5xl font-bold">Product Search</h1>
+                <h1 className="font-headline text-4xl md:text-5xl font-bold">{t('productSearchTitle')}</h1>
                 <p className="text-muted-foreground mt-2 max-w-2xl">
-                    Find exactly what you're looking for. Filter by category, artisan, price, and more.
+                    {t('productSearchSubtitle')}
                 </p>
             </div>
           </div>
