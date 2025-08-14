@@ -2,9 +2,11 @@
 "use server";
 
 import { supabase } from "@/lib/supabase";
-import { Product, ProductFormData, Artisan } from "@/lib/types";
+import { Product, Artisan } from "@/lib/types";
 
-// This function assumes the user's artisan profile has been created at sign-up.
+// Note: Omit 'images' from the type, as it will be handled separately.
+type ProductInsertData = Omit<Product, 'id' | 'artisanId' | 'images'>;
+
 const uploadImages = async (images: File[], artisanId: string): Promise<string[]> => {
     const imageUrls: string[] = [];
     for (const image of images) {
@@ -28,18 +30,20 @@ const uploadImages = async (images: File[], artisanId: string): Promise<string[]
     return imageUrls;
 };
 
-export const addProduct = async (productData: ProductFormData, artisanId: string): Promise<string> => {
+export const addProduct = async (productData: ProductInsertData, images: File[], artisanId: string): Promise<string> => {
     if (!artisanId) {
         throw new Error("You must be logged in to add a product.");
     }
+    if (!images || images.length === 0) {
+        throw new Error("At least one image is required to add a product.");
+    }
     
     try {
-        const imageUrls = await uploadImages(productData.images, artisanId);
-        
-        const { images, ...restOfProductData } = productData;
+        await ensureArtisanProfile({ id: artisanId }); // Ensure profile exists before adding product
+        const imageUrls = await uploadImages(images, artisanId);
         
         const productToAdd = {
-            ...restOfProductData,
+            ...productData,
             images: imageUrls,
             artisanId: artisanId,
         };

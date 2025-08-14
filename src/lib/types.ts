@@ -1,4 +1,5 @@
 
+
 export type Product = {
   id: string;
   name: string;
@@ -28,8 +29,11 @@ export type Artisan = {
   craft_hi: string;
 };
 
-export type ProductFormData = Omit<Product, 'id' | 'images' | 'artisanId'> & {
+// This represents the data coming from the form, before it's processed.
+export type ProductFormData = Omit<Product, 'id' | 'images' | 'artisanId' | 'materials' | 'materials_hi'> & {
   images: File[];
+  materials: string; // Comes as a comma-separated string from the form input
+  materials_hi: string; // Comes as a comma-separated string from the form input
 }
 
     

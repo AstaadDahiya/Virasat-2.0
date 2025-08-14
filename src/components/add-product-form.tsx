@@ -101,14 +101,15 @@ export function AddProductForm() {
     }
     setLoading(true);
     
-    const productData = {
-        ...values,
-        materials: values.materials.split(',').map(m => m.trim()),
-        materials_hi: values.materials_hi.split(',').map(m => m.trim()),
-    };
-    
     try {
-        await addProduct(productData, user.id);
+        const { images, ...productData } = values;
+        const productInfo = {
+            ...productData,
+            materials: values.materials.split(',').map(m => m.trim()),
+            materials_hi: values.materials_hi.split(',').map(m => m.trim()),
+        }
+
+        await addProduct(productInfo, images, user.id);
         toast({
             title: t('toastProductAddedTitle'),
             description: t('toastProductAddedDescription'),
