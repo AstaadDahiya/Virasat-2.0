@@ -5,27 +5,21 @@ import { supabase } from "@/lib/supabase";
 import { Product, ProductFormData, Artisan } from "@/lib/types";
 import { products as seedDataProducts, artisans as seedDataArtisans } from "@/lib/data";
 
-let isSeeding = false;
-let seedingCompleted = false;
+let seedingPromise: Promise<void> | null = null;
 
 // --- Seeding Function ---
 const seedDatabase = async () => {
-    // Prevent re-seeding if it's already in progress or completed
-    if (seedingCompleted || isSeeding) {
-        return;
-    }
-    
-    isSeeding = true;
     console.log("Checking if Supabase seeding is needed...");
 
     try {
-        // Check if products exist
         const { count: productsCount, error: productsCheckError } = await supabase
             .from('products')
             .select('*', { count: 'exact', head: true });
 
         if (productsCheckError) {
              console.error("Error checking for products:", productsCheckError.message);
+             // Don't proceed if we can't even check the table
+             return;
         }
 
         if (productsCount === 0) {
@@ -33,7 +27,7 @@ const seedDatabase = async () => {
             
             const { data: seededArtisans, error: artisanInsertError } = await supabase
                 .from('artisans')
-                .insert(seedDataArtisans.map(a => ({...a, id: undefined}))) // Ensure id is not passed
+                .insert(seedDataArtisans.map(a => ({...a, id: undefined})))
                 .select('id, name');
             
             if (artisanInsertError) {
@@ -74,15 +68,22 @@ const seedDatabase = async () => {
             console.log("Database already contains data. Seeding not required.");
         }
         
-        seedingCompleted = true; 
         console.log("Database seeding check complete.");
 
     } catch (error) {
         console.error("Error during seeding process. Have you created the tables and storage bucket in your Supabase project? See the setup instructions.", error instanceof Error ? error.message : error);
-    } finally {
-        isSeeding = false; 
     }
 };
+
+
+// Initialize seeding and ensure it only runs once.
+const ensureSeeded = async () => {
+    if (!seedingPromise) {
+        seedingPromise = seedDatabase();
+    }
+    await seedingPromise;
+};
+
 
 // --- Data Fetching Functions ---
 
@@ -108,21 +109,6 @@ const uploadImages = async (images: File[]): Promise<string[]> => {
     return imageUrls;
 };
 
-const createArtisanForNewUser = async (userId: string, email?: string) => {
-    const { data, error } = await supabase.rpc('create_artisan_for_new_user', {
-        user_id: userId,
-        user_email: email
-    });
-
-    if (error) {
-        console.error('Error creating artisan for new user:', error);
-        throw error;
-    }
-
-    return data;
-};
-
-
 export const addProduct = async (productData: ProductFormData): Promise<string> => {
     try {
         const { data: { user } } = await supabase.auth.getUser();
@@ -138,9 +124,14 @@ export const addProduct = async (productData: ProductFormData): Promise<string> 
 
         if (artisanError || !artisan) {
             console.log("No artisan profile found for user, creating one...");
-             const newArtisan = await createArtisanForNewUser(user.id, user.email);
-            if (!newArtisan) {
-                throw new Error("Could not find or create a matching artisan for the logged-in user.");
+             const { error: rpcError } = await supabase.rpc('create_artisan_for_new_user', {
+                user_id: user.id,
+                user_email: user.email
+            });
+
+            if (rpcError) {
+                 console.error("Error creating artisan via RPC:", rpcError);
+                 throw new Error("Could not find or create a matching artisan for the logged-in user.");
             }
         }
         
@@ -171,9 +162,9 @@ export const addProduct = async (productData: ProductFormData): Promise<string> 
     }
 };
 
-seedDatabase();
 
 export const getProducts = async (): Promise<Product[]> => {
+    await ensureSeeded();
     try {
         const { data, error } = await supabase.from('products').select('*').order('name', { ascending: true });
         if (error) throw error;
@@ -185,6 +176,7 @@ export const getProducts = async (): Promise<Product[]> => {
 };
 
 export const getProduct = async (id: string): Promise<Product | null> => {
+    await ensureSeeded();
     try {
         const { data, error } = await supabase.from('products').select('*').eq('id', id).single();
         if (error) {
@@ -202,6 +194,7 @@ export const getProduct = async (id: string): Promise<Product | null> => {
 };
 
 export const getArtisans = async (): Promise<Artisan[]> => {
+    await ensureSeeded();
     try {
         const { data, error } = await supabase.from('artisans').select('*').order('name', { ascending: true });
         if (error) throw error;
@@ -213,6 +206,7 @@ export const getArtisans = async (): Promise<Artisan[]> => {
 };
 
 export const getArtisan = async (id: string): Promise<Artisan | null> => {
+    await ensureSeeded();
     try {
         const { data, error } = await supabase.from('artisans').select('*').eq('id', id).single();
         if (error) {
