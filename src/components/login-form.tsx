@@ -66,16 +66,6 @@ export function LoginForm() {
 
   return (
     <div className="space-y-4">
-      <Alert>
-        <Terminal className="h-4 w-4" />
-        <AlertTitle>Demo Credentials</AlertTitle>
-        <AlertDescription>
-          <p>You can use the following credentials to log in:</p>
-          <p className="font-mono text-sm">Email: test@example.com</p>
-          <p className="font-mono text-sm">Password: password</p>
-          <p className="text-xs mt-2">Note: For this to work, you must create a user with these credentials in your Supabase project's Authentication section.</p>
-        </AlertDescription>
-      </Alert>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <FormField
