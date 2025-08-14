@@ -107,22 +107,12 @@ export function AddProductForm() {
         const { images, ...productInfo } = values;
         
         const productData = {
-            name: productInfo.name,
-            name_hi: productInfo.name_hi,
-            description: productInfo.description,
-            description_hi: productInfo.description_hi,
-            price: productInfo.price,
-            stock: productInfo.stock,
-            category: productInfo.category,
-            category_hi: productInfo.category_hi,
+            ...productInfo,
             materials: values.materials.split(',').map(m => m.trim()),
             materials_hi: values.materials_hi.split(',').map(m => m.trim()),
-            artisanId: user.id,
         };
 
-        console.log('About to call addProduct');
-        const result = await addProduct(productData, images);
-        console.log('Result:', result);
+        await addProduct(productData, images);
         
         toast({
             title: t('toastProductAddedTitle'),

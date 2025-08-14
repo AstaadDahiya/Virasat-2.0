@@ -34,9 +34,10 @@ const uploadImages = async (images: File[], artisanId: string): Promise<string[]
     return imageUrls;
 };
 
+export const addProduct = async (productData: ProductInsertData, images: File[]): Promise<string> => {
+    const { data: { user } } = await supabase.auth.getUser();
 
-export const addProduct = async (productData: ProductInsertData, images: File[], artisanId: string): Promise<string> => {
-    if (!artisanId) {
+    if (!user) {
         throw new Error("You must be logged in to add a product.");
     }
     if (!images || images.length === 0) {
@@ -44,12 +45,12 @@ export const addProduct = async (productData: ProductInsertData, images: File[],
     }
     
     try {
-        const imageUrls = await uploadImages(images, artisanId);
+        const imageUrls = await uploadImages(images, user.id);
         
         const productToAdd = {
             ...productData,
             images: imageUrls,
-            artisanId: artisanId,
+            artisanId: user.id,
         };
         
         const { data: newProduct, error } = await supabase
@@ -69,7 +70,7 @@ export const addProduct = async (productData: ProductInsertData, images: File[],
         
         return newProduct.id;
     } catch (e) {
-        console.error("Error adding product: ", e);
+        console.error("Error in addProduct function: ", e);
         throw e instanceof Error ? e : new Error("Failed to add product due to an unexpected error.");
     }
 };
@@ -139,8 +140,14 @@ export const ensureArtisanProfile = async (user: User): Promise<void> => {
       .eq('id', user.id)
       .single();
 
-    // If no profile exists (PGRST116: PostgREST error for "exactly one row" not found) and we have a user object, create one.
-    if (selectError && selectError.code === 'PGRST116') {
+    // If there was an error other than "not found", throw it.
+    if (selectError && selectError.code !== 'PGRST116') {
+        console.error('Error checking for artisan profile:', selectError);
+        throw new Error('Could not verify user profile.');
+    }
+
+    // If no profile exists, create one.
+    if (!existingProfile) {
       const { error: insertError } = await supabase.from('artisans').insert({
         id: user.id, // Explicitly set the ID to the user's UID
         name: user.email?.split('@')[0] || 'New Artisan',
@@ -149,7 +156,7 @@ export const ensureArtisanProfile = async (user: User): Promise<void> => {
         bio_hi: 'विरासत में आपका स्वागत है! कृपया अपनी जीवनी अपडेट करें।',
         craft: 'Not specified',
         craft_hi: 'निर्दिष्ट नहीं है',
-      location: 'Not specified',
+        location: 'Not specified',
         location_hi: 'निर्दिष्ट नहीं है',
         profileImage: `https://placehold.co/100x100.png`
       });
@@ -157,15 +164,14 @@ export const ensureArtisanProfile = async (user: User): Promise<void> => {
       if (insertError) {
         console.error('Error creating artisan profile:', insertError);
         // Check for specific RLS violation error
-        if (insertError.code === '42501') {
+        if (insertError.code === '23503' || insertError.message.includes('foreign key constraint')) {
+             throw new Error("Database reference error. Ensure the user exists in 'auth.users' before creating a profile.");
+        }
+         if (insertError.code === '42501' || insertError.message.includes('permission denied')) {
             throw new Error("Database permission denied. Please ensure Row Level Security (RLS) is enabled on the 'artisans' table and that a policy allows authenticated users to insert their own profile.");
         }
         throw new Error('Database error creating new user');
       }
-    } else if (selectError) {
-      // Handle other potential errors during the select query
-      console.error('Error checking for artisan profile:', selectError);
-      throw new Error('Could not verify user profile.');
     }
-    // If a profile already exists (existingProfile is not null), do nothing.
+    // If a profile already exists, do nothing.
 };
