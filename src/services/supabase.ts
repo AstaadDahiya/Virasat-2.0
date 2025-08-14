@@ -2,7 +2,8 @@
 "use server";
 
 import { supabase } from "@/lib/supabase";
-import { Product } from "@/lib/types";
+import type { Artisan, Product } from "@/lib/types";
+import type { User } from '@supabase/supabase-js';
 
 const uploadImages = async (images: File[], artisanId: string): Promise<string[]> => {
     const imageUrls: string[] = [];
@@ -46,7 +47,7 @@ export const addProduct = async (productData: Omit<Product, 'id' | 'images'>, im
         const productToAdd = {
             ...productData,
             images: imageUrls,
-            artisanId: artisanId, // Ensure artisanId is included in the final object
+            artisanId: artisanId,
         };
         
         const { data: newProduct, error } = await supabase
@@ -128,7 +129,7 @@ export const getArtisan = async (id: string): Promise<Artisan | null> => {
     }
 };
 
-export const ensureArtisanProfile = async (user: { id: string; email?: string }): Promise<void> => {
+export const ensureArtisanProfile = async (user: User): Promise<void> => {
     const { data: artisan, error } = await supabase
       .from('artisans')
       .select('id')
