@@ -107,6 +107,20 @@ const uploadImages = async (images: File[]): Promise<string[]> => {
     return imageUrls;
 };
 
+const createArtisanForNewUser = async (userId: string, email?: string) => {
+    const { data, error } = await supabase.rpc('create_artisan_for_new_user', {
+        user_id: userId,
+        user_email: email
+    });
+
+    if (error) {
+        console.error('Error creating artisan for new user:', error);
+        throw error;
+    }
+
+    return data;
+};
+
 
 export const addProduct = async (productData: ProductFormData): Promise<string> => {
     try {
@@ -122,10 +136,13 @@ export const addProduct = async (productData: ProductFormData): Promise<string> 
             .single();
 
         if (artisanError || !artisan) {
-            throw new Error("Could not find a matching artisan for the logged-in user.");
+             const newArtisan = await createArtisanForNewUser(user.id, user.email);
+            if (!newArtisan) {
+                throw new Error("Could not find or create a matching artisan for the logged-in user.");
+            }
         }
         
-        const artisanId = artisan.id;
+        const artisanId = user.id;
 
         const imageUrls = await uploadImages(productData.images);
         
