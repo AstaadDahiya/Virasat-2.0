@@ -3,9 +3,10 @@
 
 import { supabase } from "@/lib/supabase";
 import { Product, Artisan } from "@/lib/types";
+import { User } from "@supabase/supabase-js";
 
 // Note: Omit 'images' from the type, as it will be handled separately.
-type ProductInsertData = Omit<Product, 'id' | 'artisanId' | 'images'>;
+type ProductInsertData = Omit<Product, 'id' | 'images' | 'artisanId'>;
 
 const uploadImages = async (images: File[], artisanId: string): Promise<string[]> => {
     const imageUrls: string[] = [];
@@ -50,7 +51,7 @@ export const addProduct = async (productData: ProductInsertData, images: File[],
         
         const { data: newProduct, error } = await supabase
             .from('products')
-            .insert([productToAdd])
+            .insert(productToAdd) // Pass the fully constructed object
             .select()
             .single();
 
@@ -156,5 +157,3 @@ export const ensureArtisanProfile = async (user: { id: string; email?: string })
         throw error;
     }
 };
-
-    
