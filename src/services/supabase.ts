@@ -38,13 +38,16 @@ export const addProduct = async (productData: ProductInsertData, images: File[])
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
-        throw new Error("You must be logged in to add a product.");
+        throw new Error("Authentication required. You must be logged in to add a product.");
     }
     if (!images || images.length === 0) {
         throw new Error("At least one image is required to add a product.");
     }
     
     try {
+        // First, ensure the user has an artisan profile. This is idempotent.
+        await ensureArtisanProfile(user);
+
         const imageUrls = await uploadImages(images, user.id);
         
         const productToAdd = {
@@ -167,7 +170,7 @@ export const ensureArtisanProfile = async (user: User): Promise<void> => {
         if (insertError.code === '23503' || insertError.message.includes('foreign key constraint')) {
              throw new Error("Database reference error. Ensure the user exists in 'auth.users' before creating a profile.");
         }
-         if (insertError.code === '42501' || insertError.message.includes('permission denied')) {
+         if (insertError.code === '42501' || insertError.message.includes('permission denied') || insertError.message.includes('row-level security')) {
             throw new Error("Database permission denied. Please ensure Row Level Security (RLS) is enabled on the 'artisans' table and that a policy allows authenticated users to insert their own profile.");
         }
         throw new Error('Database error creating new user');
