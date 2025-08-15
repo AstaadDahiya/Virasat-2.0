@@ -11,15 +11,22 @@ import { getLogisticsAdvice as getLogisticsAdviceFlow } from "@/ai/flows/logisti
 type ProductInsertData = Omit<Product, 'id' | 'images' | 'artisanId'>;
 
 
-const uploadImages = async (images: File[], artisanId: string): Promise<string[]> => {
+const createSupabaseServerClient = () => {
     const cookieStore = cookies();
-    const supabase = createServerClient(
+    return createServerClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
         {
-            cookies: { get: (name: string) => cookieStore.get(name)?.value },
+            cookies: {
+                get: (name: string) => cookieStore.get(name)?.value,
+            },
         }
     );
+};
+
+
+const uploadImages = async (images: File[], artisanId: string): Promise<string[]> => {
+    const supabase = createSupabaseServerClient();
 
     const imageUrls: string[] = [];
     for (const image of images) {
@@ -46,14 +53,7 @@ const uploadImages = async (images: File[], artisanId: string): Promise<string[]
 };
 
 export const addProduct = async (productData: ProductInsertData, images: File[]): Promise<string> => {
-    const cookieStore = cookies();
-    const supabase = createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-        {
-            cookies: { get: (name: string) => cookieStore.get(name)?.value },
-        }
-    );
+    const supabase = createSupabaseServerClient();
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -98,14 +98,7 @@ export const addProduct = async (productData: ProductInsertData, images: File[])
 
 
 export const getProducts = async (): Promise<Product[]> => {
-    const cookieStore = cookies();
-    const supabase = createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-        {
-            cookies: { get: (name: string) => cookieStore.get(name)?.value },
-        }
-    );
+    const supabase = createSupabaseServerClient();
     try {
         const { data, error } = await supabase.from('products').select('*').order('name', { ascending: true });
         if (error) throw error;
@@ -117,14 +110,7 @@ export const getProducts = async (): Promise<Product[]> => {
 };
 
 export const getProduct = async (id: string): Promise<Product | null> => {
-     const cookieStore = cookies();
-    const supabase = createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-        {
-            cookies: { get: (name: string) => cookieStore.get(name)?.value },
-        }
-    );
+    const supabase = createSupabaseServerClient();
     try {
         const { data, error } = await supabase.from('products').select('*').eq('id', id).single();
         if (error) {
@@ -142,14 +128,7 @@ export const getProduct = async (id: string): Promise<Product | null> => {
 };
 
 export const getArtisans = async (): Promise<Artisan[]> => {
-     const cookieStore = cookies();
-    const supabase = createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-        {
-            cookies: { get: (name: string) => cookieStore.get(name)?.value },
-        }
-    );
+    const supabase = createSupabaseServerClient();
     try {
         const { data, error } = await supabase.from('artisans').select('*').order('name', { ascending: true });
         if (error) throw error;
@@ -161,14 +140,7 @@ export const getArtisans = async (): Promise<Artisan[]> => {
 };
 
 export const getArtisan = async (id: string): Promise<Artisan | null> => {
-    const cookieStore = cookies();
-    const supabase = createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-        {
-            cookies: { get: (name: string) => cookieStore.get(name)?.value },
-        }
-    );
+    const supabase = createSupabaseServerClient();
     try {
         const { data, error } = await supabase.from('artisans').select('*').eq('id', id).single();
         if (error) {
@@ -186,14 +158,7 @@ export const getArtisan = async (id: string): Promise<Artisan | null> => {
 };
 
 export const ensureArtisanProfile = async (user: User): Promise<void> => {
-    const cookieStore = cookies();
-    const supabase = createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-        {
-            cookies: { get: (name: string) => cookieStore.get(name)?.value },
-        }
-    );
+    const supabase = createSupabaseServerClient();
     const { data: existingProfile, error: selectError } = await supabase
       .from('artisans')
       .select('id')
@@ -235,14 +200,7 @@ export async function getLogisticsAdvice(input: LogisticsInput): Promise<Logisti
 
 
 export const saveShipment = async (shipmentData: ShipmentData): Promise<void> => {
-    const cookieStore = cookies();
-    const supabase = createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-        {
-            cookies: { get: (name: string) => cookieStore.get(name)?.value },
-        }
-    );
+    const supabase = createSupabaseServerClient();
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -280,5 +238,3 @@ export const saveShipment = async (shipmentData: ShipmentData): Promise<void> =>
         throw new Error(`Failed to save shipment: ${error.message}`);
     }
 };
-
-    
