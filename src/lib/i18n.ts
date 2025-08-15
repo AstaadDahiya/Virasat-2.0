@@ -126,6 +126,12 @@ export const translations: LanguageTranslations = {
     edit: 'Edit',
     delete: 'Delete',
     
+    // Dashboard - Shipments
+    shipments: 'Shipments',
+    shipmentsSubtitle: 'View and manage all your saved shipments.',
+    noShipments: 'No Shipments Yet',
+    noShipmentsDescription: 'Book your first shipment through the AI Logistics Hub.',
+    
     // Dashboard - Add/Edit Product
     addProductSubtitle: "Fill in the details below to add a new product to your store.",
     editProductSubtitle: "Update the details for your product below.",
@@ -435,6 +441,12 @@ export const translations: LanguageTranslations = {
     tableHeaderActions: 'कार्रवाइयाँ',
     edit: 'संपादित करें',
     delete: 'हटाएं',
+
+    // Dashboard - Shipments
+    shipments: 'शिपमेंट्स',
+    shipmentsSubtitle: 'अपने सभी सहेजे गए शिपमेंट देखें और प्रबंधित करें।',
+    noShipments: 'अभी तक कोई शिपमेंट नहीं',
+    noShipmentsDescription: 'एआई लॉजिस्टिक्स हब के माध्यम से अपना पहला शिपमेंट बुक करें।',
 
     // Dashboard - Add/Edit Product
     addProductSubtitle: "अपने स्टोर में एक नया उत्पाद जोड़ने के लिए नीचे दिए गए विवरण भरें।",

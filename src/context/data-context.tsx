@@ -2,12 +2,14 @@
 "use client";
 
 import React, { createContext, useState, useContext, ReactNode, useEffect, useCallback } from 'react';
-import { Product, Artisan } from '@/lib/types';
-import { getProducts, getArtisans, seedDatabase } from '@/services/firebase';
+import { Product, Artisan, Shipment } from '@/lib/types';
+import { getProducts, getArtisans, seedDatabase, getShipments } from '@/services/firebase';
+import { useAuth } from './auth-context';
 
 interface DataContextType {
   products: Product[];
   artisans: Artisan[];
+  shipments: Shipment[];
   loading: boolean;
   error: Error | null;
   refreshData: () => Promise<void>;
@@ -16,41 +18,41 @@ interface DataContextType {
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
 export const DataProvider = ({ children }: { children: ReactNode }) => {
+  const { user } = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
   const [artisans, setArtisans] = useState<Artisan[]>([]);
+  const [shipments, setShipments] = useState<Shipment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
   const fetchData = useCallback(async (isRefresh = false) => {
-    // On initial load, try to get data from cache first
     if (!isRefresh) {
         try {
             const cachedProducts = localStorage.getItem('products');
             const cachedArtisans = localStorage.getItem('artisans');
-            if (cachedProducts && cachedArtisans) {
-                console.log("Loading data from cache.");
+            const cachedShipments = localStorage.getItem('shipments');
+            if (cachedProducts && cachedArtisans && cachedShipments) {
                 setProducts(JSON.parse(cachedProducts));
                 setArtisans(JSON.parse(cachedArtisans));
-                setLoading(false); // Stop initial loading spinner
+                setShipments(JSON.parse(cachedShipments));
+                setLoading(false);
             }
         } catch (e) {
             console.error("Failed to read from cache", e);
-            // If cache is corrupt, clear it
             localStorage.removeItem('products');
             localStorage.removeItem('artisans');
+            localStorage.removeItem('shipments');
         }
     }
 
-    // Always try to fetch fresh data from the network
     try {
       if (!isRefresh && products.length > 0) {
-        // If we already have cached data, don't show a full-page loader
+        // Already have data, no full page load
       } else {
         setLoading(true);
       }
       setError(null);
       
-      // Seed database if it's empty
       await seedDatabase();
 
       const [productsData, artisansData] = await Promise.all([
@@ -61,15 +63,18 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
       setProducts(productsData);
       setArtisans(artisansData);
 
-      // Update cache with fresh data
       localStorage.setItem('products', JSON.stringify(productsData));
       localStorage.setItem('artisans', JSON.stringify(artisansData));
-      console.log("Cache updated with fresh data.");
+      
+      if (user) {
+        const shipmentsData = await getShipments(user.uid);
+        setShipments(shipmentsData);
+        localStorage.setItem('shipments', JSON.stringify(shipmentsData));
+      }
+
 
     } catch (err) {
       console.error("Failed to fetch network data:", err);
-      // If fetching fails, we'll just rely on the cached data.
-      // Only set an error if we have no cached data at all.
       if (products.length === 0 && artisans.length === 0) {
           if (err instanceof Error) {
               setError(err);
@@ -80,19 +85,17 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     } finally {
       setLoading(false);
     }
-  }, [products.length, artisans.length]); // Dependencies to re-evaluate the function
+  }, [products.length, artisans.length, user]);
 
   useEffect(() => {
     fetchData();
-    // The empty dependency array is correct here.
-    // We only want this effect to run once on mount.
-    // `fetchData` is wrapped in `useCallback` to be stable.
   }, [fetchData]);
 
 
   const value = {
     products,
     artisans,
+    shipments,
     loading,
     error,
     refreshData: () => fetchData(true),

@@ -2,9 +2,9 @@
 "use server";
 
 import { db } from "@/lib/firebase/config";
-import { addDoc, collection, doc, getDoc, getDocs, query, serverTimestamp, setDoc, updateDoc, writeBatch, Timestamp, deleteDoc } from "firebase/firestore";
+import { addDoc, collection, doc, getDoc, getDocs, query, serverTimestamp, setDoc, updateDoc, writeBatch, Timestamp, deleteDoc, where, orderBy } from "firebase/firestore";
 import { BlobServiceClient } from "@azure/storage-blob";
-import type { Artisan, Product, ShipmentData, LogisticsInput, LogisticsOutput, ProductFormData } from "@/lib/types";
+import type { Artisan, Product, ShipmentData, LogisticsInput, LogisticsOutput, ProductFormData, Shipment } from "@/lib/types";
 import type { User } from 'firebase/auth';
 import { getLogisticsAdvice as getLogisticsAdviceFlow } from "@/ai/flows/logistics-advisor";
 import { products as seedProducts, artisans as seedArtisans } from "@/lib/data";
@@ -310,6 +310,31 @@ export const saveShipment = async (shipmentData: ShipmentData, artisanId: string
         throw new Error(`Failed to save shipment: ${error instanceof Error ? error.message : "Unknown error"}`);
     }
 };
+
+export const getShipments = async (artisanId: string): Promise<Shipment[]> => {
+    if (!artisanId) {
+        return [];
+    }
+    try {
+        const q = query(
+            collection(db, 'shipments'), 
+            where('artisan_id', '==', artisanId),
+            orderBy('createdAt', 'desc')
+        );
+        const querySnapshot = await getDocs(q);
+        const shipments = querySnapshot.docs.map(doc => {
+            const data = doc.data();
+            if (data.createdAt && data.createdAt instanceof Timestamp) {
+                data.createdAt = data.createdAt.toMillis();
+            }
+            return { id: doc.id, ...data } as Shipment;
+        });
+        return shipments;
+    } catch (e) {
+        console.error("Error getting shipments: ", e);
+        throw new Error("Failed to get shipments");
+    }
+}
 
 export const seedDatabase = async (): Promise<void> => {
     console.log("Checking if database needs seeding...");

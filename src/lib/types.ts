@@ -92,3 +92,29 @@ export type ShipmentData = {
     aiHsCode?: string;
     aiCustomsDeclaration?: string;
 };
+
+export type Shipment = {
+  id: string;
+  artisan_id: string;
+  product_id: string;
+  destination: string;
+  package_weight_kg: number;
+  package_dimensions_cm: {
+    length: number;
+    width: number;
+    height: number;
+  };
+  declared_value: number;
+  selected_carrier: string;
+  service_type: string;
+  shipping_cost: number;
+  estimated_delivery_date: string;
+  tracking_number: string;
+  shipping_label_url: string;
+  ai_packaging_advice: string;
+  ai_risk_advice: string;
+  ai_carrier_choice_advice: string;
+  ai_hs_code?: string;
+  ai_customs_declaration?: string;
+  createdAt: number; 
+};

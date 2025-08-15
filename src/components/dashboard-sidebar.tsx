@@ -25,7 +25,8 @@ import {
   TrendingUp,
   Languages,
   LineChart,
-  Ship
+  Ship,
+  Package
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -53,6 +54,11 @@ export function DashboardSidebar() {
       href: "/dashboard/products",
       label: t('myProducts'),
       icon: Box,
+    },
+    {
+      href: "/dashboard/shipments",
+      label: t('shipments'),
+      icon: Package,
     },
   ];
 
