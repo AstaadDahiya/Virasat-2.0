@@ -23,9 +23,9 @@ import { CartDrawer } from "./cart-drawer";
 import { ScrollArea } from "./ui/scroll-area";
 
 const navLinks = [
-  { href: "/", label: "Home" },
-  { href: "/products", label: "Products" },
-  { href: "/artisans", label: "Artisans" },
+  { href: "/", label: "nav.home" },
+  { href: "/products", label: "nav.products" },
+  { href: "/artisans", label: "nav.artisans" },
 ];
 
 export function SiteHeader() {
@@ -52,7 +52,7 @@ export function SiteHeader() {
                   pathname === link.href ? "text-foreground" : "text-foreground/60"
                 )}
               >
-                {t(link.label)}
+                {t(link.label as any)}
               </Link>
             ))}
           </nav>
@@ -64,7 +64,7 @@ export function SiteHeader() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon">
                 <Globe className="h-5 w-5" />
-                <span className="sr-only">{t('Change language')}</span>
+                <span className="sr-only">{t('nav.changeLanguage')}</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -80,24 +80,24 @@ export function SiteHeader() {
           <Button variant="ghost" size="icon" asChild>
              <Link href="/products/search">
                 <Search />
-                <span className="sr-only">{t('Search')}</span>
+                <span className="sr-only">{t('common.search')}</span>
              </Link>
           </Button>
           <Button variant="ghost" size="icon" className="relative" onClick={() => setIsCartOpen(true)}>
              <ShoppingCart />
-             <span className="sr-only">{t('Shopping Cart')}</span>
+             <span className="sr-only">{t('nav.shoppingCart')}</span>
              {cartCount > 0 && (
                 <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">{cartCount}</span>
              )}
           </Button>
           <Button asChild>
-            <Link href="/dashboard">{t('Artisan Dashboard')}</Link>
+            <Link href="/dashboard">{t('nav.artisanDashboard')}</Link>
           </Button>
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="md:hidden">
                 <Menu />
-                <span className="sr-only">{t('Toggle Menu')}</span>
+                <span className="sr-only">{t('nav.toggleMenu')}</span>
               </Button>
             </SheetTrigger>
             <SheetContent side="left">
@@ -115,7 +115,7 @@ export function SiteHeader() {
                       pathname === link.href ? "text-foreground font-semibold" : "text-foreground/60"
                     )}
                   >
-                    {t(link.label)}
+                    {t(link.label as any)}
                   </Link>
                 ))}
               </nav>
@@ -127,5 +127,3 @@ export function SiteHeader() {
     </header>
   );
 }
-
-    

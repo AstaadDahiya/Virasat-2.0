@@ -39,7 +39,7 @@ export function ArtisanCard({ artisan }: ArtisanCardProps) {
       </CardContent>
       <CardFooter className="p-4 bg-secondary">
         <Button asChild className="w-full">
-          <Link href={`/artisans/${artisan.id}`}>{t('View Profile')}</Link>
+          <Link href={`/artisans/${artisan.id}`}>{t('product.viewDetails')}</Link>
         </Button>
       </CardFooter>
     </Card>

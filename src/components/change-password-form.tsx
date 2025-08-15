@@ -48,15 +48,13 @@ export function ChangePasswordForm() {
     try {
       await updatePassword(values.password);
       toast({
-        title: t('toastPasswordChangedTitle'),
-        description: t('toastPasswordChangedDescription'),
+        title: t('toasts.profileUpdated'),
       });
       form.reset();
-      // Optionally close the dialog here
     } catch (err: any) {
       toast({
         variant: "destructive",
-        title: t('toastErrorTitle'),
+        title: t('toasts.errorTitle'),
         description: err.message,
       });
     } finally {
@@ -73,7 +71,7 @@ export function ChangePasswordForm() {
                 name="password"
                 render={({ field }) => (
                 <FormItem>
-                    <FormLabel>{t('newPasswordLabel')}</FormLabel>
+                    <FormLabel>{t('dashboard.settings.updatePassword')}</FormLabel>
                     <FormControl>
                     <Input type="password" {...field} />
                     </FormControl>
@@ -86,7 +84,7 @@ export function ChangePasswordForm() {
                 name="confirmPassword"
                 render={({ field }) => (
                 <FormItem>
-                    <FormLabel>{t('confirmNewPasswordLabel')}</FormLabel>
+                    <FormLabel>{t('dashboard.settings.confirmNewPasswordLabel')}</FormLabel>
                     <FormControl>
                     <Input type="password" {...field} />
                     </FormControl>
@@ -98,7 +96,7 @@ export function ChangePasswordForm() {
         <DialogFooter>
           <Button type="submit" disabled={loading}>
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {loading ? t('common.loading') : t('updatePassword')}
+            {loading ? t('dashboard.settings.updatingProfile') : t('dashboard.settings.updatePassword')}
           </Button>
         </DialogFooter>
       </form>

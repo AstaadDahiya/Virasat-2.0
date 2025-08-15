@@ -5,6 +5,7 @@ import React, { createContext, useState, useContext, ReactNode, useEffect, useCa
 import { TranslationManager, LanguageDetector } from '@/lib/i18n-manager';
 import { db } from '@/lib/firebase/config';
 import { seedDatabase } from '@/services/firebase';
+import type { TranslationKey } from '@/lib/i18n';
 
 export const languages = [
     { name: "English", code: "en", nativeName: "English" },
@@ -37,14 +38,13 @@ export type LanguageCode = typeof languages[number]['code'];
 interface LanguageContextType {
   language: LanguageCode;
   setLanguage: (language: LanguageCode) => void;
-  t: (key: string, values?: { [key: string]: string | number }) => string;
+  t: (key: TranslationKey, values?: { [key: string]: string | number }) => string;
   loading: boolean;
   translations: { [key: string]: any };
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
-// Instantiate the manager outside the component to act as a singleton
 const translationManager = new TranslationManager(db);
 const languageDetector = new LanguageDetector();
 
@@ -75,7 +75,6 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     const initLanguage = async () => {
       console.log("LanguageProvider: Initializing language system...");
       
-      // This function now guarantees that the 'en' document exists before returning.
       await seedDatabase();
 
       let initialLang: LanguageCode = 'en';
@@ -119,14 +118,23 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   }, [language]);
 
 
-  const t = useCallback((key: string, values?: { [key: string]: string | number }): string => {
-    const fallback = key.split('.').pop() || key;
-    let translatedText = key.split('.').reduce((obj, k) => (obj && typeof obj === 'object' ? obj[k] : undefined), translations);
+  const t = useCallback((key: TranslationKey, values?: { [key: string]: string | number }): string => {
+    const path = key.split('.');
     
-    if(!translatedText || typeof translatedText !== 'string') {
-        translatedText = fallback;
+    // Attempt to get translation from the current language
+    let translatedText = path.reduce((obj, p) => (obj && typeof obj === 'object' ? obj[p] : undefined), translations);
+
+    // Fallback to English if translation is missing
+    if (!translatedText || typeof translatedText !== 'string') {
+        const enTranslations = translationManager.getEnglishTranslations();
+        translatedText = path.reduce((obj, p) => (obj && typeof obj === 'object' ? obj[p] : undefined), enTranslations);
     }
 
+    // If still not found, return the last part of the key as a readable fallback
+    if (!translatedText || typeof translatedText !== 'string') {
+        return path[path.length - 1];
+    }
+    
     if (values) {
         Object.entries(values).forEach(([placeholder, value]) => {
             translatedText = translatedText.replace(new RegExp(`{{\\s*${placeholder}\\s*}}`, 'g'), String(value));

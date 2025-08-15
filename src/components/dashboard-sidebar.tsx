@@ -48,7 +48,7 @@ export function DashboardSidebar() {
   const mainMenuItems = [
     {
       href: "/dashboard",
-      label: t('dashboardOverviewTitle'),
+      label: t('dashboard.overview.title'),
       icon: LayoutGrid,
     },
      {
@@ -58,12 +58,12 @@ export function DashboardSidebar() {
     },
     {
       href: "/dashboard/products",
-      label: t('myProducts'),
+      label: t('dashboard.myProducts.title'),
       icon: Box,
     },
     {
       href: "/dashboard/shipments",
-      label: t('shipments'),
+      label: 'Shipments',
       icon: Package,
     },
   ];
@@ -71,32 +71,32 @@ export function DashboardSidebar() {
   const aiToolsItems = [
      {
       href: "/dashboard/tools/description-generator",
-      label: t('aiStorytellerTitle'),
+      label: 'AI Storyteller',
       icon: WandSparkles,
     },
     {
       href: "/dashboard/tools/pricing-optimizer",
-      label: t('pricingOptimizerTitle'),
+      label: 'Pricing Optimizer',
       icon: DollarSign,
     },
     {
       href: "/dashboard/tools/marketing-suite",
-      label: t('marketingSuiteTitle'),
+      label: 'Marketing Suite',
       icon: Megaphone,
     },
     {
       href: "/dashboard/tools/visual-enhancer",
-      label: t('visualEnhancerTitle'),
+      label: 'Visual Enhancer',
       icon: Camera,
     },
     {
       href: "/dashboard/tools/trend-harmonizer",
-      label: t('trendHarmonizerTitle'),
+      label: 'Trend Harmonizer',
       icon: TrendingUp,
     },
      {
       href: "/dashboard/tools/logistics-hub",
-      label: t('logisticsHubTitle'),
+      label: 'Logistics Hub',
       icon: Ship,
     },
   ];
@@ -163,20 +163,20 @@ export function DashboardSidebar() {
         <SidebarMenu>
           <SidebarMenuItem>
             <div className="flex justify-between items-center w-full">
-              <SidebarMenuButton asChild isActive={pathname === '/dashboard/settings'} tooltip={{ children: t('settings') }} className="flex-grow">
+              <SidebarMenuButton asChild isActive={pathname === '/dashboard/settings'} tooltip={{ children: t('dashboard.settings.title') }} className="flex-grow">
                 <Link href="/dashboard/settings">
                   <Cog />
-                  <span>{t('settings')}</span>
+                  <span>{t('dashboard.settings.title')}</span>
                 </Link>
               </SidebarMenuButton>
                {state === 'expanded' && <ThemeToggle />}
             </div>
           </SidebarMenuItem>
            <SidebarMenuItem>
-            <SidebarMenuButton asChild tooltip={{ children: t('backToSite') }}>
+            <SidebarMenuButton asChild tooltip={{ children: t('common.backToSite') }}>
               <Link href="/">
                 <Home />
-                <span>{t('backToSite')}</span>
+                <span>{t('common.backToSite')}</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

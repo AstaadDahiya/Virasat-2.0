@@ -144,8 +144,8 @@ export function AddProductForm() {
         await addProduct(productData, images, user.uid);
         
         toast({
-            title: t('toastProductAddedTitle'),
-            description: t('toastProductAddedDescription'),
+            title: t('toasts.productAdded'),
+            description: t('toasts.productAddedDescription'),
         });
         await refreshData();
         router.push('/dashboard/products');
@@ -153,7 +153,7 @@ export function AddProductForm() {
         console.error("Failed to add product:", error);
         toast({
             variant: "destructive",
-            title: t('toastErrorTitle'),
+            title: t('toasts.errorTitle'),
             description: error instanceof Error ? error.message : "An unknown error occurred.",
         });
     } finally {
@@ -167,7 +167,7 @@ export function AddProductForm() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
             <FormField control={form.control} name="name" render={({ field }) => (
                 <FormItem>
-                    <FormLabel>{t('productName')} (English)</FormLabel>
+                    <FormLabel>{t('dashboard.myProducts.name')} (English)</FormLabel>
                     <FormControl><Input placeholder="e.g., Hand-Painted Blue Pottery Vase" {...field} onBlur={() => handleAutoTranslation('name', 'en')} /></FormControl>
                     <FormMessage />
                 </FormItem>
@@ -175,7 +175,7 @@ export function AddProductForm() {
             <FormField control={form.control} name="name_hi" render={({ field }) => (
                 <FormItem>
                     <FormLabel className="flex items-center gap-2">
-                        {t('productName')} (हिंदी)
+                        {t('dashboard.myProducts.name')} (हिंदी)
                         {translating.name && <Loader2 className="h-4 w-4 animate-spin" />}
                     </FormLabel>
                     <FormControl><Input placeholder="उदा., हाथ से पेंट किया हुआ नीला मिट्टी का फूलदान" {...field} onBlur={() => handleAutoTranslation('name', 'hi')} /></FormControl>
@@ -187,7 +187,7 @@ export function AddProductForm() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
             <FormField control={form.control} name="description" render={({ field }) => (
                 <FormItem>
-                    <FormLabel>{t('productDescription')} (English)</FormLabel>
+                    <FormLabel>{t('dashboard.myProducts.description')} (English)</FormLabel>
                     <FormControl><Textarea placeholder="Describe your product..." {...field} onBlur={() => handleAutoTranslation('description', 'en')} /></FormControl>
                     <FormMessage />
                 </FormItem>
@@ -195,7 +195,7 @@ export function AddProductForm() {
             <FormField control={form.control} name="description_hi" render={({ field }) => (
                 <FormItem>
                     <FormLabel className="flex items-center gap-2">
-                        {t('productDescription')} (हिंदी)
+                        {t('dashboard.myProducts.description')} (हिंदी)
                         {translating.description && <Loader2 className="h-4 w-4 animate-spin" />}
                     </FormLabel>
                     <FormControl><Textarea placeholder="अपने उत्पाद का वर्णन करें..." {...field} onBlur={() => handleAutoTranslation('description', 'hi')} /></FormControl>
@@ -207,14 +207,14 @@ export function AddProductForm() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField control={form.control} name="price" render={({ field }) => (
                 <FormItem>
-                    <FormLabel>{t('tableHeaderPrice')}</FormLabel>
+                    <FormLabel>{t('dashboard.tableHeaders.price')}</FormLabel>
                     <FormControl><Input type="number" placeholder="2500" {...field} /></FormControl>
                     <FormMessage />
                 </FormItem>
             )}/>
             <FormField control={form.control} name="stock" render={({ field }) => (
                 <FormItem>
-                    <FormLabel>{t('tableHeaderStock')}</FormLabel>
+                    <FormLabel>{t('dashboard.tableHeaders.stock')}</FormLabel>
                     <FormControl><Input type="number" placeholder="15" {...field} /></FormControl>
                     <FormMessage />
                 </FormItem>
@@ -224,7 +224,7 @@ export function AddProductForm() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
             <FormField control={form.control} name="category" render={({ field }) => (
                 <FormItem>
-                    <FormLabel>{t('tableHeaderCategory')} (English)</FormLabel>
+                    <FormLabel>{t('dashboard.tableHeaders.category')} (English)</FormLabel>
                     <FormControl><Input placeholder="e.g., Block-Printing" {...field} onBlur={() => handleAutoTranslation('category', 'en')} /></FormControl>
                     <FormMessage />
                 </FormItem>
@@ -232,7 +232,7 @@ export function AddProductForm() {
             <FormField control={form.control} name="category_hi" render={({ field }) => (
                 <FormItem>
                     <FormLabel className="flex items-center gap-2">
-                        {t('tableHeaderCategory')} (हिंदी)
+                        {t('dashboard.tableHeaders.category')} (हिंदी)
                         {translating.category && <Loader2 className="h-4 w-4 animate-spin" />}
                     </FormLabel>
                     <FormControl><Input placeholder="उदा., ब्लॉक-प्रिंटिंग" {...field} onBlur={() => handleAutoTranslation('category', 'hi')} /></FormControl>
@@ -244,7 +244,7 @@ export function AddProductForm() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
             <FormField control={form.control} name="materials" render={({ field }) => (
                 <FormItem>
-                    <FormLabel>{t('productMaterials')} (English)</FormLabel>
+                    <FormLabel>{t('dashboard.myProducts.materials')} (English)</FormLabel>
                     <FormControl><Input placeholder="Cotton Canvas, Natural Dyes" {...field} onBlur={() => handleAutoTranslation('materials', 'en')} /></FormControl>
                      <p className="text-xs text-muted-foreground">Separate materials with a comma.</p>
                     <FormMessage />
@@ -253,7 +253,7 @@ export function AddProductForm() {
             <FormField control={form.control} name="materials_hi" render={({ field }) => (
                 <FormItem>
                     <FormLabel className="flex items-center gap-2">
-                        {t('productMaterials')} (हिंदी)
+                        {t('dashboard.myProducts.materials')} (हिंदी)
                         {translating.materials && <Loader2 className="h-4 w-4 animate-spin" />}
                     </FormLabel>
                     <FormControl><Input placeholder="कॉटन कैनवास, प्राकृतिक रंग" {...field} onBlur={() => handleAutoTranslation('materials', 'hi')} /></FormControl>
@@ -268,7 +268,7 @@ export function AddProductForm() {
             name="images"
             render={() => (
                 <FormItem>
-                    <FormLabel>{t('productImages')}</FormLabel>
+                    <FormLabel>{t('dashboard.myProducts.images')}</FormLabel>
                     <FormControl>
                         <div className="flex items-center gap-4">
                             <Input
@@ -286,7 +286,7 @@ export function AddProductForm() {
                                 onClick={() => fileInputRef.current?.click()}
                                 disabled={loading || previews.length >= 5}
                             >
-                                <Upload className="mr-2" /> {t('uploadImage')}
+                                <Upload className="mr-2" /> {t('dashboard.myProducts.uploadImage')}
                             </Button>
                         </div>
                     </FormControl>
@@ -322,7 +322,7 @@ export function AddProductForm() {
 
         <Button type="submit" disabled={loading} className="w-full md:w-auto">
           {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          {loading ? t('savingProduct') : t('saveProduct')}
+          {loading ? t('common.saving') : t('common.save')}
         </Button>
       </form>
     </Form>

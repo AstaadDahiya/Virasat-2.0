@@ -3,6 +3,7 @@
 "use client";
 
 import { doc, getDoc, type Firestore } from "firebase/firestore";
+import { translations as i18nSeed } from "./i18n";
 
 type LanguageCode = string;
 type Translations = { [key: string]: any };
@@ -56,7 +57,6 @@ export class LanguageDetector {
             
             const possibleLanguages = this.countryLanguageMap[countryCode];
             if (possibleLanguages && possibleLanguages.length > 0) {
-                // Return first supported language for the country
                 return possibleLanguages[0];
             }
             
@@ -86,22 +86,19 @@ export class TranslationManager {
     constructor(firestore: Firestore) {
         this.db = firestore;
         this.cache = new Map();
-        this.fallbackChain = ['en']; // Default fallback chain
+        this.fallbackChain = ['en']; 
         this.loadingPromises = new Map();
+        this.cache.set('en', i18nSeed.en); // Pre-cache English translations
     }
 
     async loadTranslations(langCode: LanguageCode): Promise<Translations> {
-        // Return cached version if available
         if (this.cache.has(langCode)) {
             return this.cache.get(langCode)!;
         }
-
-        // Return existing loading promise if already in progress
         if (this.loadingPromises.has(langCode)) {
             return await this.loadingPromises.get(langCode)!;
         }
 
-        // Create new loading promise
         const loadingPromise = this.fetchFromFirestore(langCode);
         this.loadingPromises.set(langCode, loadingPromise);
 
@@ -122,45 +119,21 @@ export class TranslationManager {
             if (docSnap.exists()) {
                 return docSnap.data() as Translations;
             } else {
-                console.warn(`No translations for '${langCode}', attempting fallback to 'en'`);
-                const fallbackRef = doc(this.db, 'translations', 'en');
-                const fallbackSnap = await getDoc(fallbackRef);
-                if (fallbackSnap.exists()) {
-                    return fallbackSnap.data() as Translations;
-                }
-                
-                // This error is thrown if the primary language and all fallbacks fail.
-                // It's critical if 'en' itself is missing.
-                throw new Error(`CRITICAL: No fallback translations found for 'en'.`);
+                console.warn(`No translations for '${langCode}', using English fallback.`);
+                return this.getEnglishTranslations();
             }
         } catch (error) {
             console.error(`Error loading translations for ${langCode}:`, error);
-            return this.getEmergencyFallback();
+            return this.getEnglishTranslations(); // Always fallback to English on error
         }
     }
-
-    getEmergencyFallback(): Translations {
-        return {
-            loading: "Loading...",
-            error: "An error occurred",
-            welcome: "Welcome",
-            language: "Language",
-            common: {
-                loading: "Loading..."
-            }
-        };
+    
+    getEnglishTranslations(): Translations {
+        return i18nSeed.en;
     }
 
     async preloadLanguages(langCodes: LanguageCode[]): Promise<void> {
         const promises = langCodes.map(code => this.loadTranslations(code));
         await Promise.allSettled(promises);
-    }
-
-    clearCache(langCode: LanguageCode | null = null): void {
-        if (langCode) {
-            this.cache.delete(langCode);
-        } else {
-            this.cache.clear();
-        }
     }
 }

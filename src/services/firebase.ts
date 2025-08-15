@@ -24,10 +24,8 @@ const deleteImage = async (imageUrl: string) => {
         await deleteObject(imageRef);
         console.log(`Deleted image: ${imageUrl}`);
     } catch (error: any) {
-        // It's okay if the file doesn't exist, we can ignore that error.
         if (error.code !== 'storage/object-not-found') {
             console.error("Error deleting image from Firebase Storage:", error);
-            // We don't re-throw here to allow other operations to proceed.
         }
     }
 }
@@ -84,30 +82,24 @@ export const updateProduct = async (productId: string, productData: ProductFormD
     }
     const existingProduct = docSnap.data() as Product;
 
-    // 1. Upload new images and get their URLs
     const artisanId = existingProduct.artisanId || "unknown-artisan";
     const newImageUrls = newImageFiles.length > 0 ? await uploadImages(newImageFiles, artisanId) : [];
 
-    // 2. Identify which of the initial images were removed
     const finalImageUrls = productData.images.filter(img => typeof img === 'string') as string[];
     const imagesToDelete = initialImageUrls.filter(url => !finalImageUrls.includes(url));
     
-    // 3. Delete the removed images from storage
     if (imagesToDelete.length > 0) {
         await Promise.all(imagesToDelete.map(url => deleteImage(url)));
     }
 
-    // 4. Combine existing and new image URLs for the final update
     const allImageUrls = [...finalImageUrls, ...newImageUrls];
 
-    // 5. Prepare the data for Firestore update
     const { images, ...restOfProductData } = productData;
     const dataToUpdate = {
         ...restOfProductData,
         images: allImageUrls,
     };
 
-    // 6. Update the Firestore document
     await updateDoc(productRef, dataToUpdate);
 }
 
@@ -123,13 +115,11 @@ export const deleteProduct = async (productId: string): Promise<void> => {
 
         const product = productSnap.data() as Product;
         
-        // Delete all associated images from Firebase Storage
         if (product.images && product.images.length > 0) {
             const deletePromises = product.images.map(url => deleteImage(url));
             await Promise.all(deletePromises);
         }
 
-        // Delete the product document from Firestore
         await deleteDoc(productRef);
 
     } catch (e) {
@@ -145,7 +135,6 @@ export const getProducts = async (): Promise<Product[]> => {
         const querySnapshot = await getDocs(q);
         const products = querySnapshot.docs.map(doc => {
             const data = doc.data();
-            // Convert Firestore Timestamps to serializable format (milliseconds)
             if (data.createdAt && data.createdAt instanceof Timestamp) {
                 data.createdAt = data.createdAt.toMillis();
             }
@@ -164,7 +153,6 @@ export const getProduct = async (id: string): Promise<Product | null> => {
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
             const data = docSnap.data();
-            // Convert Firestore Timestamps to serializable format (milliseconds)
             if (data.createdAt && data.createdAt instanceof Timestamp) {
                 data.createdAt = data.createdAt.toMillis();
             }
@@ -244,7 +232,6 @@ export const updateArtisanProfile = async (artisanId: string, data: Partial<Omit
     if (newImageFile) {
         const urls = await uploadImages([newImageFile], artisanId);
         if(urls.length > 0) {
-            // Delete the old image before setting the new one
             if(imageUrl) {
                 await deleteImage(imageUrl);
             }
@@ -347,7 +334,6 @@ export const getTranslations = async (lang: string): Promise<{ [key: string]: st
             return docSnap.data() as { [key: string]: string };
         } else {
             console.warn(`No translation document for language: ${lang}, falling back to English.`);
-            // Fallback to English if the requested language doesn't exist
             const enDocRef = doc(db, 'translations', 'en');
             const enDocSnap = await getDoc(enDocRef);
             if(enDocSnap.exists()) {
@@ -364,8 +350,6 @@ export const getTranslations = async (lang: string): Promise<{ [key: string]: st
 
 export const seedDatabase = async (): Promise<void> => {
     console.log("Checking if database needs seeding...");
-    
-    // Check if the 'en' translation document exists as a sentinel
     const enTransRef = doc(db, 'translations', 'en');
     const enTransSnap = await getDoc(enTransRef);
 
@@ -399,8 +383,10 @@ export const seedDatabase = async (): Promise<void> => {
     for (const lang of languages) {
         const langCode = lang.code;
         const transRef = doc(db, 'translations', langCode);
-        const translationsToSeed = (i18nSeed as any)[langCode] || i18nSeed.en;
-        batch.set(transRef, translationsToSeed);
+        const translationsToSeed = (i18nSeed as any)[langCode] || {};
+        if (Object.keys(translationsToSeed).length > 0) {
+            batch.set(transRef, translationsToSeed);
+        }
     }
     
     try {
