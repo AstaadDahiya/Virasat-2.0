@@ -23,13 +23,7 @@ export class LanguageDetector {
 
     async detectOptimalLanguage(): Promise<{ language: LanguageCode, source: string }> {
         try {
-            // 1. Check saved preference first
-            const savedLang = localStorage.getItem('language');
-            if (savedLang && this.isLanguageSupported(savedLang)) {
-                return { language: savedLang, source: 'saved_preference' };
-            }
-
-            // 2. Try browser language
+            // 1. Try browser language
             const browserLangs = navigator.languages || [navigator.language];
             for (let lang of browserLangs) {
                 const langCode = lang.slice(0, 2);
@@ -38,13 +32,13 @@ export class LanguageDetector {
                 }
             }
 
-            // 3. Try location-based detection
+            // 2. Try location-based detection
             const locationLang = await this.detectByLocation();
             if (locationLang) {
                 return { language: locationLang, source: 'location' };
             }
 
-            // 4. Default fallback
+            // 3. Default fallback
             return { language: 'en', source: 'default' };
 
         } catch (error) {

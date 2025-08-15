@@ -62,12 +62,26 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
         // This function now ensures 'en' translations exist before proceeding.
         await seedDatabase(); 
         
-        const { language: detectedLang } = await languageDetector.detectOptimalLanguage();
-        console.log(`LanguageProvider: Detected language is ${detectedLang}`);
+        let initialLang: LanguageCode = 'en';
+        let detectionSource = 'default';
         
-        const loadedTranslations = await translationManager.loadTranslations(detectedLang);
+        // 1. Check for a saved user preference in localStorage.
+        const savedLang = localStorage.getItem('language');
+        if (savedLang && languageDetector.isLanguageSupported(savedLang)) {
+            initialLang = savedLang as LanguageCode;
+            detectionSource = 'saved_preference';
+        } else {
+            // 2. If no preference, detect the optimal language.
+            const { language: detectedLang, source } = await languageDetector.detectOptimalLanguage();
+            initialLang = detectedLang as LanguageCode;
+            detectionSource = source;
+        }
+
+        console.log(`LanguageProvider: Setting initial language to ${initialLang} (source: ${detectionSource})`);
+        
+        const loadedTranslations = await translationManager.loadTranslations(initialLang);
         setTranslations(loadedTranslations);
-        setLanguage(detectedLang);
+        setLanguage(initialLang);
         
         // Preload common languages in the background
         translationManager.preloadLanguages(['en', 'hi', 'bn']);
