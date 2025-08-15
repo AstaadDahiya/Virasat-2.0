@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Logo } from './logo';
@@ -40,7 +39,7 @@ export function SiteFooter() {
             <h3 className="font-semibold mb-4 font-headline">{t('forArtisans')}</h3>
             <ul className="space-y-2">
               <li><Link href="/dashboard" className="text-sm hover:underline">{t('sellOnVirasat')}</Link></li>
-              <li><Link href="#" className="text-sm hover:underline">{t('artisanHandbook')}</Link></li>
+              <li><Link href="/dashboard/handbook" className="text-sm hover:underline">{t('artisanHandbook')}</Link></li>
             </ul>
           </div>
         </div>
