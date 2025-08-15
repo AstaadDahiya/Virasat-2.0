@@ -1,3 +1,4 @@
+
 "use client";
 
 import { PricingToolForm } from "@/components/pricing-tool-form";
@@ -14,15 +15,15 @@ export default function PricingOptimizerPage() {
            <DollarSign className="h-6 w-6 text-primary" />
         </div>
         <div>
-          <h1 className="text-3xl font-bold font-headline">{t('pricingOptimizerTitle')}</h1>
-          <p className="text-muted-foreground">{t('pricingOptimizerSubtitle')}</p>
+          <h1 className="text-3xl font-bold font-headline">{t('dashboard.aiTools.pricingOptimizer.title')}</h1>
+          <p className="text-muted-foreground">{t('dashboard.aiTools.pricingOptimizer.subtitle')}</p>
         </div>
       </div>
       
       <Card>
         <CardHeader>
-          <CardTitle>{t('suggestPrice')}</CardTitle>
-          <CardDescription>{t('suggestPriceDescription')}</CardDescription>
+          <CardTitle>{t('dashboard.aiTools.pricingOptimizer.suggestPrice')}</CardTitle>
+          <CardDescription>{t('dashboard.aiTools.pricingOptimizer.suggestPriceDescription')}</CardDescription>
         </CardHeader>
         <CardContent>
           <PricingToolForm />

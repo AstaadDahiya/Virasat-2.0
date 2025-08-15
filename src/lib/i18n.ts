@@ -142,8 +142,41 @@ const en = {
             location: 'Location (City, State)',
             updateProfile: 'Update Profile',
             updatingProfile: 'Updating...',
+            updatePassword: 'Update Password',
+            confirmNewPasswordLabel: 'Confirm New Password',
         },
-        // ... more dashboard keys
+        aiTools: {
+            pricingOptimizer: {
+                title: 'Pricing Optimizer',
+                subtitle: 'Get AI-powered suggestions for your product pricing.',
+                suggestPrice: 'Suggest Price',
+                suggestPriceDescription: 'Fill in the details below to get a price suggestion from our AI.',
+                productName: 'Product Name',
+                productNamePlaceholder: 'e.g., Hand-Painted Blue Pottery Vase',
+                materialsCostLabel: 'Materials Cost (INR)',
+                laborCostLabel: 'Labor Cost (INR)',
+                marketDemandLabel: 'Market Demand',
+                selectDemand: 'Select demand',
+                demandLow: 'Low',
+                demandMedium: 'Medium',
+                demandHigh: 'High',
+                artisanSkillLabel: 'Artisan Skill Level',
+                selectSkillLevel: 'Select skill level',
+                skillBeginner: 'Beginner',
+                skillIntermediate: 'Intermediate',
+                skillExpert: 'Expert',
+                productQualityLabel: 'Product Quality',
+                selectQuality: 'Select quality',
+                qualityStandard: 'Standard',
+                qualityHigh: 'High',
+                qualityPremium: 'Premium',
+                optimizing: 'Optimizing...',
+                suggestedPrice: 'Suggested Price',
+                reasoning: 'AI Reasoning',
+                analyzingMarketData: 'Analyzing market data...',
+                toastPriceSuggestionError: 'Could not get price suggestion.'
+            }
+        }
     },
     // Toasts and notifications
     toasts: {
@@ -153,13 +186,10 @@ const en = {
         profileUpdated: 'Profile updated successfully!',
         copied: 'Copied to clipboard!',
     }
-    // ... add other sections like aiTools, handbook, etc.
 };
 
 
 // 2. This is the new, strongly-typed definition for your translations object.
-// `DeepPartial<T>` would be ideal here if you have a utility type library like Lodash or write your own.
-// For simplicity, we'll use `Partial` on nested objects.
 type TranslationSet = typeof en;
 type PartialTranslationSet = {
     [K in keyof TranslationSet]?: Partial<TranslationSet[K]>
@@ -190,7 +220,25 @@ export const translations: Record<string, PartialTranslationSet> = {
     // Other languages are initially empty. The lookup function will handle fallbacks.
     bn: {},
     ta: {},
-    // ... etc.
+    as: {},
+    brx: {},
+    doi: {},
+    gu: {},
+    kn: {},
+    ks: {},
+    kok: {},
+    mai: {},
+    ml: {},
+    mni: {},
+    mr: {},
+    ne: {},
+    or: {},
+    pa: {},
+    sa: {},
+    sat: {},
+    sd: {},
+    te: {},
+    ur: {},
 };
 
 // 4. Utility type to get all possible dot-notation paths from the 'en' object.
