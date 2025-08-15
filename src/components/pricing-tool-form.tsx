@@ -107,13 +107,58 @@ export function PricingToolForm() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <FormField control={form.control} name="marketDemand" render={({ field }) => (
-                <FormItem><FormLabel>{t('dashboard.aiTools.pricingOptimizer.marketDemandLabel')}</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder={t('dashboard.aiTools.pricingOptimizer.selectDemand')} /></SelectTrigger></FormControl><SelectContent><SelectItem value="low">{t('dashboard.aiTools.pricingOptimizer.demandLow')}</SelectItem><SelectItem value="medium">{t('dashboard.aiTools.pricingOptimizer.demandMedium')}</SelectItem><SelectItem value="high">{t('dashboard.aiTools.pricingOptimizer.demandHigh')}</SelectItem></SelectContent></Select><FormMessage /></FormItem>
+                <FormItem>
+                    <FormLabel>{t('dashboard.aiTools.pricingOptimizer.marketDemandLabel')}</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                            <SelectTrigger>
+                                <SelectValue placeholder={t('dashboard.aiTools.pricingOptimizer.selectDemand')} />
+                            </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                            <SelectItem value="low">{t('dashboard.aiTools.pricingOptimizer.demandLow')}</SelectItem>
+                            <SelectItem value="medium">{t('dashboard.aiTools.pricingOptimizer.demandMedium')}</SelectItem>
+                            <SelectItem value="high">{t('dashboard.aiTools.pricingOptimizer.demandHigh')}</SelectItem>
+                        </SelectContent>
+                    </Select>
+                    <FormMessage />
+                </FormItem>
             )}/>
             <FormField control={form.control} name="artisanSkillLevel" render={({ field }) => (
-                <FormItem><FormLabel>{t('dashboard.aiTools.pricingOptimizer.artisanSkillLabel')}</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder={t('dashboard.aiTools.pricingOptimizer.selectSkillLevel')} /></SelectTrigger></FormControl><SelectContent><SelectItem value="beginner">{t('dashboard.aiTools.pricingOptimizer.skillBeginner')}</SelectItem><SelectItem value="intermediate">{t('dashboard.aiTools.pricingOptimizer.skillIntermediate')}</SelectItem><SelectItem value="expert">{t('dashboard.aiTools.pricingOptimizer.skillExpert')}</SelectItem></SelectContent></Select><FormMessage /></FormItem>
+                <FormItem>
+                    <FormLabel>{t('dashboard.aiTools.pricingOptimizer.artisanSkillLabel')}</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                            <SelectTrigger>
+                                <SelectValue placeholder={t('dashboard.aiTools.pricingOptimizer.selectSkillLevel')} />
+                            </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                            <SelectItem value="beginner">{t('dashboard.aiTools.pricingOptimizer.skillBeginner')}</SelectItem>
+                            <SelectItem value="intermediate">{t('dashboard.aiTools.pricingOptimizer.skillIntermediate')}</SelectItem>
+                            <SelectItem value="expert">{t('dashboard.aiTools.pricingOptimizer.skillExpert')}</SelectItem>
+                        </SelectContent>
+                    </Select>
+                    <FormMessage />
+                </FormItem>
             )}/>
             <FormField control={form.control} name="productQuality" render={({ field }) => (
-                <FormItem><FormLabel>{t('dashboard.aiTools.pricingOptimizer.productQualityLabel')}</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder={t('dashboard.aiTools.pricingOptimizer.selectQuality')} /></SelectTrigger></FormControl><SelectContent><SelectItem value="standard">{t('dashboard.aiTools.pricingOptimizer.qualityStandard')}</SelectItem><SelectItem value="high">{t('dashboard.aiTools.pricingOptimizer.qualityHigh')}</SelectItem><SelectItem value="premium">{t('dashboard.aiTools.pricingOptimizer.qualityPremium')}</SelectItem></SelectContent></Select><FormMessage /></FormItem>
+                <FormItem>
+                    <FormLabel>{t('dashboard.aiTools.pricingOptimizer.productQualityLabel')}</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                            <SelectTrigger>
+                                <SelectValue placeholder={t('dashboard.aiTools.pricingOptimizer.selectQuality')} />
+                            </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                            <SelectItem value="standard">{t('dashboard.aiTools.pricingOptimizer.qualityStandard')}</SelectItem>
+                            <SelectItem value="high">{t('dashboard.aiTools.pricingOptimizer.qualityHigh')}</SelectItem>
+                            <SelectItem value="premium">{t('dashboard.aiTools.pricingOptimizer.qualityPremium')}</SelectItem>
+                        </SelectContent>
+                    </Select>
+                    <FormMessage />
+                </FormItem>
             )}/>
           </div>
           <Button type="submit" disabled={loading}>
