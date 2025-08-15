@@ -96,6 +96,7 @@ export function SettingsForm() {
     
     try {
         const newImageFile = values.profileImage instanceof File ? values.profileImage : undefined;
+        // The file is passed to updateArtisanProfile, but the function will return a placeholder
         const { profileImage, ...updateData } = values;
 
         const newImageUrl = await updateArtisanProfile(user.uid, updateData, newImageFile);

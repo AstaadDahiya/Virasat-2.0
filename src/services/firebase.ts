@@ -13,16 +13,14 @@ import { products as seedProducts, artisans as seedArtisans } from "@/lib/data";
 type ProductInsertData = Omit<Product, 'id' | 'images' | 'artisanId' | 'createdAt'>;
 
 
+// WORKAROUND FOR FREE PLAN: Return placeholder URLs instead of uploading to Firebase Storage.
 const uploadImages = async (images: File[], artisanId: string): Promise<string[]> => {
-    const imageUrls: string[] = [];
-    for (const image of images) {
-        const filePath = `product-images/${artisanId}/${Date.now()}-${image.name}`;
-        const storageRef = ref(storage, filePath);
-        await uploadBytes(storageRef, image);
-        const downloadUrl = await getDownloadURL(storageRef);
-        imageUrls.push(downloadUrl);
-    }
-    return imageUrls;
+    if (!images || images.length === 0) return [];
+    
+    // Return one placeholder for each image the user "uploaded".
+    const placeholderUrls = images.map((_, index) => `https://placehold.co/600x600.png?text=Image+${index+1}`);
+    console.log(`Using placeholder image URLs instead of Firebase Storage: ${placeholderUrls.join(', ')}`);
+    return placeholderUrls;
 };
 
 export const addProduct = async (productData: ProductInsertData, images: File[], artisanId: string): Promise<string> => {
@@ -115,7 +113,7 @@ export const ensureArtisanProfile = async (user: User): Promise<void> => {
     if (!docSnap.exists()) {
         try {
             await setDoc(artisanRef, {
-                id: user.uid,
+                // id: user.uid, // id is the doc key, no need to store it inside the doc
                 name: user.email?.split('@')[0] || 'New Artisan',
                 name_hi: 'नया कारीगर',
                 bio: 'Welcome to Virasat! Please update your bio.',
@@ -133,18 +131,22 @@ export const ensureArtisanProfile = async (user: User): Promise<void> => {
     }
 };
 
+
+// WORKAROUND FOR FREE PLAN: Return a placeholder URL instead of uploading to Firebase Storage.
 export const updateArtisanProfile = async (artisanId: string, data: Partial<Artisan>, newImageFile?: File): Promise<string> => {
     const artisanRef = doc(db, 'artisans', artisanId);
     let imageUrl = data.profileImage;
 
+    // If a new image was "uploaded", use a new placeholder. Otherwise keep the old one.
     if (newImageFile) {
-        const filePath = `profile-images/${artisanId}/${Date.now()}-${newImageFile.name}`;
-        const storageRef = ref(storage, filePath);
-        await uploadBytes(storageRef, newImageFile);
-        imageUrl = await getDownloadURL(storageRef);
+        imageUrl = 'https://placehold.co/100x100.png';
+        console.log(`Using placeholder profile image URL instead of Firebase Storage.`);
     }
     
-    await updateDoc(artisanRef, {...data, profileImage: imageUrl});
+    // Create a new object for updating, ensuring not to pass the File object to Firestore
+    const updateData = { ...data, profileImage: imageUrl };
+
+    await updateDoc(artisanRef, updateData);
     return imageUrl || "";
 }
 

@@ -106,6 +106,7 @@ export function AddProductForm() {
     }
     
     try {
+        // The images are passed to addProduct, but the function will return placeholders
         const { images, ...productInfo } = values;
         
         const productData = {
