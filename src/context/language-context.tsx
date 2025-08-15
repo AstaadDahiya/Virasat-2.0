@@ -2,7 +2,6 @@
 "use client";
 
 import React, { createContext, useState, useContext, ReactNode, useEffect, useCallback, useRef } from 'react';
-import { translateText } from '@/ai/flows/translate-text';
 
 type Language = 'en' | 'hi';
 
@@ -10,81 +9,84 @@ interface LanguageContextType {
   language: Language;
   setLanguage: (language: Language) => void;
   t: (key: string, values?: { [key: string]: string | number }) => string;
+  translations: Map<string, string>; // Add translations to the context value
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
-// In-memory cache for translations, cleared on language change.
-const translationCache = new Map<string, string>();
+// AI flow is imported but not used directly here anymore. The call is in `t`.
+import { translateText } from '@/ai/flows/translate-text';
 
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
-  const [language, setLanguage] = useState<Language>('en'); // Default to English
-  // State to hold dynamic translations fetched from the AI
+  const [language, setLanguage] = useState<Language>('en');
   const [translations, setTranslations] = useState<Map<string, string>>(new Map());
-  // Track which keys are currently being fetched
   const pendingTranslations = useRef(new Set<string>());
-  const isMounted = useRef(false);
 
   useEffect(() => {
     const storedLanguage = localStorage.getItem('language') as Language | null;
     if (storedLanguage) {
       setLanguage(storedLanguage);
     }
-    isMounted.current = true;
   }, []);
 
   const handleSetLanguage = (lang: Language) => {
-    if (lang !== language) {
-        setLanguage(lang);
-        localStorage.setItem('language', lang);
-        // Clear cache when language changes
-        translationCache.clear();
-        setTranslations(new Map());
-    }
+    setLanguage(lang);
+    localStorage.setItem('language', lang);
+    setTranslations(new Map()); // Clear old translations on language change
+    pendingTranslations.current.clear();
   };
 
   const t = useCallback((key: string, values?: { [key: string]: string | number }): string => {
-    let resultText = key;
-    if (language !== 'en') {
-        const cachedTranslation = translationCache.get(key);
-        if (cachedTranslation) {
-            resultText = cachedTranslation;
-        } else if (isMounted.current && !pendingTranslations.current.has(key)) {
-            pendingTranslations.current.add(key);
-
-            translateText({ text: key, targetLanguage: 'Hindi' })
-                .then(result => {
-                    if (result.translatedText) {
-                        translationCache.set(key, result.translatedText);
-                        // Update state only if component is still mounted
-                        if(isMounted.current) {
-                           setTranslations(prev => new Map(prev).set(key, result.translatedText));
-                        }
-                    }
-                })
-                .catch(err => console.error(`Failed to translate "${key}":`, err))
-                .finally(() => {
-                    pendingTranslations.current.delete(key);
-                });
+    if (language === 'en') {
+        let result = key;
+        if (values) {
+            Object.entries(values).forEach(([placeholder, value]) => {
+                result = result.replace(new RegExp(`{{\\s*${placeholder}\\s*}}`, 'g'), String(value));
+            });
         }
+        return result;
     }
-    
-    if (values) {
-        Object.entries(values).forEach(([placeholder, value]) => {
-            resultText = resultText.replace(new RegExp(`{{\\s*${placeholder}\\s*}}`, 'g'), String(value));
+
+    const translatedText = translations.get(key);
+
+    if (translatedText) {
+        let result = translatedText;
+        if (values) {
+            Object.entries(values).forEach(([placeholder, value]) => {
+                result = result.replace(new RegExp(`{{\\s*${placeholder}\\s*}}`, 'g'), String(value));
+            });
+        }
+        return result;
+    }
+
+    if (!pendingTranslations.current.has(key)) {
+      pendingTranslations.current.add(key);
+
+      translateText({ text: key, targetLanguage: 'Hindi' })
+        .then(result => {
+          if (result.translatedText) {
+            setTranslations(prev => new Map(prev).set(key, result.translatedText));
+          }
+        })
+        .catch(err => console.error(`Failed to translate "${key}":`, err))
+        .finally(() => {
+          pendingTranslations.current.delete(key);
         });
     }
 
-    return resultText;
-  }, [language]);
+    // Return original key while translation is loading
+    let result = key;
+    if (values) {
+        Object.entries(values).forEach(([placeholder, value]) => {
+            result = result.replace(new RegExp(`{{\\s*${placeholder}\\s*}}`, 'g'), String(value));
+        });
+    }
+    return result;
 
-
-  useEffect(() => {
-      // This effect can be used to force a re-render on all components when the language changes.
-  }, [language]);
+  }, [language, translations]);
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage: handleSetLanguage, t }}>
+    <LanguageContext.Provider value={{ language, setLanguage: handleSetLanguage, t, translations }}>
       {children}
     </LanguageContext.Provider>
   );
