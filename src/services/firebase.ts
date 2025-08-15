@@ -1,5 +1,4 @@
 
-
 "use server";
 
 import { db } from "@/lib/firebase/config";
@@ -98,7 +97,8 @@ export const updateProduct = async (productId: string, productData: ProductFormD
     const productRef = doc(db, 'products', productId);
     
     // 1. Upload new images and get their URLs
-    const newImageUrls = newImageFiles.length > 0 ? await uploadImages(newImageFiles, productData.artisanId) : [];
+    const artisanId = productData.artisanId || "unknown-artisan";
+    const newImageUrls = newImageFiles.length > 0 ? await uploadImages(newImageFiles, artisanId) : [];
 
     // 2. Identify which of the initial images were removed
     const finalImageUrls = productData.images.filter(img => typeof img === 'string') as string[];
@@ -175,7 +175,7 @@ export const getProduct = async (id: string): Promise<Product | null> => {
         const docRef = doc(db, 'products', id);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
-             const data = docSnap.data();
+            const data = docSnap.data();
             // Convert Firestore Timestamps to serializable format (milliseconds)
             if (data.createdAt && data.createdAt instanceof Timestamp) {
                 data.createdAt = data.createdAt.toMillis();
@@ -187,7 +187,7 @@ export const getProduct = async (id: string): Promise<Product | null> => {
         }
     } catch (e) {
         console.error("Error getting document: ", e);
-        return null;
+        throw new Error("Failed to get product.");
     }
 };
 
@@ -342,6 +342,6 @@ export const seedDatabase = async (): Promise<void> => {
         console.log("Database already contains data, skipping seed.");
     }
 };
-
+    
 
     
