@@ -21,38 +21,78 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  const fetchData = useCallback(async () => {
+  const fetchData = useCallback(async (isRefresh = false) => {
+    // On initial load, try to get data from cache first
+    if (!isRefresh) {
+        try {
+            const cachedProducts = localStorage.getItem('products');
+            const cachedArtisans = localStorage.getItem('artisans');
+            if (cachedProducts && cachedArtisans) {
+                console.log("Loading data from cache.");
+                setProducts(JSON.parse(cachedProducts));
+                setArtisans(JSON.parse(cachedArtisans));
+                setLoading(false); // Stop initial loading spinner
+            }
+        } catch (e) {
+            console.error("Failed to read from cache", e);
+            // If cache is corrupt, clear it
+            localStorage.removeItem('products');
+            localStorage.removeItem('artisans');
+        }
+    }
+
+    // Always try to fetch fresh data from the network
     try {
-      setLoading(true);
+      if (!isRefresh && products.length > 0) {
+        // If we already have cached data, don't show a full-page loader
+      } else {
+        setLoading(true);
+      }
       setError(null);
+
       const [productsData, artisansData] = await Promise.all([
         getProducts(),
         getArtisans(),
       ]);
+
       setProducts(productsData);
       setArtisans(artisansData);
+
+      // Update cache with fresh data
+      localStorage.setItem('products', JSON.stringify(productsData));
+      localStorage.setItem('artisans', JSON.stringify(artisansData));
+      console.log("Cache updated with fresh data.");
+
     } catch (err) {
-      console.error("Failed to fetch initial data:", err);
-      if (err instanceof Error) {
-          setError(err);
-      } else {
-          setError(new Error('An unknown error occurred'));
+      console.error("Failed to fetch network data:", err);
+      // If fetching fails, we'll just rely on the cached data.
+      // Only set an error if we have no cached data at all.
+      if (products.length === 0 && artisans.length === 0) {
+          if (err instanceof Error) {
+              setError(err);
+          } else {
+              setError(new Error('An unknown error occurred'));
+          }
       }
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [products.length, artisans.length]); // Dependencies to re-evaluate the function
 
   useEffect(() => {
     fetchData();
-  }, [fetchData]);
+    // The empty dependency array is correct here.
+    // We only want this effect to run once on mount.
+    // `fetchData` is wrapped in `useCallback` to be stable.
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
 
   const value = {
     products,
     artisans,
     loading,
     error,
-    refreshData: fetchData,
+    refreshData: () => fetchData(true),
   }
 
   return (
@@ -69,5 +109,3 @@ export const useData = (): DataContextType => {
   }
   return context;
 };
-
-    
