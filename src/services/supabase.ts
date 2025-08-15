@@ -3,14 +3,24 @@
 
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
-import type { Artisan, Product } from "@/lib/types";
+import type { Artisan, Product, ShipmentData, LogisticsInput, LogisticsOutput } from "@/lib/types";
 import type { User } from '@supabase/supabase-js';
+import { getLogisticsAdvice as getLogisticsAdviceFlow } from "@/ai/flows/logistics-advisor";
 
 // Defines the shape of the data coming from the form, excluding fields that are handled separately.
 type ProductInsertData = Omit<Product, 'id' | 'images' | 'artisanId'>;
 
 
-const uploadImages = async (supabase: any, images: File[], artisanId: string): Promise<string[]> => {
+const uploadImages = async (images: File[], artisanId: string): Promise<string[]> => {
+    const cookieStore = cookies();
+    const supabase = createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+            cookies: { get: (name: string) => cookieStore.get(name)?.value },
+        }
+    );
+
     const imageUrls: string[] = [];
     for (const image of images) {
         const filePath = `${artisanId}/${Date.now()}-${image.name}`;
@@ -41,11 +51,7 @@ export const addProduct = async (productData: ProductInsertData, images: File[])
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
         {
-            cookies: {
-                get(name: string) {
-                    return cookieStore.get(name)?.value;
-                },
-            },
+            cookies: { get: (name: string) => cookieStore.get(name)?.value },
         }
     );
     const { data: { user } } = await supabase.auth.getUser();
@@ -58,10 +64,9 @@ export const addProduct = async (productData: ProductInsertData, images: File[])
     }
     
     try {
-        // First, ensure the user has an artisan profile. This is idempotent.
         await ensureArtisanProfile(user);
 
-        const imageUrls = await uploadImages(supabase, images, user.id);
+        const imageUrls = await uploadImages(images, user.id);
         
         const productToAdd = {
             ...productData,
@@ -98,11 +103,7 @@ export const getProducts = async (): Promise<Product[]> => {
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
         {
-            cookies: {
-                get(name: string) {
-                    return cookieStore.get(name)?.value;
-                },
-            },
+            cookies: { get: (name: string) => cookieStore.get(name)?.value },
         }
     );
     try {
@@ -121,11 +122,7 @@ export const getProduct = async (id: string): Promise<Product | null> => {
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
         {
-            cookies: {
-                get(name: string) {
-                    return cookieStore.get(name)?.value;
-                },
-            },
+            cookies: { get: (name: string) => cookieStore.get(name)?.value },
         }
     );
     try {
@@ -150,11 +147,7 @@ export const getArtisans = async (): Promise<Artisan[]> => {
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
         {
-            cookies: {
-                get(name: string) {
-                    return cookieStore.get(name)?.value;
-                },
-            },
+            cookies: { get: (name: string) => cookieStore.get(name)?.value },
         }
     );
     try {
@@ -173,11 +166,7 @@ export const getArtisan = async (id: string): Promise<Artisan | null> => {
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
         {
-            cookies: {
-                get(name: string) {
-                    return cookieStore.get(name)?.value;
-                },
-            },
+            cookies: { get: (name: string) => cookieStore.get(name)?.value },
         }
     );
     try {
@@ -202,30 +191,23 @@ export const ensureArtisanProfile = async (user: User): Promise<void> => {
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
         {
-            cookies: {
-                get(name: string) {
-                    return cookieStore.get(name)?.value;
-                },
-            },
+            cookies: { get: (name: string) => cookieStore.get(name)?.value },
         }
     );
-    // First, check if a profile already exists.
     const { data: existingProfile, error: selectError } = await supabase
       .from('artisans')
       .select('id')
       .eq('id', user.id)
       .single();
 
-    // If there was an error other than "not found", throw it.
     if (selectError && selectError.code !== 'PGRST116') {
         console.error('Error checking for artisan profile:', selectError);
         throw new Error('Could not verify user profile.');
     }
 
-    // If no profile exists, create one.
     if (!existingProfile) {
       const { error: insertError } = await supabase.from('artisans').insert({
-        id: user.id, // Explicitly set the ID to the user's UID
+        id: user.id,
         name: user.email?.split('@')[0] || 'New Artisan',
         name_hi: 'नया कारीगर',
         bio: 'Welcome to Virasat! Please update your bio.',
@@ -239,12 +221,64 @@ export const ensureArtisanProfile = async (user: User): Promise<void> => {
 
       if (insertError) {
         console.error('Error creating artisan profile:', insertError);
-        // Check for specific RLS violation error
         if (insertError.message.includes('permission denied') || insertError.message.includes('row-level security')) {
             throw new Error("Database permission denied. Please ensure Row Level Security (RLS) is enabled on the 'artisans' table and that a policy allows authenticated users to insert their own profile.");
         }
         throw new Error('Database error creating new user');
       }
     }
-    // If a profile already exists, do nothing.
 };
+
+export async function getLogisticsAdvice(input: LogisticsInput): Promise<LogisticsOutput> {
+    return getLogisticsAdviceFlow(input);
+}
+
+
+export const saveShipment = async (shipmentData: ShipmentData): Promise<void> => {
+    const cookieStore = cookies();
+    const supabase = createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+            cookies: { get: (name: string) => cookieStore.get(name)?.value },
+        }
+    );
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+        throw new Error("Authentication required. You must be logged in to save a shipment.");
+    }
+    
+    // Simulate label generation and tracking number
+    const trackingNumber = `VRST${Date.now()}`;
+    const shippingLabelUrl = `https://api.virasat.com/labels/${trackingNumber}.pdf`;
+
+    const shipmentToSave = {
+      artisan_id: user.id,
+      product_id: shipmentData.productId,
+      destination: shipmentData.destination,
+      package_weight_kg: shipmentData.packageWeightKg,
+      package_dimensions_cm: shipmentData.packageDimensionsCm,
+      declared_value: shipmentData.declaredValue,
+      selected_carrier: shipmentData.selectedCarrier.carrier,
+      service_type: shipmentData.selectedCarrier.serviceType,
+      shipping_cost: shipmentData.selectedCarrier.totalCost,
+      estimated_delivery_date: shipmentData.selectedCarrier.estimatedDeliveryDate,
+      tracking_number: trackingNumber,
+      shipping_label_url: shippingLabelUrl,
+      ai_packaging_advice: shipmentData.aiPackagingAdvice,
+      ai_risk_advice: shipmentData.aiRiskAdvice,
+      ai_carrier_choice_advice: shipmentData.aiCarrierChoiceAdvice,
+      ai_hs_code: shipmentData.aiHsCode,
+      ai_customs_declaration: shipmentData.aiCustomsDeclaration,
+    };
+
+    const { error } = await supabase.from('shipments').insert(shipmentToSave);
+
+    if (error) {
+        console.error("Error saving shipment:", error);
+        throw new Error(`Failed to save shipment: ${error.message}`);
+    }
+};
+
+    

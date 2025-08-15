@@ -73,4 +73,21 @@ export const LogisticsOutputSchema = z.object({
   shippingOptions: z.array(ShippingRateSchema).describe("A list of available shipping options with their costs and delivery estimates, sorted from cheapest to most expensive."),
 });
 export type LogisticsOutput = z.infer<typeof LogisticsOutputSchema>;
-    
+
+export type ShipmentData = {
+    productId: string;
+    destination: string;
+    packageWeightKg: number;
+    packageDimensionsCm: {
+        length: number;
+        width: number;
+        height: number;
+    };
+    declaredValue: number;
+    selectedCarrier: ShippingRate;
+    aiPackagingAdvice: string;
+    aiRiskAdvice: string;
+    aiCarrierChoiceAdvice: string;
+    aiHsCode?: string;
+    aiCustomsDeclaration?: string;
+};

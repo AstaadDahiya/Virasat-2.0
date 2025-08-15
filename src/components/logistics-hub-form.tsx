@@ -15,7 +15,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { getLogisticsAdvice } from "@/ai/flows/logistics-advisor";
+import { getLogisticsAdvice, saveShipment } from "@/services/supabase";
 import {
   type LogisticsOutput,
   type ShippingRate,
@@ -45,7 +45,9 @@ export function LogisticsHubForm() {
   const { t, language } = useLanguage();
   const { products } = useData();
   const [loading, setLoading] = useState(false);
+  const [booking, setBooking] = useState(false);
   const [result, setResult] = useState<LogisticsOutput | null>(null);
+  const [formValues, setFormValues] = useState<z.infer<typeof formSchema> | null>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -58,6 +60,7 @@ export function LogisticsHubForm() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
     setResult(null);
+    setFormValues(values);
     try {
       const product = products.find(p => p.id === values.productId);
       if (!product) {
@@ -91,6 +94,51 @@ export function LogisticsHubForm() {
       setLoading(false);
     }
   }
+
+  const handleBooking = async (carrier: ShippingRate) => {
+    if (!formValues || !result) return;
+    setBooking(true);
+
+    try {
+        await saveShipment({
+            productId: formValues.productId,
+            destination: formValues.destination,
+            packageWeightKg: formValues.packageWeightKg,
+            packageDimensionsCm: {
+                length: formValues.length,
+                width: formValues.width,
+                height: formValues.height,
+            },
+            declaredValue: formValues.declaredValue,
+            selectedCarrier: carrier,
+            aiPackagingAdvice: result.packagingAdvice,
+            aiRiskAdvice: result.riskAndInsuranceAdvice,
+            aiCarrierChoiceAdvice: result.carrierChoiceAdvice,
+            aiHsCode: result.customsAdvice?.hsCode,
+            aiCustomsDeclaration: result.customsAdvice?.declarationText,
+        });
+
+        toast({
+            title: "Shipment Saved!",
+            description: `Your shipment with ${carrier.carrier} has been booked and saved.`
+        });
+        
+        form.reset();
+        setResult(null);
+        setFormValues(null);
+
+    } catch(error) {
+        console.error(error);
+        toast({
+            variant: "destructive",
+            title: t('toastErrorTitle'),
+            description: error instanceof Error ? error.message : "Could not save shipment.",
+        });
+    } finally {
+        setBooking(false);
+    }
+  }
+
 
   return (
     <div className="space-y-8">
@@ -209,8 +257,9 @@ export function LogisticsHubForm() {
                                         </p>
                                     )}
                                 </div>
-                                <Button className="w-full md:w-auto" disabled>
-                                    <Bot className="mr-2"/> {t('bookAndGenerateLabel')}
+                                <Button className="w-full md:w-auto" disabled={booking} onClick={() => handleBooking(option)}>
+                                    {booking ? <Loader2 className="mr-2 animate-spin"/> :  <Bot className="mr-2"/>}
+                                    {booking ? "Booking..." : t('bookAndGenerateLabel')}
                                 </Button>
                             </CardContent>
                          </Card>
