@@ -24,7 +24,8 @@ import {
   Camera,
   TrendingUp,
   Languages,
-  LineChart
+  LineChart,
+  Ship
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -80,6 +81,11 @@ export function DashboardSidebar() {
       href: "/dashboard/tools/trend-harmonizer",
       label: t('trendHarmonizerTitle'),
       icon: TrendingUp,
+    },
+     {
+      href: "/dashboard/tools/logistics-hub",
+      label: t('logisticsHubTitle'),
+      icon: Ship,
     },
   ];
 

@@ -261,6 +261,32 @@ export const translations: LanguageTranslations = {
     generatingMockupMessage: 'Generating your beautiful mockup... this may take a moment.',
     generatedMockup: 'Generated Mockup:',
     download: 'Download',
+
+    // Logistics Hub
+    logisticsHubTitle: 'AI Logistics Hub',
+    logisticsHubSubtitle: 'A complete shipping solution with AI-powered advice and direct carrier booking.',
+    getShippingAdvice: 'Get Shipping Advice',
+    getShippingAdviceDescription: 'Enter package and destination details to get tailored advice and competitive shipping rates.',
+    shippingDetails: 'Shipment Details',
+    destination: 'Destination',
+    destinationPlaceholder: 'e.g., Mumbai, India or New York, USA',
+    declaredValue: 'Declared Value (₹)',
+    packageWeight: 'Package Weight (kg)',
+    packageDimensions: 'Package Dimensions (cm)',
+    length: 'Length',
+    width: 'Width',
+    height: 'Height',
+    getAdvice: 'Get Advice',
+    gettingAdvice: 'Getting advice...',
+    aiLogisticsAdvisor: 'AI Logistics Advisor',
+    packagingAdvice: 'Packaging Advice',
+    riskAndInsuranceAdvice: 'Risk & Insurance Advice',
+    customsAdvice: 'Customs Advice',
+    hsCode: 'HS Code',
+    declaration: 'Declaration',
+    carrierChoiceAdvice: 'Carrier Choice Advice',
+    shippingOptions: 'Shipping Options',
+    bookAndGenerateLabel: 'Book & Generate Label',
     
     // Cart
     shoppingCart: 'Shopping Cart',
@@ -289,6 +315,7 @@ export const translations: LanguageTranslations = {
     toastNoAudioTitle: 'No audio recorded',
     toastNoAudioDescription: 'Please record your story before generating a description.',
     toastProcessAudioError: 'Failed to process audio. Please try again.',
+    toastLogisticsError: 'Could not retrieve logistics advice. Please try again.',
 
   },
   hi: {
@@ -544,6 +571,32 @@ export const translations: LanguageTranslations = {
     generatedMockup: 'उत्पन्न मॉकअप:',
     download: 'डाउनलोड करें',
 
+    // Logistics Hub
+    logisticsHubTitle: 'एआई लॉजिस्टिक्स हब',
+    logisticsHubSubtitle: 'एआई-संचालित सलाह और सीधे वाहक बुकिंग के साथ एक संपूर्ण शिपिंग समाधान।',
+    getShippingAdvice: 'शिपिंग सलाह प्राप्त करें',
+    getShippingAdviceDescription: 'अनुरूप सलाह और प्रतिस्पर्धी शिपिंग दरें प्राप्त करने के लिए पैकेज और गंतव्य विवरण दर्ज करें।',
+    shippingDetails: 'शिपमेंट विवरण',
+    destination: 'गंतव्य',
+    destinationPlaceholder: 'उदा., मुंबई, भारत या न्यूयॉर्क, यूएसए',
+    declaredValue: 'घोषित मूल्य (₹)',
+    packageWeight: 'पैकेज का वजन (किग्रा)',
+    packageDimensions: 'पैकेज के आयाम (सेमी)',
+    length: 'लंबाई',
+    width: 'चौड़ाई',
+    height: 'ऊंचाई',
+    getAdvice: 'सलाह प्राप्त करें',
+    gettingAdvice: 'सलाह मिल रही है...',
+    aiLogisticsAdvisor: 'एआई लॉजिस्टिक्स सलाहकार',
+    packagingAdvice: 'पैकेजिंग सलाह',
+    riskAndInsuranceAdvice: 'जोखिम और बीमा सलाह',
+    customsAdvice: 'सीमा शुल्क सलाह',
+    hsCode: 'एचएस कोड',
+    declaration: 'घोषणा',
+    carrierChoiceAdvice: 'वाहक विकल्प सलाह',
+    shippingOptions: 'शिपिंग विकल्प',
+    bookAndGenerateLabel: 'बुक करें और लेबल बनाएं',
+
     // Cart
     shoppingCart: 'शॉपिंग कार्ट',
     subtotal: 'उप-योग',
@@ -570,6 +623,7 @@ export const translations: LanguageTranslations = {
     toastNoAudioTitle: 'कोई ऑडियो रिकॉर्ड नहीं किया गया',
     toastNoAudioDescription: 'विवरण उत्पन्न करने से पहले कृपया अपनी कहानी रिकॉर्ड करें।',
     toastProcessAudioError: 'ऑडियो संसाधित करने में विफल। कृपया पुन: प्रयास करें।',
+    toastLogisticsError: 'लॉजिस्टिक्स सलाह प्राप्त नहीं की जा सकी। कृपया पुनः प्रयास करें।',
   },
 };
 
