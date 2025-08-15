@@ -17,12 +17,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/context/language-context";
-import { Loader2, Upload } from "lucide-react";
+import { Loader2, Upload, Languages } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "@/context/auth-context";
 import { Artisan } from "@/lib/types";
 import Image from "next/image";
 import { getArtisan, updateArtisanProfile } from "@/services/firebase";
+import { translateText } from "@/ai/flows/translate-text";
 
 const formSchema = z.object({
   name: z.string().min(2, "Name is required"),
@@ -36,11 +37,14 @@ const formSchema = z.object({
   profileImage: z.any().optional(),
 });
 
+type TranslatableField = "name" | "bio" | "craft" | "location";
+
 export function SettingsForm() {
   const { toast } = useToast();
   const { t } = useLanguage();
   const { user, loading: authLoading } = useAuth();
   const [loading, setLoading] = useState(true);
+  const [translating, setTranslating] = useState<Partial<Record<TranslatableField, boolean>>>({});
   const [artisan, setArtisan] = useState<Artisan | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -89,6 +93,32 @@ export function SettingsForm() {
       setPreview(URL.createObjectURL(file));
     }
   };
+  
+  const handleTranslation = async (field: TranslatableField) => {
+    const englishValue = form.getValues(`${field}`);
+    const hindiValue = form.getValues(`${field}_hi`);
+
+    const toLanguage = englishValue && !hindiValue ? 'Hindi' : 'English';
+    const textToTranslate = toLanguage === 'Hindi' ? englishValue : hindiValue;
+    const targetField = toLanguage === 'Hindi' ? `${field}_hi` : `${field}`;
+
+    if (!textToTranslate) {
+      toast({ variant: 'destructive', title: "Nothing to translate", description: "Please enter some text in one of the fields first."});
+      return;
+    }
+
+    setTranslating(prev => ({...prev, [field]: true}));
+    try {
+      const result = await translateText({ text: textToTranslate, targetLanguage: toLanguage });
+      form.setValue(targetField as any, result.translatedText, { shouldValidate: true });
+    } catch(error) {
+      console.error("Translation failed", error);
+      toast({ variant: "destructive", title: "Translation failed" });
+    } finally {
+      setTranslating(prev => ({...prev, [field]: false}));
+    }
+  }
+
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     if (!user) return;
@@ -96,7 +126,6 @@ export function SettingsForm() {
     
     try {
         const newImageFile = values.profileImage instanceof File ? values.profileImage : undefined;
-        // The file is passed to updateArtisanProfile, but the function will return a placeholder
         const { profileImage, ...updateData } = values;
 
         const newImageUrl = await updateArtisanProfile(user.uid, updateData, newImageFile);
@@ -112,6 +141,12 @@ export function SettingsForm() {
     }
   }
   
+  const renderTranslationButton = (field: TranslatableField) => (
+     <Button type="button" size="icon" variant="ghost" onClick={() => handleTranslation(field)} disabled={translating[field]}>
+        {translating[field] ? <Loader2 className="h-4 w-4 animate-spin" /> : <Languages className="h-4 w-4" />}
+     </Button>
+  )
+
   if (authLoading || loading) {
       return <div className="flex justify-center p-8"><Loader2 className="animate-spin" /></div>
   }
@@ -130,35 +165,49 @@ export function SettingsForm() {
                 <FormMessage />
             </FormItem>
         )}/>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
             <FormField control={form.control} name="name" render={({ field }) => (
                 <FormItem><FormLabel>{t('artisanNameLabel')} (English)</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
             )}/>
-             <FormField control={form.control} name="name_hi" render={({ field }) => (
-                <FormItem><FormLabel>{t('artisanNameLabel')} (हिंदी)</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
-            )}/>
+            <div className="flex gap-2">
+                <FormField control={form.control} name="name_hi" render={({ field }) => (
+                    <FormItem className="flex-grow"><FormLabel>{t('artisanNameLabel')} (हिंदी)</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+                )}/>
+                {renderTranslationButton("name")}
+            </div>
         </div>
-        <FormField control={form.control} name="bio" render={({ field }) => (
-            <FormItem><FormLabel>{t('bioLabel')} (English)</FormLabel><FormControl><Textarea {...field} /></FormControl><FormMessage /></FormItem>
-        )}/>
-        <FormField control={form.control} name="bio_hi" render={({ field }) => (
-            <FormItem><FormLabel>{t('bioLabel')} (हिंदी)</FormLabel><FormControl><Textarea {...field} /></FormControl><FormMessage /></FormItem>
-        )}/>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+         <div className="space-y-2">
+            <FormField control={form.control} name="bio" render={({ field }) => (
+                <FormItem><FormLabel>{t('bioLabel')} (English)</FormLabel><FormControl><Textarea {...field} /></FormControl><FormMessage /></FormItem>
+            )}/>
+            <div className="flex gap-2 items-end">
+                <FormField control={form.control} name="bio_hi" render={({ field }) => (
+                    <FormItem className="flex-grow"><FormLabel>{t('bioLabel')} (हिंदी)</FormLabel><FormControl><Textarea {...field} /></FormControl><FormMessage /></FormItem>
+                )}/>
+                 {renderTranslationButton("bio")}
+            </div>
+         </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
             <FormField control={form.control} name="craft" render={({ field }) => (
                 <FormItem><FormLabel>{t('craftLabel')} (English)</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
             )}/>
-             <FormField control={form.control} name="craft_hi" render={({ field }) => (
-                <FormItem><FormLabel>{t('craftLabel')} (हिंदी)</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
-            )}/>
+             <div className="flex gap-2">
+                <FormField control={form.control} name="craft_hi" render={({ field }) => (
+                    <FormItem className="flex-grow"><FormLabel>{t('craftLabel')} (हिंदी)</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+                )}/>
+                {renderTranslationButton("craft")}
+             </div>
         </div>
-         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
             <FormField control={form.control} name="location" render={({ field }) => (
                 <FormItem><FormLabel>{t('locationLabel')} (English)</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
             )}/>
-             <FormField control={form.control} name="location_hi" render={({ field }) => (
-                <FormItem><FormLabel>{t('locationLabel')} (हिंदी)</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
-            )}/>
+             <div className="flex gap-2">
+                <FormField control={form.control} name="location_hi" render={({ field }) => (
+                    <FormItem className="flex-grow"><FormLabel>{t('locationLabel')} (हिंदी)</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+                )}/>
+                {renderTranslationButton("location")}
+             </div>
         </div>
 
         <Button type="submit" disabled={loading}>

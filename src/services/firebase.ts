@@ -97,8 +97,14 @@ export const addProduct = async (productData: ProductInsertData, images: File[],
 export const updateProduct = async (productId: string, productData: ProductFormData, newImageFiles: File[], initialImageUrls: string[]) => {
     const productRef = doc(db, 'products', productId);
     
+    const docSnap = await getDoc(productRef);
+    if (!docSnap.exists()) {
+        throw new Error("Product not found");
+    }
+    const existingProduct = docSnap.data() as Product;
+
     // 1. Upload new images and get their URLs
-    const artisanId = productData.artisanId || "unknown-artisan";
+    const artisanId = existingProduct.artisanId || "unknown-artisan";
     const newImageUrls = newImageFiles.length > 0 ? await uploadImages(newImageFiles, artisanId) : [];
 
     // 2. Identify which of the initial images were removed
@@ -245,18 +251,30 @@ export const ensureArtisanProfile = async (user: User): Promise<void> => {
 };
 
 
-export const updateArtisanProfile = async (artisanId: string, data: Partial<Artisan>, newImageFile?: File): Promise<string> => {
+export const updateArtisanProfile = async (artisanId: string, data: Partial<Omit<Artisan, 'id' | 'profileImage'>>, newImageFile?: File): Promise<string> => {
     const artisanRef = doc(db, 'artisans', artisanId);
-    let imageUrl = data.profileImage;
+    let imageUrl: string | undefined = undefined;
+
+    const docSnap = await getDoc(artisanRef);
+    if(docSnap.exists()) {
+        imageUrl = docSnap.data().profileImage;
+    }
 
     if (newImageFile) {
         const urls = await uploadImages([newImageFile], artisanId);
         if(urls.length > 0) {
             imageUrl = urls[0];
+            // If there was an old image and it wasn't a placeholder, delete it
+            if(docSnap.exists() && docSnap.data().profileImage && !docSnap.data().profileImage.includes('placehold.co')) {
+                await deleteBlob(docSnap.data().profileImage);
+            }
         }
     }
     
-    const updateData = { ...data, profileImage: imageUrl };
+    const updateData: Partial<Artisan> = { ...data };
+    if (imageUrl) {
+        updateData.profileImage = imageUrl;
+    }
 
     await updateDoc(artisanRef, updateData);
     return imageUrl || "";
@@ -295,11 +313,10 @@ export const saveShipment = async (shipmentData: ShipmentData, artisanId: string
       createdAt: serverTimestamp(),
     };
     
-    // Conditionally add customs fields to avoid 'undefined' errors
-    if(shipmentData.aiHsCode) {
+    if (shipmentData.aiHsCode) {
         shipmentToSave.ai_hs_code = shipmentData.aiHsCode;
     }
-    if(shipmentData.aiCustomsDeclaration) {
+    if (shipmentData.aiCustomsDeclaration) {
         shipmentToSave.ai_customs_declaration = shipmentData.aiCustomsDeclaration;
     }
 
@@ -331,7 +348,12 @@ export const getShipments = async (artisanId: string): Promise<Shipment[]> => {
             return { id: doc.id, ...data } as Shipment;
         });
         return shipments;
-    } catch (e) {
+    } catch (e: any) {
+        if (e.code === 'failed-precondition') {
+          console.error("Firestore index missing for getShipments query. Please create a composite index for the 'shipments' collection on 'artisan_id' (ascending) and 'createdAt' (descending).");
+          // Return empty array to prevent app crash while allowing user to create the index.
+          return [];
+        }
         console.error("Error getting shipments: ", e);
         throw new Error("Failed to get shipments");
     }
@@ -375,8 +397,3 @@ export const seedDatabase = async (): Promise<void> => {
         console.log("Database already contains data, skipping seed.");
     }
 };
-    
-
-    
-
-    

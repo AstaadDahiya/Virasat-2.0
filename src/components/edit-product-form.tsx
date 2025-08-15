@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/context/language-context";
-import { Loader2, Upload, X } from "lucide-react";
+import { Loader2, Upload, X, Languages } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getProduct, updateProduct } from "@/services/firebase";
@@ -25,13 +25,14 @@ import Image from "next/image";
 import { useData } from "@/context/data-context";
 import { useAuth } from "@/context/auth-context";
 import { Skeleton } from "./ui/skeleton";
+import { translateText } from "@/ai/flows/translate-text";
 
 
 const formSchema = z.object({
   name: z.string().min(3, { message: "English name must be at least 3 characters." }),
-  name_hi: z.string().min(3, { message: "Hindi name must be at least 3 characters." }),
+  name_hi: z.string().min(3, { message: "Hindi name is required." }),
   description: z.string().min(10, { message: "English description must be at least 10 characters." }),
-  description_hi: z.string().min(10, { message: "Hindi description must be at least 10 characters." }),
+  description_hi: z.string().min(10, { message: "Hindi description is required." }),
   price: z.coerce.number().min(1, { message: "Price must be at least 1." }),
   stock: z.coerce.number().int().min(0, { message: "Stock can't be negative." }),
   category: z.string().min(2, { message: "English category is required." }),
@@ -40,6 +41,8 @@ const formSchema = z.object({
   materials_hi: z.string().min(3, { message: "Please list at least one material in Hindi." }),
   images: z.array(z.union([z.instanceof(File), z.string()])).min(1, { message: "Please upload at least one image." }).max(5, {message: "You can upload a maximum of 5 images."}),
 });
+
+type TranslatableField = "name" | "description" | "category" | "materials";
 
 interface EditProductFormProps {
     productId: string;
@@ -52,6 +55,7 @@ export function EditProductForm({ productId }: EditProductFormProps) {
   const { refreshData } = useData();
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [translating, setTranslating] = useState<Partial<Record<TranslatableField, boolean>>>({});
   const [dataLoading, setDataLoading] = useState(true);
   const [previews, setPreviews] = useState<string[]>([]);
   const [initialImageUrls, setInitialImageUrls] = useState<string[]>([]);
@@ -91,6 +95,31 @@ export function EditProductForm({ productId }: EditProductFormProps) {
     fetchProduct();
   }, [productId, form, toast, router]);
 
+  const handleTranslation = async (field: TranslatableField) => {
+    const englishValue = form.getValues(`${field}`);
+    const hindiValue = form.getValues(`${field}_hi`);
+
+    const toLanguage = englishValue && !hindiValue ? 'Hindi' : 'English';
+    const textToTranslate = toLanguage === 'Hindi' ? englishValue : hindiValue;
+    const targetField = toLanguage === 'Hindi' ? `${field}_hi` : `${field}`;
+
+    if (!textToTranslate) {
+      toast({ variant: 'destructive', title: "Nothing to translate", description: "Please enter some text in one of the fields first."});
+      return;
+    }
+
+    setTranslating(prev => ({...prev, [field]: true}));
+    try {
+      const result = await translateText({ text: textToTranslate, targetLanguage: toLanguage });
+      form.setValue(targetField as any, result.translatedText, { shouldValidate: true });
+    } catch(error) {
+      console.error("Translation failed", error);
+      toast({ variant: "destructive", title: "Translation failed" });
+    } finally {
+      setTranslating(prev => ({...prev, [field]: false}));
+    }
+  }
+
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
@@ -129,7 +158,6 @@ export function EditProductForm({ productId }: EditProductFormProps) {
     
     try {
         const newImageFiles = values.images.filter(img => img instanceof File) as File[];
-        const existingImageUrls = values.images.filter(img => typeof img === 'string') as string[];
         
         const productData = {
             ...values,
@@ -157,6 +185,12 @@ export function EditProductForm({ productId }: EditProductFormProps) {
     }
   }
 
+  const renderTranslationButton = (field: TranslatableField) => (
+     <Button type="button" size="icon" variant="ghost" onClick={() => handleTranslation(field)} disabled={translating[field]}>
+        {translating[field] ? <Loader2 className="h-4 w-4 animate-spin" /> : <Languages className="h-4 w-4" />}
+     </Button>
+  )
+
   if(dataLoading) {
       return (
           <div className="space-y-6">
@@ -177,7 +211,7 @@ export function EditProductForm({ productId }: EditProductFormProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
             <FormField control={form.control} name="name" render={({ field }) => (
                 <FormItem>
                     <FormLabel>{t('productName')} (English)</FormLabel>
@@ -185,29 +219,37 @@ export function EditProductForm({ productId }: EditProductFormProps) {
                     <FormMessage />
                 </FormItem>
             )}/>
-            <FormField control={form.control} name="name_hi" render={({ field }) => (
+            <div className="flex gap-2">
+                <FormField control={form.control} name="name_hi" render={({ field }) => (
+                    <FormItem className="flex-grow">
+                        <FormLabel>{t('productName')} (हिंदी)</FormLabel>
+                        <FormControl><Input placeholder="उदा., हाथ से पेंट किया हुआ नीला मिट्टी का फूलदान" {...field} /></FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}/>
+                {renderTranslationButton("name")}
+            </div>
+        </div>
+        
+        <div className="space-y-2">
+            <FormField control={form.control} name="description" render={({ field }) => (
                 <FormItem>
-                    <FormLabel>{t('productName')} (हिंदी)</FormLabel>
-                    <FormControl><Input placeholder="उदा., हाथ से पेंट किया हुआ नीला मिट्टी का फूलदान" {...field} /></FormControl>
+                    <FormLabel>{t('productDescription')} (English)</FormLabel>
+                    <FormControl><Textarea placeholder="Describe your product..." {...field} /></FormControl>
                     <FormMessage />
                 </FormItem>
             )}/>
+            <div className="flex gap-2 items-end">
+                <FormField control={form.control} name="description_hi" render={({ field }) => (
+                    <FormItem className="flex-grow">
+                        <FormLabel>{t('productDescription')} (हिंदी)</FormLabel>
+                        <FormControl><Textarea placeholder="अपने उत्पाद का वर्णन करें..." {...field} /></FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}/>
+                {renderTranslationButton("description")}
+            </div>
         </div>
-        
-        <FormField control={form.control} name="description" render={({ field }) => (
-            <FormItem>
-                <FormLabel>{t('productDescription')} (English)</FormLabel>
-                <FormControl><Textarea placeholder="Describe your product..." {...field} /></FormControl>
-                <FormMessage />
-            </FormItem>
-        )}/>
-        <FormField control={form.control} name="description_hi" render={({ field }) => (
-            <FormItem>
-                <FormLabel>{t('productDescription')} (हिंदी)</FormLabel>
-                <FormControl><Textarea placeholder="अपने उत्पाद का वर्णन करें..." {...field} /></FormControl>
-                <FormMessage />
-            </FormItem>
-        )}/>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField control={form.control} name="price" render={({ field }) => (
@@ -226,7 +268,7 @@ export function EditProductForm({ productId }: EditProductFormProps) {
             )}/>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
             <FormField control={form.control} name="category" render={({ field }) => (
                 <FormItem>
                     <FormLabel>{t('tableHeaderCategory')} (English)</FormLabel>
@@ -234,16 +276,19 @@ export function EditProductForm({ productId }: EditProductFormProps) {
                     <FormMessage />
                 </FormItem>
             )}/>
-            <FormField control={form.control} name="category_hi" render={({ field }) => (
-                <FormItem>
-                    <FormLabel>{t('tableHeaderCategory')} (हिंदी)</FormLabel>
-                    <FormControl><Input placeholder="उदा., ब्लॉक-प्रिंटिंग" {...field} /></FormControl>
-                    <FormMessage />
-                </FormItem>
-            )}/>
+            <div className="flex gap-2">
+                <FormField control={form.control} name="category_hi" render={({ field }) => (
+                    <FormItem className="flex-grow">
+                        <FormLabel>{t('tableHeaderCategory')} (हिंदी)</FormLabel>
+                        <FormControl><Input placeholder="उदा., ब्लॉक-प्रिंटिंग" {...field} /></FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}/>
+                {renderTranslationButton("category")}
+            </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
             <FormField control={form.control} name="materials" render={({ field }) => (
                 <FormItem>
                     <FormLabel>{t('productMaterials')} (English)</FormLabel>
@@ -252,14 +297,17 @@ export function EditProductForm({ productId }: EditProductFormProps) {
                     <FormMessage />
                 </FormItem>
             )}/>
-             <FormField control={form.control} name="materials_hi" render={({ field }) => (
-                <FormItem>
-                    <FormLabel>{t('productMaterials')} (हिंदी)</FormLabel>
-                    <FormControl><Input placeholder="कॉटन कैनवास, प्राकृतिक रंग" {...field} /></FormControl>
-                    <p className="text-xs text-muted-foreground">सामग्री को अल्पविराम से अलग करें।</p>
-                    <FormMessage />
-                </FormItem>
-            )}/>
+             <div className="flex gap-2">
+                <FormField control={form.control} name="materials_hi" render={({ field }) => (
+                    <FormItem className="flex-grow">
+                        <FormLabel>{t('productMaterials')} (हिंदी)</FormLabel>
+                        <FormControl><Input placeholder="कॉटन कैनवास, प्राकृतिक रंग" {...field} /></FormControl>
+                        <p className="text-xs text-muted-foreground">सामग्री को अल्पविराम से अलग करें।</p>
+                        <FormMessage />
+                    </FormItem>
+                )}/>
+                {renderTranslationButton("materials")}
+            </div>
         </div>
         
          <FormField
