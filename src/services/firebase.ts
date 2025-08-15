@@ -331,20 +331,9 @@ export const getShipments = async (artisanId: string): Promise<Shipment[]> => {
             return { id: doc.id, ...data } as Shipment;
         });
         return shipments;
-    } catch (e: any) {
-        if (e.code === 'failed-precondition') {
-            console.error("*************************************************************************************************");
-            console.error("Firestore Index Missing: A composite index is required for this query to work.");
-            console.error("Please create a composite index in your Firebase Firestore console with the following details:");
-            console.error("  - Collection ID: shipments");
-            console.error("  - Fields to index: 1) artisan_id (Ascending), 2) createdAt (Descending)");
-            console.error("The app will not show shipments until this index is created and enabled.");
-            console.error("*************************************************************************************************");
-        } else {
-            console.error("An unexpected error occurred while getting shipments: ", e);
-        }
-        // Return an empty array to prevent the app from crashing.
-        return [];
+    } catch (e) {
+        console.error("Error getting shipments: ", e);
+        throw new Error("Failed to get shipments");
     }
 }
 
