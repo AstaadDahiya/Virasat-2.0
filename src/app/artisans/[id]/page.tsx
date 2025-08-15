@@ -97,11 +97,11 @@ export default function ArtisanDetailPage() {
 
               <div className="grid md:grid-cols-3 gap-8 mt-8">
                 <div className="md:col-span-2">
-                  <h2 className="font-headline text-2xl font-bold mb-4">{t('artisanDetailAbout')} {artisanName}</h2>
+                  <h2 className="font-headline text-2xl font-bold mb-4">{t('About')} {artisanName}</h2>
                   <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">{language === 'hi' ? artisan.bio_hi : artisan.bio}</p>
                 </div>
                 <div>
-                   <h2 className="font-headline text-2xl font-bold mb-4">{t('artisanDetailContact')} {artisanName}</h2>
+                   <h2 className="font-headline text-2xl font-bold mb-4">{t('Contact')} {artisanName}</h2>
                    <ContactArtisanForm />
                 </div>
               </div>
@@ -109,7 +109,7 @@ export default function ArtisanDetailPage() {
           </Card>
 
           <div className="mt-16">
-            <h2 className="font-headline text-3xl font-bold mb-6">{t('artisanDetailProductsBy')} {artisanName}</h2>
+            <h2 className="font-headline text-3xl font-bold mb-6">{t('Products by')} {artisanName}</h2>
             {products.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                 {products.map(product => (
@@ -117,7 +117,7 @@ export default function ArtisanDetailPage() {
                 ))}
               </div>
             ) : (
-               <p className="text-muted-foreground">{t('artisanDetailNoProducts')}</p>
+               <p className="text-muted-foreground">{t('This artisan has not listed any products yet.')}</p>
             )}
           </div>
         </div>

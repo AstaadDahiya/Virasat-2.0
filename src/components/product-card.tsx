@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from 'next/link';
@@ -39,14 +40,14 @@ export function ProductCard({ product, artisans }: ProductCardProps) {
         </CardTitle>
         {artisan && (
           <p className="text-sm text-muted-foreground">
-            by <Link href={`/artisans/${artisan.id}`} className="hover:underline text-accent">{language === 'hi' ? artisan.name_hi : artisan.name}</Link>
+            {t('by')} <Link href={`/artisans/${artisan.id}`} className="hover:underline text-accent">{language === 'hi' ? artisan.name_hi : artisan.name}</Link>
           </p>
         )}
       </CardContent>
       <CardFooter className="p-4 pt-0 flex justify-between items-center">
         <p className="text-lg font-semibold text-primary">₹{product.price.toFixed(2)}</p>
         <Button asChild size="sm">
-          <Link href={`/products/${product.id}`}>{t('viewDetails')}</Link>
+          <Link href={`/products/${product.id}`}>{t('View Details')}</Link>
         </Button>
       </CardFooter>
     </Card>

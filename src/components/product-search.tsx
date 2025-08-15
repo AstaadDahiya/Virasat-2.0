@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useMemo, useEffect } from 'react';
@@ -67,25 +68,25 @@ export function ProductSearch({ products, artisans }: ProductSearchProps) {
             <div className="relative">
                 <Input
                     type="text"
-                    placeholder={t('productSearchPlaceholder')}
+                    placeholder={t("Search for products...")}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pr-16"
                 />
                  <Button className="absolute right-1 top-1/2 -translate-y-1/2 h-8">
                     <SearchIcon className="h-4 w-4 mr-2"/>
-                    {t('search')}
+                    {t('Search')}
                 </Button>
             </div>
         </div>
         <div>
-          <label className="text-sm font-medium mb-2 block">{t('tableHeaderCategory')}</label>
+          <label className="text-sm font-medium mb-2 block">{t('Category')}</label>
           <Select value={category} onValueChange={setCategory}>
             <SelectTrigger>
-              <SelectValue placeholder={t('allCategories')} />
+              <SelectValue placeholder={t('All Categories')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">{t('allCategories')}</SelectItem>
+              <SelectItem value="all">{t('All Categories')}</SelectItem>
               {categories.map(cat => (
                 <SelectItem key={cat} value={cat}>{cat}</SelectItem>
               ))}
@@ -93,13 +94,13 @@ export function ProductSearch({ products, artisans }: ProductSearchProps) {
           </Select>
         </div>
         <div>
-           <label className="text-sm font-medium mb-2 block">{t('artisans')}</label>
+           <label className="text-sm font-medium mb-2 block">{t('Artisans')}</label>
            <Select value={artisan} onValueChange={setArtisan}>
             <SelectTrigger>
-              <SelectValue placeholder={t('allArtisans')} />
+              <SelectValue placeholder={t('All Artisans')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">{t('allArtisans')}</SelectItem>
+              <SelectItem value="all">{t('All Artisans')}</SelectItem>
               {artisanNames.map(name => (
                 <SelectItem key={name} value={name}>{name}</SelectItem>
               ))}
@@ -107,7 +108,7 @@ export function ProductSearch({ products, artisans }: ProductSearchProps) {
           </Select>
         </div>
         <div className="lg:col-span-2">
-          <label className="text-sm font-medium mb-2 block">{t('priceRange')}: <span className="font-semibold text-primary">₹{priceRange[0].toLocaleString()} - ₹{priceRange[1].toLocaleString()}</span></label>
+          <label className="text-sm font-medium mb-2 block">{t('Price Range')}: <span className="font-semibold text-primary">₹{priceRange[0].toLocaleString()} - ₹{priceRange[1].toLocaleString()}</span></label>
           <Slider
             min={0}
             max={maxPrice}
@@ -127,8 +128,8 @@ export function ProductSearch({ products, artisans }: ProductSearchProps) {
         </div>
       ) : (
         <div className="text-center py-16 border rounded-lg bg-secondary">
-          <h3 className="text-2xl font-headline font-bold">{t('noProductsFound')}</h3>
-          <p className="text-muted-foreground mt-2">{t('noProductsFoundFilterSubtitle')}</p>
+          <h3 className="text-2xl font-headline font-bold">{t('No Products Found')}</h3>
+          <p className="text-muted-foreground mt-2">{t("Try adjusting your search or filters to find what you're looking for.")}</p>
         </div>
       )}
     </div>

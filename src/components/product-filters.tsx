@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useMemo, useEffect } from 'react';
@@ -58,7 +59,7 @@ export function ProductFilters({ products }: ProductFiltersProps) {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
           <Input
             type="text"
-            placeholder={t('searchProductsPlaceholder')}
+            placeholder={t('Search for products...')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10"
@@ -67,10 +68,10 @@ export function ProductFilters({ products }: ProductFiltersProps) {
         <div>
           <Select value={category} onValueChange={setCategory}>
             <SelectTrigger>
-              <SelectValue placeholder={t('selectACategory')} />
+              <SelectValue placeholder={t('Select a category')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">{t('allCategories')}</SelectItem>
+              <SelectItem value="all">{t('All Categories')}</SelectItem>
               {categories.map(cat => (
                 <SelectItem key={cat} value={cat}>{cat}</SelectItem>
               ))}
@@ -79,7 +80,7 @@ export function ProductFilters({ products }: ProductFiltersProps) {
         </div>
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
-            <span>{t('priceRange')}</span>
+            <span>{t('Price Range')}</span>
             <span className="font-medium text-primary">₹{priceRange[0]} - ₹{priceRange[1]}</span>
           </div>
           <Slider
@@ -100,8 +101,8 @@ export function ProductFilters({ products }: ProductFiltersProps) {
         </div>
       ) : (
         <div className="text-center py-16">
-          <h3 className="text-2xl font-headline">{t('noProductsFound')}</h3>
-          <p className="text-muted-foreground mt-2">{t('noProductsFoundSubtitle')}</p>
+          <h3 className="text-2xl font-headline">{t('No Products Found')}</h3>
+          <p className="text-muted-foreground mt-2">{t('Try adjusting your search or filters.')}</p>
         </div>
       )}
     </div>

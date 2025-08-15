@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useForm } from "react-hook-form";
@@ -40,8 +41,8 @@ export function ContactArtisanForm() {
     // Simulate sending a message
     console.log("Form submitted:", values);
     toast({
-      title: t('toastMessageSentTitle'),
-      description: t('toastMessageSentDescription'),
+      title: t('Message Sent!'),
+      description: t('The artisan has been notified and will get back to you soon.'),
     });
     form.reset();
   }
@@ -56,9 +57,9 @@ export function ContactArtisanForm() {
                 name="name"
                 render={({ field }) => (
                     <FormItem>
-                    <FormLabel>{t('formLabelYourName')}</FormLabel>
+                    <FormLabel>{t('Your Name')}</FormLabel>
                     <FormControl>
-                        <Input placeholder={t('formPlaceholderYourName')} {...field} />
+                        <Input placeholder={t('Jane Doe')} {...field} />
                     </FormControl>
                     <FormMessage />
                     </FormItem>
@@ -69,9 +70,9 @@ export function ContactArtisanForm() {
                 name="email"
                 render={({ field }) => (
                     <FormItem>
-                    <FormLabel>{t('formLabelYourEmail')}</FormLabel>
+                    <FormLabel>{t('Your Email')}</FormLabel>
                     <FormControl>
-                        <Input placeholder={t('formPlaceholderYourEmail')} {...field} />
+                        <Input placeholder={t('jane.doe@example.com')} {...field} />
                     </FormControl>
                     <FormMessage />
                     </FormItem>
@@ -82,10 +83,10 @@ export function ContactArtisanForm() {
                 name="message"
                 render={({ field }) => (
                     <FormItem>
-                    <FormLabel>{t('formLabelMessage')}</FormLabel>
+                    <FormLabel>{t('Message')}</FormLabel>
                     <FormControl>
                         <Textarea
-                        placeholder={t('formPlaceholderMessage')}
+                        placeholder={t('Inquire about a custom order or ask a question...')}
                         className="resize-none"
                         {...field}
                         />
@@ -95,7 +96,7 @@ export function ContactArtisanForm() {
                 )}
                 />
                 <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
-                {form.formState.isSubmitting ? t('sending') : t('sendMessage')}
+                {form.formState.isSubmitting ? t('Sending...') : t('Send Message')}
                 </Button>
             </form>
             </Form>

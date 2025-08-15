@@ -24,7 +24,7 @@ export function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="flex flex-col">
         <SheetHeader>
-          <SheetTitle>{t('shoppingCart')}</SheetTitle>
+          <SheetTitle>{t('Shopping Cart')}</SheetTitle>
         </SheetHeader>
         {cartItems.length > 0 ? (
           <>
@@ -59,20 +59,20 @@ export function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
               <div className="w-full space-y-4">
                  <Separator />
                  <div className="flex justify-between font-semibold">
-                    <span>{t('subtotal')}</span>
+                    <span>{t('Subtotal')}</span>
                     <span>₹{cartTotal.toFixed(2)}</span>
                  </div>
                  <Button asChild className="w-full" size="lg" onClick={() => onOpenChange(false)}>
-                    <Link href="/checkout">{t('checkout')}</Link>
+                    <Link href="/checkout">{t('Checkout')}</Link>
                 </Button>
               </div>
             </SheetFooter>
           </>
         ) : (
           <div className="flex-grow flex flex-col items-center justify-center text-center">
-            <h3 className="font-semibold text-lg">{t('cartIsEmpty')}</h3>
-            <p className="text-muted-foreground mt-1">{t('cartIsEmptyHint')}</p>
-            <Button className="mt-4" onClick={() => onOpenChange(false)}>{t('continueShopping')}</Button>
+            <h3 className="font-semibold text-lg">{t('Your cart is empty')}</h3>
+            <p className="text-muted-foreground mt-1">{t('Find something beautiful to add!')}</p>
+            <Button className="mt-4" onClick={() => onOpenChange(false)}>{t('Continue Shopping')}</Button>
           </div>
         )}
       </SheetContent>

@@ -93,7 +93,7 @@ export default function ProductDetailPage() {
                   <p className="text-3xl font-bold text-primary">₹{product.price.toFixed(2)}</p>
                   <div className="flex items-center gap-1">
                     {[...Array(5)].map((_, i) => <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />)}
-                    <span className="text-muted-foreground text-sm ml-1">{t('productReviews')}</span>
+                    <span className="text-muted-foreground text-sm ml-1">{t('(12 reviews)')}</span>
                   </div>
                 </div>
                 <p className="text-muted-foreground mt-4 leading-relaxed">{language === 'hi' ? product.description_hi : product.description}</p>
@@ -102,7 +102,7 @@ export default function ProductDetailPage() {
               <Separator className="my-6" />
 
               <div>
-                <h3 className="font-headline text-lg font-semibold mb-2">{t('productMaterials')}</h3>
+                <h3 className="font-headline text-lg font-semibold mb-2">{t('Materials')}</h3>
                 <ul className="list-disc list-inside text-muted-foreground space-y-1">
                   {(language === 'hi' ? product.materials_hi : product.materials).map(material => <li key={material}>{material}</li>)}
                 </ul>
@@ -115,12 +115,12 @@ export default function ProductDetailPage() {
                         <Input type="number" value={quantity} onChange={e => setQuantity(Number(e.target.value))} className="w-16 text-center" min="1" max={product.stock} />
                         <Button variant="outline" size="icon" onClick={() => setQuantity(q => Math.min(product.stock, q+1))}><Plus/></Button>
                     </div>
-                     <p className="text-sm text-muted-foreground">{product.stock} {t('inStock')}</p>
+                     <p className="text-sm text-muted-foreground">{product.stock} {t('in stock')}</p>
                  </div>
 
                  <Button size="lg" className="w-full" onClick={handleAddToCart} disabled={product.stock < 1}>
                     <ShoppingCart className="mr-2 h-5 w-5" /> 
-                    {product.stock > 0 ? t('addToCart') : t('outOfStock')}
+                    {product.stock > 0 ? t('Add to Cart') : t('Out of Stock')}
                   </Button>
                 {artisan && (
                   <div className="mt-6 bg-secondary p-4 rounded-lg flex items-center gap-4">
@@ -129,7 +129,7 @@ export default function ProductDetailPage() {
                       <AvatarFallback>{(language === 'hi' ? artisan.name_hi : artisan.name).charAt(0)}</AvatarFallback>
                     </Avatar>
                     <div>
-                      <p className="text-sm text-muted-foreground">{t('soldBy')}</p>
+                      <p className="text-sm text-muted-foreground">{t('Sold by')}</p>
                       <Link href={`/artisans/${artisan.id}`} className="font-semibold text-accent hover:underline font-headline text-lg">{language === 'hi' ? artisan.name_hi : artisan.name}</Link>
                     </div>
                   </div>

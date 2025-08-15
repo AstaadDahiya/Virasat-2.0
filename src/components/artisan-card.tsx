@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from 'next/link';
@@ -38,7 +39,7 @@ export function ArtisanCard({ artisan }: ArtisanCardProps) {
       </CardContent>
       <CardFooter className="p-4 bg-secondary">
         <Button asChild className="w-full">
-          <Link href={`/artisans/${artisan.id}`}>{t('viewProfile')}</Link>
+          <Link href={`/artisans/${artisan.id}`}>{t('View Profile')}</Link>
         </Button>
       </CardFooter>
     </Card>

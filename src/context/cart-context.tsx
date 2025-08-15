@@ -5,8 +5,6 @@ import React, { createContext, useState, useContext, ReactNode, useEffect } from
 import { Product } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from './language-context';
-import { translate } from '@/lib/i18n';
-
 
 export interface CartItem extends Product {
   quantity: number;
@@ -49,40 +47,41 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     const productName = language === 'hi' ? product.name_hi : product.name;
     const existingItem = cartItems.find(item => item.id === product.id);
 
+    let canAddToCart = true;
+    let toastTitle = t('Item added!');
+    let toastDescription = t('Added {{name}} to your cart.', { name: productName });
+    let toastVariant: 'default' | 'destructive' = 'default';
+
     if (existingItem) {
         const newQuantity = existingItem.quantity + quantity;
         if (newQuantity > product.stock) {
-            toast({
-                variant: 'destructive',
-                title: t('toastNotEnoughStockTitle'),
-                description: translate('toastNotEnoughStockDescription', language, { stock: product.stock.toString() }),
-            });
-            return;
+            canAddToCart = false;
+            toastTitle = t('Not enough stock');
+            toastDescription = t('You cannot add more than the {{stock}} items available.', { stock: product.stock });
+            toastVariant = 'destructive';
+        } else {
+            setCartItems(prevItems =>
+                prevItems.map(item =>
+                    item.id === product.id ? { ...item, quantity: newQuantity } : item
+                )
+            );
         }
-        setCartItems(prevItems =>
-            prevItems.map(item =>
-                item.id === product.id ? { ...item, quantity: newQuantity } : item
-            )
-        );
-        toast({
-            title: t('toastItemAddedToCartTitle'),
-            description: translate('toastItemAddedToCartDescription', language, { name: productName }),
-        });
     } else {
         if (quantity > product.stock) {
-            toast({
-                variant: 'destructive',
-                title: t('toastNotEnoughStockTitle'),
-                description: translate('toastNotEnoughStockDescription', language, { stock: product.stock.toString() }),
-            });
-            return;
+            canAddToCart = false;
+            toastTitle = t('Not enough stock');
+            toastDescription = t('You cannot add more than the {{stock}} items available.', { stock: product.stock });
+            toastVariant = 'destructive';
+        } else {
+            setCartItems(prevItems => [...prevItems, { ...product, quantity }]);
         }
-        setCartItems(prevItems => [...prevItems, { ...product, quantity }]);
-        toast({
-            title: t('toastItemAddedToCartTitle'),
-            description: translate('toastItemAddedToCartDescription', language, { name: productName }),
-        });
     }
+    
+    toast({
+        variant: toastVariant,
+        title: toastTitle,
+        description: toastDescription,
+    });
   };
 
   const removeFromCart = (productId: string) => {
@@ -99,8 +98,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     if (itemToUpdate && quantity > itemToUpdate.stock) {
         toast({
             variant: 'destructive',
-            title: t('toastNotEnoughStockTitle'),
-            description: translate('toastNotEnoughStockDescription', language, { stock: itemToUpdate.stock.toString() }),
+            title: t('Not enough stock'),
+            description: t('You cannot add more than the {{stock}} items available.', { stock: itemToUpdate.stock }),
         });
         setCartItems(prevItems =>
             prevItems.map(item =>

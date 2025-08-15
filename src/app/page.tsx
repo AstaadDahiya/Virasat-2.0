@@ -34,13 +34,13 @@ export default function Home() {
           />
           <div className="relative z-10 flex h-full flex-col items-center justify-center bg-black/50 p-4 text-center">
             <h1 className="font-headline text-5xl font-bold md:text-7xl">
-              {t('heroTitle')}
+              {t('Handcrafted Stories, Timeless Treasures')}
             </h1>
             <p className="mt-4 max-w-2xl text-lg md:text-xl">
-              {t('heroSubtitle')}
+              {t('Discover unique, handmade goods from skilled artisans around the world.')}
             </p>
             <Button asChild size="lg" className="mt-8 bg-primary text-primary-foreground hover:bg-primary/90">
-              <Link href="/products">{t('exploreProducts')}</Link>
+              <Link href="/products">{t('Explore Products')}</Link>
             </Button>
           </div>
         </section>
@@ -49,11 +49,11 @@ export default function Home() {
           <div className="container mx-auto px-4">
             <div className="flex items-center justify-between mb-8">
                <h2 className="font-headline text-3xl font-bold md:text-4xl">
-                {t('featuredProducts')}
+                {t('Featured Products')}
               </h2>
               <Button variant="ghost" asChild>
                 <Link href="/products" className="flex items-center gap-2">
-                  {t('viewAll')} <ArrowRight size={16} />
+                  {t('View All')} <ArrowRight size={16} />
                 </Link>
               </Button>
             </div>
@@ -75,11 +75,11 @@ export default function Home() {
           <div className="container mx-auto px-4">
              <div className="flex items-center justify-between mb-8">
                <h2 className="font-headline text-3xl font-bold md:text-4xl">
-                {t('meetTheArtisans')}
+                {t('Meet the Artisans')}
               </h2>
               <Button variant="ghost" asChild>
                 <Link href="/artisans" className="flex items-center gap-2">
-                  {t('viewAll')} <ArrowRight size={16} />
+                  {t('View All')} <ArrowRight size={16} />
                 </Link>
               </Button>
             </div>
