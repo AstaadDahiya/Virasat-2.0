@@ -33,8 +33,8 @@ export type Artisan = {
 };
 
 // This represents the data coming from the form, before it's processed.
-export type ProductFormData = Omit<Product, 'id' | 'images' | 'artisanId' | 'materials' | 'materials_hi'> & {
-  images: File[];
+export type ProductFormData = Omit<Product, 'id' | 'images' | 'artisanId' | 'materials' | 'materials_hi' | 'createdAt'> & {
+  images: (File | string)[]; // Can be existing URL strings or new File objects
   materials: string; // Comes as a comma-separated string from the form input
   materials_hi: string; // Comes as a comma-separated string from the form input
 }

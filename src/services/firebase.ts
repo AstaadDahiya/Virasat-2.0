@@ -3,9 +3,9 @@
 "use server";
 
 import { db } from "@/lib/firebase/config";
-import { addDoc, collection, doc, getDoc, getDocs, query, serverTimestamp, setDoc, updateDoc, writeBatch, Timestamp } from "firebase/firestore";
+import { addDoc, collection, doc, getDoc, getDocs, query, serverTimestamp, setDoc, updateDoc, writeBatch, Timestamp, deleteDoc } from "firebase/firestore";
 import { BlobServiceClient } from "@azure/storage-blob";
-import type { Artisan, Product, ShipmentData, LogisticsInput, LogisticsOutput } from "@/lib/types";
+import type { Artisan, Product, ShipmentData, LogisticsInput, LogisticsOutput, ProductFormData } from "@/lib/types";
 import type { User } from 'firebase/auth';
 import { getLogisticsAdvice as getLogisticsAdviceFlow } from "@/ai/flows/logistics-advisor";
 import { products as seedProducts, artisans as seedArtisans } from "@/lib/data";
@@ -20,6 +20,27 @@ const getBlobServiceClient = () => {
     }
     return BlobServiceClient.fromConnectionString(connectionString);
 };
+
+const deleteBlob = async (blobUrl: string) => {
+    if (!blobUrl) return;
+    try {
+        const blobServiceClient = getBlobServiceClient();
+        const containerName = process.env.AZURE_STORAGE_CONTAINER_NAME || 'images';
+        const containerClient = blobServiceClient.getContainerClient(containerName);
+        const blobName = blobUrl.split('/').pop();
+        if(blobName) {
+            const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+            await blockBlobClient.delete();
+            console.log(`Deleted blob: ${blobName}`);
+        }
+    } catch(error: any) {
+        // It's okay if the blob doesn't exist, we can ignore that error.
+        if (error.statusCode !== 404) {
+            console.error("Error deleting blob from Azure:", error);
+            // We don't re-throw here to allow the Firestore deletion to proceed.
+        }
+    }
+}
 
 const uploadImages = async (images: File[], artisanId: string): Promise<string[]> => {
     if (!images || images.length === 0) return [];
@@ -70,6 +91,62 @@ export const addProduct = async (productData: ProductInsertData, images: File[],
     } catch (e) {
         console.error("Error in addProduct function: ", e);
         throw e instanceof Error ? e : new Error("Failed to add product due to an unexpected error.");
+    }
+};
+
+export const updateProduct = async (productId: string, productData: ProductFormData, newImageFiles: File[], initialImageUrls: string[]) => {
+    const productRef = doc(db, 'products', productId);
+    
+    // 1. Upload new images and get their URLs
+    const newImageUrls = newImageFiles.length > 0 ? await uploadImages(newImageFiles, productData.artisanId) : [];
+
+    // 2. Identify which of the initial images were removed
+    const finalImageUrls = productData.images.filter(img => typeof img === 'string') as string[];
+    const imagesToDelete = initialImageUrls.filter(url => !finalImageUrls.includes(url));
+    
+    // 3. Delete the removed images from storage
+    if (imagesToDelete.length > 0) {
+        await Promise.all(imagesToDelete.map(url => deleteBlob(url)));
+    }
+
+    // 4. Combine existing and new image URLs for the final update
+    const allImageUrls = [...finalImageUrls, ...newImageUrls];
+
+    // 5. Prepare the data for Firestore update
+    const { images, ...restOfProductData } = productData;
+    const dataToUpdate = {
+        ...restOfProductData,
+        images: allImageUrls,
+    };
+
+    // 6. Update the Firestore document
+    await updateDoc(productRef, dataToUpdate);
+}
+
+
+export const deleteProduct = async (productId: string): Promise<void> => {
+    try {
+        const productRef = doc(db, 'products', productId);
+        const productSnap = await getDoc(productRef);
+
+        if (!productSnap.exists()) {
+            throw new Error("Product not found.");
+        }
+
+        const product = productSnap.data() as Product;
+        
+        // Delete all associated images from Azure Blob Storage
+        if (product.images && product.images.length > 0) {
+            const deletePromises = product.images.map(url => deleteBlob(url));
+            await Promise.all(deletePromises);
+        }
+
+        // Delete the product document from Firestore
+        await deleteDoc(productRef);
+
+    } catch (e) {
+        console.error("Error deleting product: ", e);
+        throw e instanceof Error ? e : new Error("Failed to delete product due to an unexpected error.");
     }
 };
 

@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { MoreHorizontal, PlusCircle, Loader2 } from "lucide-react";
+import { MoreHorizontal, PlusCircle, Loader2, Trash2 } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,12 +23,61 @@ import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/context/language-context";
 import Link from "next/link";
 import { useData } from "@/context/data-context";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { deleteProduct } from "@/services/firebase";
+import { Product } from "@/lib/types";
 
 export default function DashboardProductsPage() {
   const { t, language } = useLanguage();
-  const { products, loading } = useData();
+  const { products, loading, refreshData } = useData();
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [productToDelete, setProductToDelete] = useState<Product | null>(null);
+  const [isAlertOpen, setIsAlertOpen] = useState(false);
+  const { toast } = useToast();
+
+  const handleDeleteClick = (product: Product) => {
+    setProductToDelete(product);
+    setIsAlertOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!productToDelete) return;
+    
+    setIsDeleting(true);
+    try {
+      await deleteProduct(productToDelete.id);
+      toast({
+        title: "Product Deleted",
+        description: `"${language === 'hi' ? productToDelete.name_hi : productToDelete.name}" has been deleted.`,
+      });
+      await refreshData();
+    } catch (error) {
+       toast({
+        variant: "destructive",
+        title: "Error deleting product",
+        description: error instanceof Error ? error.message : "An unknown error occurred.",
+      });
+    } finally {
+      setIsDeleting(false);
+      setIsAlertOpen(false);
+      setProductToDelete(null);
+    }
+  };
+
 
   return (
+    <>
     <div className="space-y-8">
        <div className="flex items-center justify-between">
          <div>
@@ -101,8 +150,12 @@ export default function DashboardProductsPage() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                             <DropdownMenuLabel>{t('tableHeaderActions')}</DropdownMenuLabel>
-                            <DropdownMenuItem>{t('edit')}</DropdownMenuItem>
-                            <DropdownMenuItem className="text-destructive">{t('delete')}</DropdownMenuItem>
+                             <DropdownMenuItem asChild>
+                                <Link href={`/dashboard/products/edit/${product.id}`}>{t('edit')}</Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="text-destructive" onClick={() => handleDeleteClick(product)}>
+                                {t('delete')}
+                            </DropdownMenuItem>
                         </DropdownMenuContent>
                         </DropdownMenu>
                     </TableCell>
@@ -114,5 +167,29 @@ export default function DashboardProductsPage() {
         </CardContent>
       </Card>
     </div>
+    <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
+        <AlertDialogContent>
+            <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+                This action cannot be undone. This will permanently delete the
+                product "{productToDelete && (language === 'hi' ? productToDelete.name_hi : productToDelete.name)}"
+                and all of its data from our servers.
+            </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setIsAlertOpen(false)} disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+                onClick={handleConfirmDelete}
+                disabled={isDeleting}
+                className="bg-destructive hover:bg-destructive/90"
+            >
+                {isDeleting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Trash2 className="mr-2 h-4 w-4"/>}
+                {isDeleting ? "Deleting..." : "Yes, delete product"}
+            </AlertDialogAction>
+            </AlertDialogFooter>
+        </AlertDialogContent>
+    </AlertDialog>
+  </>
   );
 }

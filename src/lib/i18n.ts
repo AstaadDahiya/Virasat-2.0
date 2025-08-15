@@ -126,8 +126,9 @@ export const translations: LanguageTranslations = {
     edit: 'Edit',
     delete: 'Delete',
     
-    // Dashboard - Add Product
+    // Dashboard - Add/Edit Product
     addProductSubtitle: "Fill in the details below to add a new product to your store.",
+    editProductSubtitle: "Update the details for your product below.",
     productDetails: "Product Details",
     productDetailsDescription: "Provide both English and Hindi details for a wider reach.",
     productName: "Product Name",
@@ -435,8 +436,9 @@ export const translations: LanguageTranslations = {
     edit: 'संपादित करें',
     delete: 'हटाएं',
 
-    // Dashboard - Add Product
+    // Dashboard - Add/Edit Product
     addProductSubtitle: "अपने स्टोर में एक नया उत्पाद जोड़ने के लिए नीचे दिए गए विवरण भरें।",
+    editProductSubtitle: "नीचे अपने उत्पाद के लिए विवरण अपडेट करें।",
     productDetails: "उत्पाद विवरण",
     productDetailsDescription: "व्यापक पहुंच के लिए अंग्रेजी और हिंदी दोनों में विवरण प्रदान करें।",
     productName: "उत्पाद का नाम",
