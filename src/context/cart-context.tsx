@@ -47,40 +47,42 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
   const addToCart = (product: Product, quantity: number = 1) => {
     const productName = language === 'hi' ? product.name_hi : product.name;
-    setCartItems(prevItems => {
-      const existingItem = prevItems.find(item => item.id === product.id);
-      if (existingItem) {
+    const existingItem = cartItems.find(item => item.id === product.id);
+
+    if (existingItem) {
         const newQuantity = existingItem.quantity + quantity;
         if (newQuantity > product.stock) {
-           toast({
+            toast({
                 variant: 'destructive',
                 title: t('toastNotEnoughStockTitle'),
                 description: translate('toastNotEnoughStockDescription', language, { stock: product.stock.toString() }),
-           });
-           return prevItems;
+            });
+            return;
         }
+        setCartItems(prevItems =>
+            prevItems.map(item =>
+                item.id === product.id ? { ...item, quantity: newQuantity } : item
+            )
+        );
         toast({
             title: t('toastItemAddedToCartTitle'),
             description: translate('toastItemAddedToCartDescription', language, { name: productName }),
         });
-        return prevItems.map(item =>
-          item.id === product.id ? { ...item, quantity: newQuantity } : item
-        );
-      }
-      if (quantity > product.stock) {
-           toast({
+    } else {
+        if (quantity > product.stock) {
+            toast({
                 variant: 'destructive',
                 title: t('toastNotEnoughStockTitle'),
                 description: translate('toastNotEnoughStockDescription', language, { stock: product.stock.toString() }),
-           });
-           return prevItems;
-      }
-       toast({
-        title: t('toastItemAddedToCartTitle'),
-        description: translate('toastItemAddedToCartDescription', language, { name: productName }),
-      });
-      return [...prevItems, { ...product, quantity }];
-    });
+            });
+            return;
+        }
+        setCartItems(prevItems => [...prevItems, { ...product, quantity }]);
+        toast({
+            title: t('toastItemAddedToCartTitle'),
+            description: translate('toastItemAddedToCartDescription', language, { name: productName }),
+        });
+    }
   };
 
   const removeFromCart = (productId: string) => {
