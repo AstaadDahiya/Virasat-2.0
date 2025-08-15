@@ -13,6 +13,7 @@ import { useLanguage, languages } from "@/context/language-context";
 import { useData } from "@/context/data-context";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function Home() {
   const { t, setLanguage, language } = useLanguage();
@@ -60,11 +61,13 @@ export default function Home() {
                            <SelectValue placeholder="Select a language" />
                        </SelectTrigger>
                        <SelectContent>
+                         <ScrollArea className="h-72">
                            {languages.map(lang => (
                                <SelectItem key={lang.code} value={lang.code}>
                                    {lang.name} ({lang.nativeName})
                                </SelectItem>
                            ))}
+                         </ScrollArea>
                        </SelectContent>
                    </Select>
                 </CardContent>
