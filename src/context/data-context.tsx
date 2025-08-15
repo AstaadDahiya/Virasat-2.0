@@ -3,7 +3,7 @@
 
 import React, { createContext, useState, useContext, ReactNode, useEffect, useCallback } from 'react';
 import { Product, Artisan } from '@/lib/types';
-import { getProducts, getArtisans } from '@/services/supabase';
+import { getProducts, getArtisans } from '@/services/firebase';
 
 interface DataContextType {
   products: Product[];
@@ -84,7 +84,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     // The empty dependency array is correct here.
     // We only want this effect to run once on mount.
     // `fetchData` is wrapped in `useCallback` to be stable.
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [fetchData]);
 
 
   const value = {

@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import { useState } from "react";
@@ -16,7 +15,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { getLogisticsAdvice, saveShipment } from "@/services/supabase";
+import { getLogisticsAdvice, saveShipment } from "@/services/firebase";
 import {
   type LogisticsOutput,
   type ShippingRate,
@@ -30,6 +29,7 @@ import { useData } from "@/context/data-context";
 import { Separator } from "./ui/separator";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 import { Badge } from "./ui/badge";
+import { useAuth } from "@/context/auth-context";
 
 const formSchema = z.object({
   productId: z.string({ required_error: "Please select a product." }).min(1, "Please select a product."),
@@ -45,6 +45,7 @@ export function LogisticsHubForm() {
   const { toast } = useToast();
   const { t, language } = useLanguage();
   const { products } = useData();
+  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [booking, setBooking] = useState(false);
   const [result, setResult] = useState<LogisticsOutput | null>(null);
@@ -102,7 +103,10 @@ export function LogisticsHubForm() {
   }
 
   const handleBooking = async (carrier: ShippingRate) => {
-    if (!formValues || !result) return;
+    if (!formValues || !result || !user) {
+        toast({ variant: "destructive", title: "Authentication Error", description: "You must be logged in to book a shipment." });
+        return;
+    };
     setBooking(true);
 
     try {
@@ -122,7 +126,7 @@ export function LogisticsHubForm() {
             aiCarrierChoiceAdvice: result.carrierChoiceAdvice,
             aiHsCode: result.customsAdvice?.hsCode,
             aiCustomsDeclaration: result.customsAdvice?.declarationText,
-        });
+        }, user.uid);
 
         toast({
             title: "Shipment Saved!",
@@ -277,5 +281,3 @@ export function LogisticsHubForm() {
     </div>
   );
 }
-
-    

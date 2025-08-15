@@ -19,8 +19,7 @@ import { useAuth } from "@/context/auth-context";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
-import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
-import { Terminal } from "lucide-react";
+import { FirebaseError } from "firebase/app";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address." }),
@@ -53,11 +52,23 @@ export function LoginForm() {
       });
       router.push("/dashboard");
     } catch (err: any) {
-      setError(err.message || "An unexpected error occurred.");
+      let errorMessage = "An unexpected error occurred.";
+       if (err instanceof FirebaseError) {
+            switch (err.code) {
+                case "auth/user-not-found":
+                case "auth/wrong-password":
+                case "auth/invalid-credential":
+                    errorMessage = "Invalid email or password.";
+                    break;
+                default:
+                    errorMessage = "Failed to log in. Please try again.";
+            }
+        }
+      setError(errorMessage);
       toast({
         variant: "destructive",
         title: "Login Failed",
-        description: err.message,
+        description: errorMessage,
       });
     } finally {
       setLoading(false);

@@ -17,13 +17,12 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/context/language-context";
-import { Loader2, Upload, X } from "lucide-react";
+import { Loader2, Upload } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "@/context/auth-context";
-import { supabase } from "@/lib/supabase";
 import { Artisan } from "@/lib/types";
 import Image from "next/image";
-import { ensureArtisanProfile } from "@/services/supabase";
+import { getArtisan, updateArtisanProfile } from "@/services/firebase";
 
 const formSchema = z.object({
   name: z.string().min(2, "Name is required"),
@@ -64,19 +63,13 @@ export function SettingsForm() {
       }
       setLoading(true);
       try {
-        await ensureArtisanProfile(user); // Make sure profile exists
-        const { data, error } = await supabase
-          .from('artisans')
-          .select('*')
-          .eq('id', user.id)
-          .single();
-
-        if (error) throw error;
-        
-        setArtisan(data);
-        form.reset(data);
-        if (data.profileImage) {
-          setPreview(data.profileImage);
+        const artisanData = await getArtisan(user.uid);
+        if (artisanData) {
+            setArtisan(artisanData);
+            form.reset(artisanData);
+            if (artisanData.profileImage) {
+            setPreview(artisanData.profileImage);
+            }
         }
       } catch (error: any) {
         toast({ variant: 'destructive', title: t('toastErrorTitle'), description: error.message });
@@ -102,25 +95,13 @@ export function SettingsForm() {
     setLoading(true);
     
     try {
-        let imageUrl = artisan?.profileImage;
-        const newImageFile = values.profileImage;
-
-        if (newImageFile && newImageFile instanceof File) {
-             const filePath = `${user.id}/${Date.now()}-${newImageFile.name}`;
-             const { error: uploadError } = await supabase.storage.from('product-images').upload(filePath, newImageFile, { upsert: true });
-             if (uploadError) throw uploadError;
-             const { data: urlData } = supabase.storage.from('product-images').getPublicUrl(filePath);
-             imageUrl = urlData.publicUrl;
-        }
-
+        const newImageFile = values.profileImage instanceof File ? values.profileImage : undefined;
         const { profileImage, ...updateData } = values;
 
-        const { error } = await supabase
-            .from('artisans')
-            .update({ ...updateData, profileImage: imageUrl })
-            .eq('id', user.id);
-
-        if (error) throw error;
+        const newImageUrl = await updateArtisanProfile(user.uid, updateData, newImageFile);
+        if(newImageUrl) {
+            setPreview(newImageUrl);
+        }
         toast({ title: t('toastProfileUpdated') });
 
     } catch (error: any) {
@@ -187,5 +168,3 @@ export function SettingsForm() {
     </Form>
   );
 }
-
-    

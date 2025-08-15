@@ -15,7 +15,7 @@ import { ShoppingCart, Star, Loader2, Minus, Plus } from "lucide-react";
 import { useLanguage } from "@/context/language-context";
 import { useEffect, useState } from "react";
 import { Product, Artisan } from "@/lib/types";
-import { getProduct, getArtisan } from "@/services/supabase";
+import { getProduct, getArtisan } from "@/services/firebase";
 import { useCart } from "@/context/cart-context";
 import { Input } from "@/components/ui/input";
 

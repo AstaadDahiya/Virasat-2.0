@@ -21,7 +21,7 @@ import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 import { Terminal } from "lucide-react";
-import { ensureArtisanProfile } from "@/services/supabase";
+import { FirebaseError } from "firebase/app";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address." }),
@@ -49,21 +49,34 @@ export function SignUpForm() {
     setError(null);
     setSuccess(false);
     try {
-      const { data } = await signUp(values.email, values.password);
-      if (data.user) {
-        await ensureArtisanProfile(data.user);
-      }
+      await signUp(values.email, values.password);
       setSuccess(true);
       toast({
         title: "Sign Up Successful",
-        description: "Please check your email to confirm your account.",
+        description: "Redirecting to your dashboard...",
       });
+      router.push('/dashboard');
     } catch (err: any) {
-      setError(err.message || "An unexpected error occurred.");
+        let errorMessage = "An unexpected error occurred.";
+        if (err instanceof FirebaseError) {
+            switch (err.code) {
+                case "auth/email-already-in-use":
+                    errorMessage = "This email is already registered. Please log in.";
+                    break;
+                case "auth/weak-password":
+                    errorMessage = "The password is too weak. Please use at least 6 characters.";
+                    break;
+                default:
+                    errorMessage = err.message;
+            }
+        } else if (err instanceof Error) {
+            errorMessage = err.message;
+        }
+      setError(errorMessage);
       toast({
         variant: "destructive",
         title: "Sign Up Failed",
-        description: err.message,
+        description: errorMessage,
       });
     } finally {
       setLoading(false);
@@ -74,9 +87,9 @@ export function SignUpForm() {
     return (
         <Alert>
             <Terminal className="h-4 w-4" />
-            <AlertTitle>Confirm your email</AlertTitle>
+            <AlertTitle>Welcome!</AlertTitle>
             <AlertDescription>
-            We've sent a confirmation link to your email address. Please click the link to complete your registration.
+                Your account has been created successfully. Redirecting you to the dashboard.
             </AlertDescription>
         </Alert>
     )
@@ -122,5 +135,3 @@ export function SignUpForm() {
     </div>
   );
 }
-
-    

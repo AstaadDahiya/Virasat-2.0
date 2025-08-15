@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import { useForm } from "react-hook-form";
@@ -21,9 +20,10 @@ import { useLanguage } from "@/context/language-context";
 import { Loader2, Upload, X } from "lucide-react";
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { addProduct } from "@/services/supabase";
+import { addProduct } from "@/services/firebase";
 import Image from "next/image";
 import { useData } from "@/context/data-context";
+import { useAuth } from "@/context/auth-context";
 
 
 const formSchema = z.object({
@@ -44,6 +44,7 @@ export function AddProductForm() {
   const { toast } = useToast();
   const { t } = useLanguage();
   const router = useRouter();
+  const { user } = useAuth();
   const { refreshData } = useData();
   const [loading, setLoading] = useState(false);
   const [previews, setPreviews] = useState<string[]>([]);
@@ -97,6 +98,12 @@ export function AddProductForm() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
+
+    if (!user) {
+        toast({ variant: "destructive", title: "Authentication Error", description: "You must be logged in to add a product." });
+        setLoading(false);
+        return;
+    }
     
     try {
         const { images, ...productInfo } = values;
@@ -107,7 +114,7 @@ export function AddProductForm() {
             materials_hi: values.materials_hi.split(',').map(m => m.trim()),
         };
 
-        await addProduct(productData, images);
+        await addProduct(productData, images, user.uid);
         
         toast({
             title: t('toastProductAddedTitle'),

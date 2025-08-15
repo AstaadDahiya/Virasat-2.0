@@ -2,17 +2,25 @@
 "use client";
 
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
-import { AuthError, AuthResponse, Session, User } from '@supabase/supabase-js';
-import { ensureArtisanProfile } from '@/services/supabase';
+import { auth, db } from '@/lib/firebase/config';
+import { 
+    onAuthStateChanged, 
+    createUserWithEmailAndPassword, 
+    signInWithEmailAndPassword, 
+    signOut as firebaseSignOut,
+    updatePassword as firebaseUpdatePassword,
+    type User,
+    type Auth
+} from "firebase/auth";
+import { ensureArtisanProfile } from '@/services/firebase';
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  signIn: (email, password) => Promise<AuthResponse>;
-  signOut: () => Promise<{ error: AuthError | null }>;
-  signUp: (email, password) => Promise<AuthResponse>;
-  updatePassword: (password: string) => Promise<AuthResponse>;
+  signIn: (email, password) => Promise<any>;
+  signOut: () => Promise<void>;
+  signUp: (email, password) => Promise<any>;
+  updatePassword: (password: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -22,51 +30,35 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const getSession = async () => {
-        const { data: { session } } = await supabase.auth.getSession();
-        setUser(session?.user ?? null);
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+        setUser(user);
         setLoading(false);
-    }
-    
-    getSession();
+    });
 
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setUser(session?.user ?? null);
-        setLoading(false);
-      }
-    );
-
-    return () => {
-      authListener?.subscription.unsubscribe();
-    };
+    return () => unsubscribe();
   }, []);
 
   const signIn = async (email, password) => {
-    const response = await supabase.auth.signInWithPassword({ email, password });
-    if (response.error) throw response.error;
-    // The ensureArtisanProfile call has been removed from here.
-    // It should only be called upon sign-up.
-    return response;
+    return signInWithEmailAndPassword(auth, email, password);
   };
 
   const signOut = async () => {
-    return await supabase.auth.signOut();
+    return firebaseSignOut(auth);
   };
 
   const signUp = async (email, password) => {
-    const response = await supabase.auth.signUp({
-      email,
-      password,
-    });
-    if (response.error) throw response.error;
-    return response;
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    if (userCredential.user) {
+        await ensureArtisanProfile(userCredential.user);
+    }
+    return userCredential;
   };
 
-  const updatePassword = async (password: string) => {
-    const response = await supabase.auth.updateUser({ password });
-    if (response.error) throw response.error;
-    return response;
+  const updatePassword = async (newPassword: string) => {
+    if (auth.currentUser) {
+      return firebaseUpdatePassword(auth.currentUser, newPassword);
+    }
+    throw new Error("No user is currently signed in.");
   }
 
   const value = {
@@ -78,7 +70,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     updatePassword
   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={value}>{!loading && children}</AuthContext.Provider>;
 };
 
 export const useAuth = (): AuthContextType => {
@@ -88,5 +80,3 @@ export const useAuth = (): AuthContextType => {
   }
   return context;
 };
-
-    
