@@ -25,89 +25,91 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  const refreshData = useCallback(async () => {
+  const fetchData = useCallback(async (isInitialLoad = false) => {
+    if (isInitialLoad) {
       setLoading(true);
-      try {
-        setError(null);
-        
+    }
+    try {
+      setError(null);
+      
+      // We only seed the database if it's the very first load and no products exist.
+      // This is a simplified check. A more robust system might use a 'version' flag.
+      const productCollection = await getDocs(collection(db, 'products'));
+      if (productCollection.empty) {
         await seedDatabase();
+      }
 
-        const [productsData, artisansData] = await Promise.all([
-          getProducts(),
-          getArtisans(),
-        ]);
+      const [productsData, artisansData] = await Promise.all([
+        getProducts(),
+        getArtisans(),
+      ]);
 
-        setProducts(productsData);
-        setArtisans(artisansData);
+      setProducts(productsData);
+      setArtisans(artisansData);
 
-        localStorage.setItem('products', JSON.stringify(productsData));
-        localStorage.setItem('artisans', JSON.stringify(artisansData));
-        
-        if (user) {
-          try {
-              const shipmentsData = await getShipments(user.uid);
-              setShipments(shipmentsData);
-              localStorage.setItem('shipments', JSON.stringify(shipmentsData));
-          } catch (shipmentError) {
-              console.error("Could not fetch shipments, Firestore index might be missing:", shipmentError);
-              setShipments([]); 
-              localStorage.setItem('shipments', JSON.stringify([]));
-          }
+      localStorage.setItem('products', JSON.stringify(productsData));
+      localStorage.setItem('artisans', JSON.stringify(artisansData));
+      
+      if (user) {
+        try {
+            const shipmentsData = await getShipments(user.uid);
+            setShipments(shipmentsData);
+            localStorage.setItem('shipments', JSON.stringify(shipmentsData));
+        } catch (shipmentError) {
+            console.error("Could not fetch shipments, Firestore index might be missing:", shipmentError);
+            setShipments([]); 
+            localStorage.setItem('shipments', JSON.stringify([]));
         }
-      } catch (err) {
-        console.error("Failed to refresh network data:", err);
-         if (err instanceof Error) {
-            setError(err);
-        } else {
-            setError(new Error('An unknown error occurred'));
-        }
-      } finally {
+      }
+    } catch (err) {
+      console.error("Failed to refresh network data:", err);
+       if (err instanceof Error) {
+          setError(err);
+      } else {
+          setError(new Error('An unknown error occurred'));
+      }
+    } finally {
+      if (isInitialLoad) {
         setLoading(false);
       }
+    }
   }, [user]);
 
   useEffect(() => {
-    const fetchData = async () => {
-        setLoading(true);
-        try {
-            const cachedProducts = localStorage.getItem('products');
-            const cachedArtisans = localStorage.getItem('artisans');
-            const cachedShipments = localStorage.getItem('shipments');
-            if (cachedProducts && cachedArtisans) {
-                setProducts(JSON.parse(cachedProducts));
-                setArtisans(JSON.parse(cachedArtisans));
-                if(cachedShipments) setShipments(JSON.parse(cachedShipments));
-            }
-
-            await seedDatabase();
-            const [productsData, artisansData] = await Promise.all([
-                getProducts(),
-                getArtisans(),
-            ]);
-
-            setProducts(productsData);
-            setArtisans(artisansData);
-            localStorage.setItem('products', JSON.stringify(productsData));
-            localStorage.setItem('artisans', JSON.stringify(artisansData));
-            
-            if (user) {
-                const shipmentsData = await getShipments(user.uid);
-                setShipments(shipmentsData);
-                localStorage.setItem('shipments', JSON.stringify(shipmentsData));
-            }
-        } catch (err) {
-            console.error("Failed to fetch initial data:", err);
-             if (err instanceof Error) {
-                setError(err);
-            } else {
-                setError(new Error('An unknown error occurred'));
-            }
-        } finally {
-            setLoading(false);
+    // This effect runs once on mount to load initial data.
+    const loadInitialData = async () => {
+      setLoading(true);
+      try {
+        const cachedProducts = localStorage.getItem('products');
+        const cachedArtisans = localStorage.getItem('artisans');
+        const cachedShipments = localStorage.getItem('shipments');
+        
+        if (cachedProducts && cachedArtisans) {
+          setProducts(JSON.parse(cachedProducts));
+          setArtisans(JSON.parse(cachedArtisans));
+          if(cachedShipments) setShipments(JSON.parse(cachedShipments));
+          setLoading(false); // Stop loading indicator early with cached data
+          await fetchData(false); // Then refresh data in the background
+        } else {
+          await fetchData(true); // Fetch data with loading indicator if no cache
         }
+      } catch (err) {
+        console.error("Failed to fetch initial data:", err);
+        if (err instanceof Error) {
+          setError(err);
+        } else {
+          setError(new Error('An unknown error occurred'));
+        }
+        setLoading(false);
+      }
     };
-    fetchData();
-  }, [user]);
+    
+    loadInitialData();
+  }, [fetchData]);
+
+  const refreshData = useCallback(async () => {
+    await fetchData(false);
+  }, [fetchData]);
 
 
   const value = {

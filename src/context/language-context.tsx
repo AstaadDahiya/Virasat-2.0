@@ -18,17 +18,19 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 const translationCache = new Map<string, string>();
 
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
-  const [language, setLanguage] = useState<Language>('hi');
+  const [language, setLanguage] = useState<Language>('en'); // Default to English
   // State to hold dynamic translations fetched from the AI
   const [translations, setTranslations] = useState<Map<string, string>>(translationCache);
   // Track which keys are currently being fetched
   const pendingTranslations = useRef(new Set<string>());
+  const isMounted = useRef(false);
 
   useEffect(() => {
     const storedLanguage = localStorage.getItem('language') as Language | null;
     if (storedLanguage) {
       setLanguage(storedLanguage);
     }
+    isMounted.current = true;
   }, []);
 
   const handleSetLanguage = (lang: Language) => {
@@ -38,7 +40,13 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
 
   const t = useCallback((key: string, values?: { [key: string]: string | number }): string => {
     if (language === 'en') {
-      return key; // Return the key itself if the language is English
+      let result = key;
+       if (values) {
+         Object.entries(values).forEach(([placeholder, value]) => {
+            result = result.replace(new RegExp(`{{\\s*${placeholder}\\s*}}`, 'g'), String(value));
+        });
+      }
+      return result;
     }
 
     // If translation is in the cache, use it
@@ -52,8 +60,8 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
       return translated;
     }
 
-    // If translation is not in the cache, and not already being fetched, fetch it.
-    if (!pendingTranslations.current.has(key)) {
+    // If component is mounted and translation is not in the cache, fetch it.
+    if (isMounted.current && !pendingTranslations.current.has(key)) {
       pendingTranslations.current.add(key); // Mark as pending
       
       translateText({ text: key, targetLanguage: 'Hindi' })

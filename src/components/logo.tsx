@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect } from 'react';
@@ -11,6 +12,15 @@ export const Logo: React.FC<{ size?: number; className?: string }> = ({
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  if (!isClient) {
+    return (
+      <div
+        className={`flex justify-center items-center ${className}`}
+        style={{ width: size, height: size }}
+      />
+    );
+  }
 
   return (
     <div
