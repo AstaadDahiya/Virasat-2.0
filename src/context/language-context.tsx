@@ -53,54 +53,46 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   const [translations, setTranslations] = useState<{ [key: string]: any }>({});
   const [loading, setLoading] = useState(true);
 
+  const switchLanguage = useCallback(async (langCode: LanguageCode) => {
+    setLoading(true);
+    try {
+      const newTranslations = await translationManager.loadTranslations(langCode);
+      localStorage.setItem('language', langCode);
+      setLanguage(langCode);
+      setTranslations(newTranslations);
+    } catch (error) {
+      console.error(`Failed to switch language to ${langCode}`, error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     const initLanguage = async () => {
-      setLoading(true);
       console.log("LanguageProvider: Initializing language system...");
+      
+      // Ensure translations are seeded before proceeding.
+      await seedDatabase();
 
-      try {
-        // This function now ensures 'en' translations exist before proceeding.
-        await seedDatabase(); 
-        
-        let initialLang: LanguageCode = 'en';
-        let detectionSource = 'default';
-        
-        // 1. Check for a saved user preference in localStorage.
-        const savedLang = localStorage.getItem('language');
-        if (savedLang && languageDetector.isLanguageSupported(savedLang)) {
-            initialLang = savedLang as LanguageCode;
-            detectionSource = 'saved_preference';
-        } else {
-            // 2. If no preference, detect the optimal language.
-            const { language: detectedLang, source } = await languageDetector.detectOptimalLanguage();
-            initialLang = detectedLang as LanguageCode;
-            detectionSource = source;
-        }
+      let initialLang: LanguageCode = 'en';
+      let detectionSource = 'default';
 
-        console.log(`LanguageProvider: Setting initial language to ${initialLang} (source: ${detectionSource})`);
-        
-        const loadedTranslations = await translationManager.loadTranslations(initialLang);
-        setTranslations(loadedTranslations);
-        setLanguage(initialLang);
-        
-        // Preload common languages in the background
-        translationManager.preloadLanguages(['en', 'hi', 'bn']);
-      } catch (error) {
-          console.error("LanguageProvider: CRITICAL - Failed to initialize language system.", error);
-          // In case of a catastrophic failure, set some very basic English words
-          setTranslations({ 
-              welcome: "Welcome", 
-              loading: "Loading...",
-              common: { loading: "Loading..."}
-          });
-          setLanguage('en');
-      } finally {
-        setLoading(false);
-        console.log("LanguageProvider: Initialization finished.");
+      const savedLang = localStorage.getItem('language');
+      if (savedLang && languageDetector.isLanguageSupported(savedLang)) {
+        initialLang = savedLang as LanguageCode;
+        detectionSource = 'saved_preference';
+      } else {
+        const { language: detectedLang, source } = await languageDetector.detectOptimalLanguage();
+        initialLang = detectedLang as LanguageCode;
+        detectionSource = source;
       }
+      
+      console.log(`LanguageProvider: Setting initial language to ${initialLang} (source: ${detectionSource})`);
+      await switchLanguage(initialLang);
     };
+
     initLanguage();
-  }, []);
+  }, [switchLanguage]);
   
   useEffect(() => {
     const rtlLanguages = ['ur', 'sd', 'ks'];
@@ -112,20 +104,6 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     document.documentElement.lang = language;
   }, [language]);
 
-
-  const handleSetLanguage = useCallback(async (lang: LanguageCode) => {
-    setLoading(true);
-    try {
-      const newTranslations = await translationManager.loadTranslations(lang);
-      setTranslations(newTranslations);
-      setLanguage(lang);
-      localStorage.setItem('language', lang);
-    } catch (error) {
-        console.error(`Failed to switch language to ${lang}`, error);
-    } finally {
-        setLoading(false);
-    }
-  }, []);
 
   const t = useCallback((key: string, values?: { [key: string]: string | number }): string => {
     const fallback = key.split('.').pop() || key;
@@ -144,7 +122,7 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     return translatedText;
   }, [translations]);
   
-  const value = useMemo(() => ({ language, setLanguage: handleSetLanguage, t, loading, translations }), [language, handleSetLanguage, t, loading, translations]);
+  const value = useMemo(() => ({ language, setLanguage: switchLanguage, t, loading, translations }), [language, switchLanguage, t, loading, translations]);
 
   return (
     <LanguageContext.Provider value={value}>
