@@ -9,6 +9,7 @@ import Image from "next/image";
 import { ScrollArea } from "./ui/scroll-area";
 import { Separator } from "./ui/separator";
 import { Minus, Plus, Trash2 } from "lucide-react";
+import Link from "next/link";
 
 interface CartDrawerProps {
   open: boolean;
@@ -61,7 +62,9 @@ export function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
                     <span>{t('subtotal')}</span>
                     <span>₹{cartTotal.toFixed(2)}</span>
                  </div>
-                 <Button className="w-full" size="lg">{t('checkout')}</Button>
+                 <Button asChild className="w-full" size="lg" onClick={() => onOpenChange(false)}>
+                    <Link href="/checkout">{t('checkout')}</Link>
+                </Button>
               </div>
             </SheetFooter>
           </>
