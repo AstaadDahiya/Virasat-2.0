@@ -4,7 +4,6 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import { Product } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
-import { useLanguage } from './language-context';
 
 export interface CartItem extends Product {
   quantity: number;
@@ -25,7 +24,6 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const { toast } = useToast();
-  const { t, language } = useLanguage();
 
   useEffect(() => {
     try {
@@ -44,20 +42,17 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   }, [cartItems]);
 
   const addToCart = (product: Product, quantity: number = 1) => {
-    const productName = language === 'hi' ? product.name_hi : product.name;
     const existingItem = cartItems.find(item => item.id === product.id);
 
-    let canAddToCart = true;
-    let toastTitle = t('Item added!');
-    let toastDescription = t('Added {{name}} to your cart.', { name: productName });
+    let toastTitle = 'Item added!';
+    let toastDescription = `Added ${product.name} to your cart.`;
     let toastVariant: 'default' | 'destructive' = 'default';
 
     if (existingItem) {
         const newQuantity = existingItem.quantity + quantity;
         if (newQuantity > product.stock) {
-            canAddToCart = false;
-            toastTitle = t('Not enough stock');
-            toastDescription = t('You cannot add more than the {{stock}} items available.', { stock: product.stock });
+            toastTitle = 'Not enough stock';
+            toastDescription = `You cannot add more than the ${product.stock} items available.`;
             toastVariant = 'destructive';
         } else {
             setCartItems(prevItems =>
@@ -68,9 +63,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         }
     } else {
         if (quantity > product.stock) {
-            canAddToCart = false;
-            toastTitle = t('Not enough stock');
-            toastDescription = t('You cannot add more than the {{stock}} items available.', { stock: product.stock });
+            toastTitle = 'Not enough stock';
+            toastDescription = `You cannot add more than the ${product.stock} items available.`;
             toastVariant = 'destructive';
         } else {
             setCartItems(prevItems => [...prevItems, { ...product, quantity }]);
@@ -98,8 +92,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     if (itemToUpdate && quantity > itemToUpdate.stock) {
         toast({
             variant: 'destructive',
-            title: t('Not enough stock'),
-            description: t('You cannot add more than the {{stock}} items available.', { stock: itemToUpdate.stock }),
+            title: 'Not enough stock',
+            description: `You cannot add more than the ${itemToUpdate.stock} items available.`,
         });
         setCartItems(prevItems =>
             prevItems.map(item =>
