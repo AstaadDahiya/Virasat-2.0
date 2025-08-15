@@ -3,7 +3,7 @@
 
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, Loader2, Star, ShoppingCart, MessageSquare } from "lucide-react";
+import { Users, Loader2, Star, ShoppingCart, MessageSquare, ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import {
   Table,
@@ -32,12 +32,59 @@ export default function DashboardPage() {
   const { products, loading } = useData();
   
   const recentProducts = products.slice(0, 5);
+  
+  const quickStartSteps = [
+      {
+          step: 1,
+          title: "Complete Profile",
+          description: "Tell your story and connect with customers.",
+          href: "/dashboard/settings"
+      },
+      {
+          step: 2,
+          title: "Add Products",
+          description: "Upload your beautiful creations.",
+          href: "/dashboard/products/new"
+      },
+      {
+          step: 3,
+          title: "Market Your Shop",
+          description: "Use AI to create social media buzz.",
+          href: "/dashboard/tools/marketing-suite"
+      },
+      {
+          step: 4,
+          title: "Get Paid",
+          description: "Set up your payment details.",
+          href: "/dashboard/settings"
+      }
+  ]
 
   return (
     <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-bold font-headline">{t('dashboardOverviewTitle')}</h1>
         <p className="text-muted-foreground">{t('dashboardOverviewSubtitle')}</p>
+      </div>
+
+       <div>
+        <h2 className="text-2xl font-bold font-headline">Quick Start Guide</h2>
+        <p className="text-muted-foreground mb-4">New to Virasat? Here are some quick steps to get your shop running.</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {quickStartSteps.map(step => (
+                 <Card key={step.step} className="hover:bg-secondary/50 transition-colors">
+                    <Link href={step.href} className="block h-full">
+                       <CardContent className="p-6 h-full flex flex-col">
+                         <div className="flex justify-between items-start">
+                           <p className="text-lg font-bold font-headline">{step.step}. {step.title}</p>
+                           <ArrowUpRight className="text-muted-foreground shrink-0"/>
+                         </div>
+                         <p className="text-muted-foreground text-sm mt-1 flex-grow">{step.description}</p>
+                       </CardContent>
+                    </Link>
+                 </Card>
+            ))}
+        </div>
       </div>
 
        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
