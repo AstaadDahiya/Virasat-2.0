@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Menu, Search, Languages, ShoppingCart } from "lucide-react";
+import { Menu, Search, Globe, ShoppingCart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Logo } from "./logo";
 import { useLanguage, languages } from "@/context/language-context";
@@ -62,7 +62,7 @@ export function SiteHeader() {
            <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5"><path d="M4 14.5a4.5 4.5 0 0 0 4.5 4.5 4.5 4.5 0 0 0 4.5-4.5V4M4 4v10.5A4.5 4.5 0 0 0 8.5 19a4.5 4.5 0 0 0 4.5-4.5V4M2.5 8h9M15 16V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v11m-4 0h4"></path></svg>
+                <Globe className="h-5 w-5" />
                 <span className="sr-only">{t('Change language')}</span>
               </Button>
             </DropdownMenuTrigger>
