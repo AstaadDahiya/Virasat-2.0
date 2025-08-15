@@ -9,6 +9,8 @@ import {
   SidebarMenuButton,
   SidebarFooter,
   useSidebar,
+  SidebarGroup,
+  SidebarGroupLabel
 } from "@/components/ui/sidebar";
 import {
   LayoutGrid,
@@ -23,7 +25,8 @@ import {
   Camera,
   TrendingUp,
   Ship,
-  Package
+  Package,
+  LineChart
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -41,11 +44,16 @@ export function DashboardSidebar() {
   const { user, signOut } = useAuth();
 
 
-  const menuItems = [
+  const mainMenuItems = [
     {
       href: "/dashboard",
       label: t('dashboardOverviewTitle'),
       icon: LayoutGrid,
+    },
+     {
+      href: "/dashboard/analytics",
+      label: 'Analytics',
+      icon: LineChart,
     },
     {
       href: "/dashboard/products",
@@ -57,6 +65,9 @@ export function DashboardSidebar() {
       label: t('shipments'),
       icon: Package,
     },
+  ];
+  
+  const aiToolsItems = [
      {
       href: "/dashboard/tools/description-generator",
       label: t('aiStorytellerTitle'),
@@ -110,21 +121,40 @@ export function DashboardSidebar() {
 
       <SidebarContent className="p-2">
         <SidebarMenu>
-          <p className="px-2 text-xs text-muted-foreground mb-2 group-data-[collapsible=icon]:hidden">Dashboard</p>
-          {menuItems.map((item) => (
-            <SidebarMenuItem key={item.href}>
-              <SidebarMenuButton
-                asChild
-                isActive={isActive(item.href)}
-                tooltip={{ children: item.label }}
-              >
-                <Link href={item.href}>
-                  <item.icon />
-                  <span>{item.label}</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
+            <SidebarGroup>
+                <SidebarGroupLabel>Dashboard</SidebarGroupLabel>
+                {mainMenuItems.map((item) => (
+                    <SidebarMenuItem key={item.href}>
+                    <SidebarMenuButton
+                        asChild
+                        isActive={isActive(item.href)}
+                        tooltip={{ children: item.label }}
+                    >
+                        <Link href={item.href}>
+                        <item.icon />
+                        <span>{item.label}</span>
+                        </Link>
+                    </SidebarMenuButton>
+                    </SidebarMenuItem>
+                ))}
+            </SidebarGroup>
+            <SidebarGroup>
+                 <SidebarGroupLabel>{t('aiTools')}</SidebarGroupLabel>
+                 {aiToolsItems.map((item) => (
+                    <SidebarMenuItem key={item.href}>
+                    <SidebarMenuButton
+                        asChild
+                        isActive={isActive(item.href)}
+                        tooltip={{ children: item.label }}
+                    >
+                        <Link href={item.href}>
+                        <item.icon />
+                        <span>{item.label}</span>
+                        </Link>
+                    </SidebarMenuButton>
+                    </SidebarMenuItem>
+                ))}
+            </SidebarGroup>
         </SidebarMenu>
       </SidebarContent>
 
