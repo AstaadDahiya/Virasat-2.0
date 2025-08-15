@@ -2,7 +2,7 @@
 "use client";
 
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
-import { Users, Star, ShoppingCart, IndianRupee, LineChart as LineChartIcon } from "lucide-react";
+import { Users, Star, ShoppingCart, IndianRupee, LineChart as LineChartIcon, Loader2 } from "lucide-react";
 import { 
     ResponsiveContainer, 
     LineChart, 
@@ -14,28 +14,99 @@ import {
     Line, 
     Bar 
 } from 'recharts';
+import { useData } from "@/context/data-context";
+import { useMemo } from "react";
+import { Product } from "@/lib/types";
 
+// Helper to group data by a specific time period (e.g., day, week)
+const groupDataByTime = (data: any[], dateKey: string, valueKey: string, unit: 'day' | 'week' | 'month') => {
+    const grouped: { [key: string]: number } = {};
+    const now = new Date();
+    
+    data.forEach(item => {
+        const itemDate = new Date(item[dateKey]);
+        let key = '';
 
-const revenueData = [
-  { date: "Mon", revenue: 5400 },
-  { date: "Tue", revenue: 6100 },
-  { date: "Wed", revenue: 4800 },
-  { date: "Thu", revenue: 7200 },
-  { date: "Fri", revenue: 9800 },
-  { date: "Sat", revenue: 12300 },
-  { date: "Sun", revenue: 11500 },
-];
+        if (unit === 'day') {
+            // Check if the date is within the last 7 days
+            const diffDays = (now.getTime() - itemDate.getTime()) / (1000 * 3600 * 24);
+            if (diffDays <= 7) {
+                key = itemDate.toLocaleDateString('en-US', { weekday: 'short' });
+            }
+        }
+        // Add more units like week/month if needed
 
-const categoryData = [
-  { name: "Wood Carving", sales: 45 },
-  { name: "Block-Printing", sales: 32 },
-  { name: "Embroidery", sales: 28 },
-  { name: "Pottery", sales: 21 },
-  { name: "Textiles", sales: 15 },
-];
+        if (key) {
+            if (!grouped[key]) {
+                grouped[key] = 0;
+            }
+            grouped[key] += item[valueKey];
+        }
+    });
+
+    if (unit === 'day') {
+        const sortedDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        const result = sortedDays.map(day => ({
+            date: day,
+            revenue: grouped[day] || 0
+        }));
+        // Sort to show current week days in order
+        const todayIndex = now.getDay();
+        return [...result.slice(todayIndex + 1), ...result.slice(0, todayIndex + 1)];
+    }
+
+    return Object.entries(grouped).map(([date, value]) => ({ date, revenue: value }));
+};
 
 
 export default function AnalyticsPage() {
+  const { shipments, products, loading } = useData();
+
+  const analyticsData = useMemo(() => {
+    if (loading || !shipments || !products) {
+      return {
+        totalRevenue: 0,
+        totalSales: 0,
+        revenueData: [],
+        categoryData: [],
+      };
+    }
+
+    const totalRevenue = shipments.reduce((acc, shipment) => acc + shipment.declared_value, 0);
+    const totalSales = shipments.length;
+    
+    const revenueData = groupDataByTime(shipments, 'createdAt', 'declared_value', 'day');
+
+    const categorySales: { [key: string]: number } = {};
+    shipments.forEach(shipment => {
+        const product = products.find(p => p.id === shipment.product_id);
+        if (product) {
+            const categoryName = product.category;
+            if (!categorySales[categoryName]) {
+                categorySales[categoryName] = 0;
+            }
+            categorySales[categoryName]++;
+        }
+    });
+
+    const categoryData = Object.entries(categorySales)
+        .map(([name, sales]) => ({ name, sales }))
+        .sort((a, b) => b.sales - a.sales)
+        .slice(0, 5); // Top 5 categories
+
+    return { totalRevenue, totalSales, revenueData, categoryData };
+
+  }, [shipments, products, loading]);
+
+
+  if (loading) {
+    return (
+        <div className="flex min-h-[50vh] items-center justify-center">
+            <Loader2 className="h-16 w-16 animate-spin text-primary" />
+        </div>
+    );
+  }
+
   return (
     <div className="space-y-8">
        <div className="flex items-start gap-4">
@@ -55,8 +126,8 @@ export default function AnalyticsPage() {
              <IndianRupee className="h-4 w-4 text-muted-foreground"/>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">₹3,56,787</div>
-            <p className="text-xs text-muted-foreground">+20.1% from last month</p>
+            <div className="text-2xl font-bold">₹{analyticsData.totalRevenue.toLocaleString()}</div>
+            <p className="text-xs text-muted-foreground">Calculated from all shipments</p>
           </CardContent>
         </Card>
         <Card>
@@ -65,8 +136,8 @@ export default function AnalyticsPage() {
             <ShoppingCart className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">+1,234</div>
-            <p className="text-xs text-muted-foreground">+19% from last month</p>
+            <div className="text-2xl font-bold">{analyticsData.totalSales}</div>
+            <p className="text-xs text-muted-foreground">Total shipments booked</p>
           </CardContent>
         </Card>
         <Card>
@@ -76,7 +147,7 @@ export default function AnalyticsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">+89</div>
-            <p className="text-xs text-muted-foreground">32 new this month</p>
+            <p className="text-xs text-muted-foreground">Example data</p>
           </CardContent>
         </Card>
         <Card>
@@ -86,7 +157,7 @@ export default function AnalyticsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">4.8 / 5</div>
-            <p className="text-xs text-muted-foreground">Based on 215 reviews</p>
+            <p className="text-xs text-muted-foreground">Example data</p>
           </CardContent>
         </Card>
       </div>
@@ -99,7 +170,7 @@ export default function AnalyticsPage() {
             </CardHeader>
             <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
-                    <LineChart data={revenueData}>
+                    <LineChart data={analyticsData.revenueData}>
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="date" stroke="#888888" fontSize={12} tickLine={false} axisLine={false}/>
                         <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `₹${value/1000}k`}/>
@@ -120,9 +191,9 @@ export default function AnalyticsPage() {
             </CardHeader>
             <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
-                    <BarChart data={categoryData} layout="vertical" margin={{ left: 25 }}>
+                    <BarChart data={analyticsData.categoryData} layout="vertical" margin={{ left: 25 }}>
                         <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis type="number" stroke="#888888" fontSize={12} tickLine={false} axisLine={false}/>
+                        <XAxis type="number" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} allowDecimals={false}/>
                         <YAxis type="category" dataKey="name" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} width={80} />
                         <Tooltip
                             cursor={{ fill: 'hsl(var(--muted))' }}
