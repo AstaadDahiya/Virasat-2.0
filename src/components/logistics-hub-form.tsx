@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useState } from "react";
@@ -56,9 +57,9 @@ export function LogisticsHubForm() {
       destination: "",
       packageWeightKg: 1,
       declaredValue: 1000,
-      length: undefined, // Using undefined and coerce in zod will allow placeholder to show
-      width: undefined,
-      height: undefined,
+      length: '' as any,
+      width: '' as any,
+      height: '' as any,
     },
   });
 
@@ -252,7 +253,7 @@ export function LogisticsHubForm() {
                                         <h3 className="font-bold text-lg text-primary">{option.carrier}</h3>
                                         <Badge variant="secondary">{option.serviceType}</Badge>
                                     </div>
-                                    <p className="text-sm text-muted-foreground mt-1">Est. Delivery: {option.estimatedDeliveryDate}</p>
+                                    <p className="text-sm text-muted-foreground">Est. Delivery: {option.estimatedDeliveryDate}</p>
                                 </div>
                                 <div className="text-left md:text-right">
                                     <p className="text-2xl font-bold">₹{option.totalCost.toFixed(2)}</p>
