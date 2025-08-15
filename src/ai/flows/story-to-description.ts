@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -69,7 +70,7 @@ const storyToDescriptionFlow = ai.defineFlow(
   async (input) => {
     // 1. Transcribe the audio
     const {text: transcript} = await ai.generate({
-        model: googleAI.model('gemini-2.0-flash'),
+        model: googleAI.model('gemini-1.5-flash'),
         prompt: [{media: {url: input.audioStory}}, {text: "Transcribe this audio."}],
     });
     
