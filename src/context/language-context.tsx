@@ -5,6 +5,8 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect, useCallback, useMemo } from 'react';
 import { TranslationManager, LanguageDetector } from '@/lib/i18n-manager';
 import { db } from '@/lib/firebase/config';
+import { getDoc, doc } from 'firebase/firestore';
+import { seedDatabase } from '@/services/firebase';
 
 export const languages = [
     { name: "English", code: "en", nativeName: "English" },
@@ -56,6 +58,16 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const initLanguage = async () => {
       setLoading(true);
+
+      // Check if seeding is needed before doing anything else
+      const enTranslationsRef = doc(db, 'translations', 'en');
+      const enTranslationsSnap = await getDoc(enTranslationsRef);
+      if (!enTranslationsSnap.exists()) {
+        console.log("No English translations found, seeding database...");
+        await seedDatabase();
+        console.log("Seeding complete.");
+      }
+      
       const { language: detectedLang } = await languageDetector.detectOptimalLanguage();
       
       const loadedTranslations = await translationManager.loadTranslations(detectedLang);
@@ -127,5 +139,3 @@ export const useLanguage = (): LanguageContextType => {
   }
   return context;
 };
-
-    

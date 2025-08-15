@@ -3,10 +3,8 @@
 
 import React, { createContext, useState, useContext, ReactNode, useEffect, useCallback } from 'react';
 import { Product, Artisan, Shipment } from '@/lib/types';
-import { getProducts, getArtisans, seedDatabase, getShipments } from '@/services/firebase';
+import { getProducts, getArtisans, getShipments } from '@/services/firebase';
 import { useAuth } from './auth-context';
-import { collection, getDocs } from 'firebase/firestore';
-import { db } from '@/lib/firebase/config';
 
 interface DataContextType {
   products: Product[];
@@ -34,11 +32,6 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     try {
       setError(null);
       
-      const productCollection = await getDocs(collection(db, 'products'));
-      if (productCollection.empty) {
-        await seedDatabase();
-      }
-
       const [productsData, artisansData] = await Promise.all([
         getProducts(),
         getArtisans(),
