@@ -23,15 +23,15 @@ export default function SettingsPage() {
                     <Cog className="h-6 w-6 text-primary" />
                 </div>
                 <div>
-                    <h1 className="text-3xl font-bold font-headline">{t('settingsTitle')}</h1>
-                    <p className="text-muted-foreground">{t('settingsSubtitle')}</p>
+                    <h1 className="text-3xl font-bold font-headline">{t('dashboard.settings.title')}</h1>
+                    <p className="text-muted-foreground">{t('dashboard.settings.subtitle')}</p>
                 </div>
             </div>
             
             <Card>
                 <CardHeader>
-                    <CardTitle>{t('artisanProfile')}</CardTitle>
-                    <CardDescription>{t('artisanProfileDescription')}</CardDescription>
+                    <CardTitle>{t('dashboard.settings.artisanProfile')}</CardTitle>
+                    <CardDescription>{t('dashboard.settings.profileDescription')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <SettingsForm />
@@ -40,24 +40,24 @@ export default function SettingsPage() {
 
             <Card>
                 <CardHeader>
-                    <CardTitle>{t('accountSettings')}</CardTitle>
-                    <CardDescription>{t('accountSettingsDescription')}</CardDescription>
+                    <CardTitle>Account Settings</CardTitle>
+                    <CardDescription>Manage your login and password.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                    <div className="space-y-2">
-                        <Label htmlFor="email">{t('emailLabel')}</Label>
+                        <Label htmlFor="email">Email</Label>
                         <Input id="email" type="email" value={user?.email || ''} disabled />
                    </div>
                    <div className="space-y-2">
-                        <Label htmlFor="password">{t('passwordLabel')}</Label>
+                        <Label htmlFor="password">Password</Label>
                         <Dialog>
                             <DialogTrigger asChild>
-                                <Button variant="outline">{t('changePassword')}</Button>
+                                <Button variant="outline">Change Password</Button>
                             </DialogTrigger>
                             <DialogContent className="sm:max-w-[425px]">
                                 <DialogHeader>
-                                    <DialogTitle>{t('changePassword')}</DialogTitle>
-                                    <DialogDescription>{t('changePasswordDescription')}</DialogDescription>
+                                    <DialogTitle>Change Password</DialogTitle>
+                                    <DialogDescription>Enter a new password for your account.</DialogDescription>
                                 </DialogHeader>
                                 <ChangePasswordForm />
                             </DialogContent>
@@ -68,21 +68,21 @@ export default function SettingsPage() {
 
              <Card>
                 <CardHeader>
-                    <CardTitle>{t('notifications')}</CardTitle>
-                    <CardDescription>{t('notificationsDescription')}</CardDescription>
+                    <CardTitle>Notifications</CardTitle>
+                    <CardDescription>Manage how you receive notifications from us.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                    <div className="flex items-center justify-between p-4 border rounded-lg">
                         <div>
-                            <Label htmlFor="email-notifications" className="font-semibold">{t('notificationEmailLabel')}</Label>
-                            <p className="text-sm text-muted-foreground">{t('notificationEmailDescription')}</p>
+                            <Label htmlFor="email-notifications" className="font-semibold">Email Notifications</Label>
+                            <p className="text-sm text-muted-foreground">Receive emails about new sales, messages, and features.</p>
                         </div>
                         <Switch id="email-notifications" defaultChecked />
                    </div>
                     <div className="flex items-center justify-between p-4 border rounded-lg bg-muted/50">
                         <div>
-                            <Label htmlFor="push-notifications" className="font-semibold">{t('notificationPushLabel')}</Label>
-                            <p className="text-sm text-muted-foreground">{t('notificationPushDescription')}</p>
+                            <Label htmlFor="push-notifications" className="font-semibold">Push Notifications</Label>
+                            <p className="text-sm text-muted-foreground">Receive push notifications on your devices (Coming soon).</p>
                         </div>
                         <Switch id="push-notifications" disabled />
                    </div>

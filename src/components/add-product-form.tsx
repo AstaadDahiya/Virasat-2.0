@@ -24,7 +24,6 @@ import { addProduct } from "@/services/firebase";
 import Image from "next/image";
 import { useData } from "@/context/data-context";
 import { useAuth } from "@/context/auth-context";
-import { translateText } from "@/ai/flows/translate-text";
 
 
 const formSchema = z.object({
@@ -45,7 +44,7 @@ type TranslatableField = "name" | "description" | "category" | "materials";
 
 export function AddProductForm() {
   const { toast } = useToast();
-  const { t } = useLanguage();
+  const { t, translate: tAI } = useLanguage();
   const router = useRouter();
   const { user } = useAuth();
   const { refreshData } = useData();
@@ -76,15 +75,15 @@ export function AddProductForm() {
     const targetFieldName = sourceLang === 'en' ? `${field}_hi` : field;
 
     const sourceValue = form.getValues(sourceFieldName as any);
-    const targetValue = form.getValues(targetFieldName as any);
-
-    if (sourceValue && !targetValue) {
+    
+    // Only translate if the source has a value and the target is empty
+    if (sourceValue) {
       const toLanguage = sourceLang === 'en' ? 'Hindi' : 'English';
       
       setTranslating(prev => ({ ...prev, [field]: true }));
       try {
-        const result = await translateText({ text: sourceValue, targetLanguage: toLanguage });
-        form.setValue(targetFieldName as any, result.translatedText, { shouldValidate: true });
+        const result = await tAI(sourceValue, toLanguage);
+        form.setValue(targetFieldName as any, result, { shouldValidate: true });
       } catch (error) {
         console.error("Translation failed", error);
         toast({ variant: "destructive", title: "Translation failed" });

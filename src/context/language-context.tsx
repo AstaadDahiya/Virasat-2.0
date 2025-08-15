@@ -6,6 +6,7 @@ import { TranslationManager, LanguageDetector } from '@/lib/i18n-manager';
 import { db } from '@/lib/firebase/config';
 import { seedDatabase } from '@/services/firebase';
 import type { TranslationKey } from '@/lib/i18n';
+import { translateText as performTranslation } from '@/ai/flows/translate-text';
 
 export const languages = [
     { name: "English", code: "en", nativeName: "English" },
@@ -39,6 +40,7 @@ interface LanguageContextType {
   language: LanguageCode;
   setLanguage: (language: LanguageCode) => void;
   t: (key: TranslationKey, values?: { [key: string]: string | number }) => string;
+  translate: (text: string | string[], targetLanguage: string) => Promise<any>;
   loading: boolean;
   translations: { [key: string]: any };
 }
@@ -47,6 +49,7 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 
 const translationManager = new TranslationManager(db);
 const languageDetector = new LanguageDetector();
+const translationCache = new Map<string, any>();
 
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   const [language, setLanguageState] = useState<LanguageCode>('en');
@@ -143,8 +146,19 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     
     return translatedText;
   }, [translations]);
+
+  const translate = useCallback(async (text: string | string[], targetLanguage: string) => {
+    const cacheKey = `${JSON.stringify(text)}_${targetLanguage}`;
+    if (translationCache.has(cacheKey)) {
+        return translationCache.get(cacheKey);
+    }
+
+    const { translatedText } = await performTranslation({ text, targetLanguage });
+    translationCache.set(cacheKey, translatedText);
+    return translatedText;
+  }, []);
   
-  const value = useMemo(() => ({ language, setLanguage, t, loading, translations }), [language, setLanguage, t, loading, translations]);
+  const value = useMemo(() => ({ language, setLanguage, t, loading, translations, translate }), [language, setLanguage, t, loading, translations, translate]);
 
   return (
     <LanguageContext.Provider value={value}>

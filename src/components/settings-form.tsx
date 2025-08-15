@@ -23,7 +23,6 @@ import { useAuth } from "@/context/auth-context";
 import { Artisan } from "@/lib/types";
 import Image from "next/image";
 import { getArtisan, updateArtisanProfile } from "@/services/firebase";
-import { translateText } from "@/ai/flows/translate-text";
 
 const formSchema = z.object({
   name: z.string().min(2, "Name is required"),
@@ -41,7 +40,7 @@ type TranslatableField = "name" | "bio" | "craft" | "location";
 
 export function SettingsForm() {
   const { toast } = useToast();
-  const { t } = useLanguage();
+  const { t, translate: tAI } = useLanguage();
   const { user, loading: authLoading } = useAuth();
   const [loading, setLoading] = useState(true);
   const [translating, setTranslating] = useState<Partial<Record<TranslatableField, boolean>>>({});
@@ -76,7 +75,7 @@ export function SettingsForm() {
             }
         }
       } catch (error: any) {
-        toast({ variant: 'destructive', title: t('toastErrorTitle'), description: error.message });
+        toast({ variant: 'destructive', title: t('toasts.errorTitle'), description: error.message });
       } finally {
         setLoading(false);
       }
@@ -99,15 +98,14 @@ export function SettingsForm() {
     const targetFieldName = sourceLang === 'en' ? `${field}_hi` : field;
 
     const sourceValue = form.getValues(sourceFieldName as any);
-    const targetValue = form.getValues(targetFieldName as any);
-
-    if (sourceValue && !targetValue) {
+    
+    if (sourceValue) {
       const toLanguage = sourceLang === 'en' ? 'Hindi' : 'English';
       
       setTranslating(prev => ({ ...prev, [field]: true }));
       try {
-        const result = await translateText({ text: sourceValue, targetLanguage: toLanguage });
-        form.setValue(targetFieldName as any, result.translatedText, { shouldValidate: true });
+        const result = await tAI(sourceValue, toLanguage);
+        form.setValue(targetFieldName as any, result, { shouldValidate: true });
       } catch (error) {
         console.error("Translation failed", error);
         toast({ variant: "destructive", title: "Translation failed" });
@@ -130,10 +128,10 @@ export function SettingsForm() {
         if(newImageUrl) {
             setPreview(newImageUrl);
         }
-        toast({ title: t('toastProfileUpdated') });
+        toast({ title: t('toasts.profileUpdated') });
 
     } catch (error: any) {
-        toast({ variant: 'destructive', title: t('toastErrorTitle'), description: error.message });
+        toast({ variant: 'destructive', title: t('toasts.errorTitle'), description: error.message });
     } finally {
         setLoading(false);
     }
@@ -148,23 +146,23 @@ export function SettingsForm() {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
          <FormField control={form.control} name="profileImage" render={({ field }) => (
             <FormItem>
-                <FormLabel>{t('profilePictureLabel')}</FormLabel>
+                <FormLabel>{t('dashboard.settings.profilePicture')}</FormLabel>
                 <div className="flex items-center gap-4">
                     <Image src={preview || "https://placehold.co/100x100.png"} alt="Profile Preview" width={100} height={100} className="rounded-full aspect-square object-cover" />
                     <Input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
-                    <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}><Upload className="mr-2" /> {t('uploadImage')}</Button>
+                    <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}><Upload className="mr-2" /> {t('dashboard.myProducts.uploadImage')}</Button>
                 </div>
                 <FormMessage />
             </FormItem>
         )}/>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
             <FormField control={form.control} name="name" render={({ field }) => (
-                <FormItem><FormLabel>{t('artisanNameLabel')} (English)</FormLabel><FormControl><Input {...field} onBlur={() => handleAutoTranslation('name', 'en')} /></FormControl><FormMessage /></FormItem>
+                <FormItem><FormLabel>{t('dashboard.settings.artisanName')} (English)</FormLabel><FormControl><Input {...field} onBlur={() => handleAutoTranslation('name', 'en')} /></FormControl><FormMessage /></FormItem>
             )}/>
             <FormField control={form.control} name="name_hi" render={({ field }) => (
                 <FormItem>
                     <FormLabel className="flex items-center gap-2">
-                        {t('artisanNameLabel')} (हिंदी)
+                        {t('dashboard.settings.artisanName')} (हिंदी)
                         {translating.name && <Loader2 className="h-4 w-4 animate-spin" />}
                     </FormLabel>
                     <FormControl><Input {...field} onBlur={() => handleAutoTranslation('name', 'hi')} /></FormControl><FormMessage />
@@ -173,12 +171,12 @@ export function SettingsForm() {
         </div>
          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
             <FormField control={form.control} name="bio" render={({ field }) => (
-                <FormItem><FormLabel>{t('bioLabel')} (English)</FormLabel><FormControl><Textarea {...field} onBlur={() => handleAutoTranslation('bio', 'en')} /></FormControl><FormMessage /></FormItem>
+                <FormItem><FormLabel>{t('dashboard.settings.bio')} (English)</FormLabel><FormControl><Textarea {...field} onBlur={() => handleAutoTranslation('bio', 'en')} /></FormControl><FormMessage /></FormItem>
             )}/>
             <FormField control={form.control} name="bio_hi" render={({ field }) => (
                 <FormItem>
                     <FormLabel className="flex items-center gap-2">
-                        {t('bioLabel')} (हिंदी)
+                        {t('dashboard.settings.bio')} (हिंदी)
                         {translating.bio && <Loader2 className="h-4 w-4 animate-spin" />}
                     </FormLabel>
                     <FormControl><Textarea {...field} onBlur={() => handleAutoTranslation('bio', 'hi')} /></FormControl><FormMessage />
@@ -187,12 +185,12 @@ export function SettingsForm() {
          </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
             <FormField control={form.control} name="craft" render={({ field }) => (
-                <FormItem><FormLabel>{t('craftLabel')} (English)</FormLabel><FormControl><Input {...field} onBlur={() => handleAutoTranslation('craft', 'en')} /></FormControl><FormMessage /></FormItem>
+                <FormItem><FormLabel>{t('dashboard.settings.craft')} (English)</FormLabel><FormControl><Input {...field} onBlur={() => handleAutoTranslation('craft', 'en')} /></FormControl><FormMessage /></FormItem>
             )}/>
              <FormField control={form.control} name="craft_hi" render={({ field }) => (
                 <FormItem>
                     <FormLabel className="flex items-center gap-2">
-                        {t('craftLabel')} (हिंदी)
+                        {t('dashboard.settings.craft')} (हिंदी)
                         {translating.craft && <Loader2 className="h-4 w-4 animate-spin" />}
                     </FormLabel>
                     <FormControl><Input {...field} onBlur={() => handleAutoTranslation('craft', 'hi')} /></FormControl><FormMessage />
@@ -201,12 +199,12 @@ export function SettingsForm() {
         </div>
          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
             <FormField control={form.control} name="location" render={({ field }) => (
-                <FormItem><FormLabel>{t('locationLabel')} (English)</FormLabel><FormControl><Input {...field} onBlur={() => handleAutoTranslation('location', 'en')} /></FormControl><FormMessage /></FormItem>
+                <FormItem><FormLabel>{t('dashboard.settings.location')} (English)</FormLabel><FormControl><Input {...field} onBlur={() => handleAutoTranslation('location', 'en')} /></FormControl><FormMessage /></FormItem>
             )}/>
              <FormField control={form.control} name="location_hi" render={({ field }) => (
                 <FormItem>
                     <FormLabel className="flex items-center gap-2">
-                        {t('locationLabel')} (हिंदी)
+                        {t('dashboard.settings.location')} (हिंदी)
                         {translating.location && <Loader2 className="h-4 w-4 animate-spin" />}
                     </FormLabel>
                     <FormControl><Input {...field} onBlur={() => handleAutoTranslation('location', 'hi')} /></FormControl><FormMessage />
@@ -216,7 +214,7 @@ export function SettingsForm() {
 
         <Button type="submit" disabled={loading}>
           {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          {loading ? t('updatingProfile') : t('updateProfile')}
+          {loading ? t('dashboard.settings.updatingProfile') : t('dashboard.settings.updateProfile')}
         </Button>
       </form>
     </Form>
