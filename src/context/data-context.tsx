@@ -67,9 +67,15 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
       localStorage.setItem('artisans', JSON.stringify(artisansData));
       
       if (user) {
-        const shipmentsData = await getShipments(user.uid);
-        setShipments(shipmentsData);
-        localStorage.setItem('shipments', JSON.stringify(shipmentsData));
+        try {
+            const shipmentsData = await getShipments(user.uid);
+            setShipments(shipmentsData);
+            localStorage.setItem('shipments', JSON.stringify(shipmentsData));
+        } catch (shipmentError) {
+            console.error("Could not fetch shipments, Firestore index might be missing:", shipmentError);
+            setShipments([]); // Set shipments to empty array on error
+            localStorage.setItem('shipments', JSON.stringify([]));
+        }
       }
 
 
