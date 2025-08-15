@@ -1,5 +1,4 @@
 
-
 "use server";
 
 import { createServerClient } from '@supabase/ssr';
@@ -241,7 +240,7 @@ export const ensureArtisanProfile = async (user: User): Promise<void> => {
       if (insertError) {
         console.error('Error creating artisan profile:', insertError);
         // Check for specific RLS violation error
-        if (insertError.code === '42501' || insertError.message.includes('permission denied') || insertError.message.includes('row-level security')) {
+        if (insertError.message.includes('permission denied') || insertError.message.includes('row-level security')) {
             throw new Error("Database permission denied. Please ensure Row Level Security (RLS) is enabled on the 'artisans' table and that a policy allows authenticated users to insert their own profile.");
         }
         throw new Error('Database error creating new user');
