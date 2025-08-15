@@ -62,7 +62,7 @@ export function SiteHeader() {
            <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon">
-                <Languages />
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="m7 2 5 5"/><path d="m12 3-1.5 4-5 4-4-4Z"/><path d="M18 10h4"/><path d="M14 21h6"/><path d="M16 16v5"/></svg>
                 <span className="sr-only">{t('Change language')}</span>
               </Button>
             </DropdownMenuTrigger>
