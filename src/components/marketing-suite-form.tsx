@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -18,7 +19,7 @@ import {
   generateMarketingContent,
   type GenerateMarketingContentOutput,
 } from "@/ai/flows/generate-marketing-content";
-import { Loader2, Copy } from "lucide-react";
+import { Loader2, Copy, Instagram, Facebook, Twitter } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
@@ -29,6 +30,12 @@ const formSchema = z.object({
   productId: z.string({ required_error: "Please select a product." }),
   targetAudience: z.string().min(3, { message: "Target audience is required." }),
 });
+
+const TikTokIcon = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" {...props}>
+        <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-2.43.05-4.86-.95-6.69-2.81-1.77-1.8-2.55-4.16-2.4-6.6s.92-4.67 2.56-6.44c.97-1.04 2.16-1.86 3.48-2.34.01 2.05.01 4.1-.01 6.15-.3.89-.68 1.74-1.16 2.55-.47.8-.9 1.69-1.28 2.62-.43 1.07-.56 2.26-.56 3.43.01 1.43.34 2.87.97 4.18.64 1.32 1.52 2.54 2.65 3.52.99.88 2.21 1.54 3.5 1.95.84.26 1.7.42 2.58.42 1.46 0 2.9-.45 4.12-1.25.99-.64 1.87-1.5 2.58-2.54.71-1.04 1.2-2.22 1.42-3.48.01-1.02-.09-2.05-.28-3.06-.01-.01-.01-.01 0 0z"/>
+    </svg>
+)
 
 export function MarketingSuiteForm() {
   const { toast } = useToast();
@@ -80,6 +87,13 @@ export function MarketingSuiteForm() {
     });
   };
 
+  const socialPosts = result ? [
+      { title: "Instagram Post", content: result.instagramPost, icon: <Instagram />},
+      { title: "Facebook Post", content: result.facebookPost, icon: <Facebook />},
+      { title: "Twitter Post", content: result.twitterPost, icon: <Twitter />},
+      { title: "TikTok Post", content: result.tiktokPost, icon: <TikTokIcon />}
+  ] : [];
+
   return (
     <div className="space-y-6">
       <Form {...form}>
@@ -125,15 +139,17 @@ export function MarketingSuiteForm() {
 
       {result && (
         <div className="pt-6 space-y-6">
-            <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
-                    <CardTitle>{t('socialMediaPost')}</CardTitle>
-                    <Button variant="ghost" size="icon" onClick={() => handleCopy(result.socialMediaPost)}><Copy className="h-4 w-4" /></Button>
-                </CardHeader>
-                <CardContent>
-                    <p className="text-secondary-foreground whitespace-pre-wrap">{result.socialMediaPost}</p>
-                </CardContent>
-            </Card>
+            {socialPosts.map(post => (
+                 <Card key={post.title}>
+                    <CardHeader className="flex flex-row items-center justify-between">
+                        <CardTitle className="flex items-center gap-2 text-lg">{post.icon} {post.title}</CardTitle>
+                        <Button variant="ghost" size="icon" onClick={() => handleCopy(post.content)}><Copy className="h-4 w-4" /></Button>
+                    </CardHeader>
+                    <CardContent>
+                        <p className="text-secondary-foreground whitespace-pre-wrap">{post.content}</p>
+                    </CardContent>
+                </Card>
+            ))}
             <Card>
                 <CardHeader className="flex flex-row items-center justify-between">
                     <CardTitle>{t('emailNewsletter')}</CardTitle>

@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -21,7 +22,10 @@ const GenerateMarketingContentInputSchema = z.object({
 export type GenerateMarketingContentInput = z.infer<typeof GenerateMarketingContentInputSchema>;
 
 const GenerateMarketingContentOutputSchema = z.object({
-  socialMediaPost: z.string().describe('A short, engaging social media post for platforms like Instagram or Facebook.'),
+  instagramPost: z.string().describe('A short, engaging Instagram post with relevant emojis and hashtags.'),
+  facebookPost: z.string().describe('A slightly more detailed Facebook post that tells a story and encourages engagement.'),
+  twitterPost: z.string().describe('A concise and punchy tweet (under 280 characters) with key hashtags.'),
+  tiktokPost: z.string().describe('A script idea or caption for a short TikTok video, focusing on visual appeal and trends.'),
   emailNewsletter: z.string().describe('A friendly and descriptive email newsletter section highlighting the product.'),
   adCopy: z.string().describe('A concise and persuasive ad copy for online advertising.'),
 });
@@ -39,10 +43,13 @@ const marketingContentPrompt = ai.definePrompt({
     Description: {{{productDescription}}}
     Target Audience: {{{targetAudience}}}
 
-    Based on the information above, please generate the following:
-    1.  A social media post (for Instagram/Facebook) that is engaging and includes relevant hashtags.
-    2.  An email newsletter section that is warm, descriptive, and encourages clicks.
-    3.  A short, punchy ad copy suitable for Google or Facebook ads.`,
+    Based on the information above, please generate the following six pieces of content, each tailored for its specific platform:
+    1.  **Instagram Post**: Make it visually focused, engaging, and include plenty of relevant hashtags and maybe an emoji or two.
+    2.  **Facebook Post**: This can be a bit longer. Tell a small story about the product or the artisan. Ask a question to encourage comments.
+    3.  **Twitter Post**: Keep it short, punchy, and under 280 characters. Use key hashtags.
+    4.  **TikTok Post**: Provide a video idea or a caption for an "unboxing," "behind-the-scenes," or "styling" video.
+    5.  **Email Newsletter**: Write a warm, descriptive section for an email that encourages clicks.
+    6.  **Ad Copy**: Create a short, persuasive copy suitable for Google or Facebook ads.`,
 });
 
 
