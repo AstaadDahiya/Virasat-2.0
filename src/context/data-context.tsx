@@ -3,7 +3,7 @@
 
 import React, { createContext, useState, useContext, ReactNode, useEffect, useCallback } from 'react';
 import { Product, Artisan } from '@/lib/types';
-import { getProducts, getArtisans } from '@/services/firebase';
+import { getProducts, getArtisans, seedDatabase } from '@/services/firebase';
 
 interface DataContextType {
   products: Product[];
@@ -49,6 +49,9 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         setLoading(true);
       }
       setError(null);
+      
+      // Seed database if it's empty
+      await seedDatabase();
 
       const [productsData, artisansData] = await Promise.all([
         getProducts(),

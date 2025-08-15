@@ -2,11 +2,12 @@
 "use server";
 
 import { db, storage } from "@/lib/firebase/config";
-import { addDoc, collection, doc, getDoc, getDocs, query, serverTimestamp, setDoc, updateDoc, where } from "firebase/firestore";
+import { addDoc, collection, doc, getDoc, getDocs, query, serverTimestamp, setDoc, updateDoc, writeBatch } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import type { Artisan, Product, ShipmentData, LogisticsInput, LogisticsOutput } from "@/lib/types";
 import type { User } from 'firebase/auth';
 import { getLogisticsAdvice as getLogisticsAdviceFlow } from "@/ai/flows/logistics-advisor";
+import { products as seedProducts, artisans as seedArtisans } from "@/lib/data";
 
 // Defines the shape of the data coming from the form, excluding fields that are handled separately.
 type ProductInsertData = Omit<Product, 'id' | 'images' | 'artisanId' | 'createdAt'>;
@@ -188,5 +189,46 @@ export const saveShipment = async (shipmentData: ShipmentData, artisanId: string
     } catch (error) {
          console.error("Error saving shipment:", error);
         throw new Error(`Failed to save shipment: ${error instanceof Error ? error.message : "Unknown error"}`);
+    }
+};
+
+export const seedDatabase = async (): Promise<void> => {
+    console.log("Checking if database needs seeding...");
+    const productsSnapshot = await getDocs(query(collection(db, 'products')));
+    if (productsSnapshot.empty) {
+        console.log("Database is empty, proceeding with seeding...");
+        const batch = writeBatch(db);
+
+        // Seed artisans and keep track of their new Firestore IDs
+        const artisanIdMap = new Map<string, string>();
+        for (const artisanData of seedArtisans) {
+            const tempId = `artisan-${seedArtisans.indexOf(artisanData) + 1}`;
+            const artisanRef = doc(collection(db, 'artisans'));
+            batch.set(artisanRef, artisanData);
+            artisanIdMap.set(tempId, artisanRef.id);
+            console.log(`Staged artisan: ${artisanData.name}`);
+        }
+
+        // Seed products, replacing temporary artisan IDs with new Firestore IDs
+        for (const productData of seedProducts) {
+            const productRef = doc(collection(db, 'products'));
+            const finalArtisanId = artisanIdMap.get(productData.artisanId);
+            if (finalArtisanId) {
+                const productWithRealArtisanId = { ...productData, artisanId: finalArtisanId, createdAt: serverTimestamp() };
+                batch.set(productRef, productWithRealArtisanId);
+                console.log(`Staged product: ${productData.name}`);
+            } else {
+                console.warn(`Could not find artisan for product: ${productData.name}`);
+            }
+        }
+        
+        try {
+            await batch.commit();
+            console.log("Database seeded successfully!");
+        } catch (error) {
+            console.error("Error seeding database: ", error);
+        }
+    } else {
+        console.log("Database already contains data, skipping seed.");
     }
 };
