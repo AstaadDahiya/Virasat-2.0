@@ -1,12 +1,13 @@
 
+
 "use client";
 
 import { doc, getDoc, type Firestore } from "firebase/firestore";
 
 type LanguageCode = string;
-type Translations = { [key: string]: string };
+type Translations = { [key: string]: any };
 
-class LanguageDetector {
+export class LanguageDetector {
     countryLanguageMap: { [key: string]: string[] };
 
     constructor() {
@@ -24,7 +25,7 @@ class LanguageDetector {
     async detectOptimalLanguage(): Promise<{ language: LanguageCode, source: string }> {
         try {
             // 1. Check saved preference first
-            const savedLang = localStorage.getItem('preferredLanguage');
+            const savedLang = localStorage.getItem('language');
             if (savedLang && this.isLanguageSupported(savedLang)) {
                 return { language: savedLang, source: 'saved_preference' };
             }
@@ -97,9 +98,8 @@ export class TranslationManager {
 
     async loadTranslations(langCode: LanguageCode): Promise<Translations> {
         // Return cached version if available
-        const cachedTranslations = localStorage.getItem(`translations_${langCode}`);
-        if(cachedTranslations) {
-            return JSON.parse(cachedTranslations);
+        if (this.cache.has(langCode)) {
+            return this.cache.get(langCode)!;
         }
 
         // Return existing loading promise if already in progress
@@ -113,7 +113,7 @@ export class TranslationManager {
 
         try {
             const translations = await loadingPromise;
-            localStorage.setItem(`translations_${langCode}`, JSON.stringify(translations));
+            this.cache.set(langCode, translations);
             return translations;
         } finally {
             this.loadingPromises.delete(langCode);
@@ -151,7 +151,10 @@ export class TranslationManager {
             loading: "Loading...",
             error: "An error occurred",
             welcome: "Welcome",
-            language: "Language"
+            language: "Language",
+            common: {
+                loading: "Loading..."
+            }
         };
     }
 
@@ -162,10 +165,11 @@ export class TranslationManager {
 
     clearCache(langCode: LanguageCode | null = null): void {
         if (langCode) {
-            localStorage.removeItem(`translations_${langCode}`);
+            this.cache.delete(langCode);
         } else {
-            // This is more complex with localStorage, would need to iterate keys
-            console.warn("Clearing all language caches from localStorage is not implemented.");
+            this.cache.clear();
         }
     }
 }
+
+    

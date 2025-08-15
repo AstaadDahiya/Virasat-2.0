@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -68,43 +69,72 @@
   }
 }
 
-/* RTL-specific fonts for better rendering */
-[dir="rtl"] {
-    font-family: 'Noto Sans Arabic', 'Arabic UI Text', 'SF Arabic', -apple-system, system-ui, sans-serif;
+@layer components {
+  /* RTL-specific fonts for better rendering */
+  [dir="rtl"] {
+      font-family: 'Noto Sans Arabic', 'Arabic UI Text', 'SF Arabic', -apple-system, system-ui, sans-serif;
+  }
+
+  /* Language-specific Font Loading */
+  /* Devanagari Script (Hindi, Marathi, Nepali, Sanskrit) */
+  [lang="hi"], [lang="mr"], [lang="ne"], [lang="sa"], [lang="mai"] {
+      font-family: 'Noto Sans Devanagari', 'Mangal', 'Aparajita', serif;
+  }
+
+  /* Bengali Script */
+  [lang="bn"], [lang="as"] {
+      font-family: 'Noto Sans Bengali', 'Vrinda', 'Akaash', serif;
+  }
+
+  /* Tamil Script */
+  [lang="ta"] {
+      font-family: 'Noto Sans Tamil', 'Latha', 'Vijaya', serif;
+  }
+
+  /* Telugu Script */
+  [lang="te"] {
+      font-family: 'Noto Sans Telugu', 'Gautami', 'Vani', serif;
+  }
+
+  /* Kannada Script */
+  [lang="kn"] {
+      font-family: 'Noto Sans Kannada', 'Tunga', 'Akshar Unicode', serif;
+  }
+
+  /* Malayalam Script */
+  [lang="ml"] {
+      font-family: 'Noto Sans Malayalam', 'Kartika', 'AnjaliOldLipi', serif;
+  }
+
+  /* Gujarati Script */
+  [lang="gu"] {
+      font-family: 'Noto Sans Gujarati', 'Shruti', 'Gujarati Sangam MN', serif;
+  }
+  
+  /* Punjabi Script (Gurmukhi) */
+  [lang="pa"] {
+      font-family: 'Noto Sans Gurmukhi', 'Raavi', 'Gurmukhi Sangam MN', serif;
+  }
+
+  /* Oriya Script */
+  [lang="or"] {
+      font-family: 'Noto Sans Oriya', 'Kalinga', 'Oriya Sangam MN', serif;
+  }
+
+  /* Urdu Script (Arabic-based) */
+  [lang="ur"] {
+      font-family: 'Noto Nastaliq Urdu', 'Aldhabi', 'Arabic Typesetting', 'Urdu Typesetting', serif;
+  }
+
+  /* Sindhi Script */
+  [lang="sd"] {
+      font-family: 'Noto Sans Arabic', 'Arabic UI Text', 'SF Arabic', serif;
+  }
+
+  /* Kashmiri Script */
+  [lang="ks"] {
+      font-family: 'Noto Sans Arabic', 'Arabic UI Text', 'SF Arabic', serif;
+  }
 }
 
-/* Language-specific Font Loading */
-/* Devanagari Script (Hindi, Marathi, Nepali, Sanskrit) */
-[lang="hi"], [lang="mr"], [lang="ne"], [lang="sa"], [lang="mai"] {
-    font-family: 'Noto Sans Devanagari', 'Mangal', 'Aparajita', serif;
-}
-
-/* Bengali Script */
-[lang="bn"], [lang="as"] {
-    font-family: 'Noto Sans Bengali', 'Vrinda', 'Akaash', serif;
-}
-
-/* Tamil Script */
-[lang="ta"] {
-    font-family: 'Noto Sans Tamil', 'Latha', 'Vijaya', serif;
-}
-
-/* Telugu Script */
-[lang="te"] {
-    font-family: 'Noto Sans Telugu', 'Gautami', 'Vani', serif;
-}
-
-/* Kannada Script */
-[lang="kn"] {
-    font-family: 'Noto Sans Kannada', 'Tunga', 'Akshar Unicode', serif;
-}
-
-/* Malayalam Script */
-[lang="ml"] {
-    font-family: 'Noto Sans Malayalam', 'Kartika', 'AnjaliOldLipi', serif;
-}
-
-/* Gujarati Script */
-[lang="gu"] {
-    font-family: 'Noto Sans Gujarati', 'Shruti', 'Akshar Unicode', serif;
-}
+    

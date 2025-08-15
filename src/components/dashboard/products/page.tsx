@@ -1,3 +1,4 @@
+
 "use client";
 
 import { products } from "@/lib/data";
@@ -105,3 +106,5 @@ export default function DashboardProductsPage() {
     </div>
   );
 }
+
+    

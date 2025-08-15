@@ -1,4 +1,5 @@
 
+
 "use server";
 
 import { db } from "@/lib/firebase/config";
@@ -412,6 +413,7 @@ export const seedDatabase = async (): Promise<void> => {
             const langCode = lang.code;
             const transRef = doc(db, 'translations', langCode);
             // Use specific translations if available, otherwise fallback to English
+            // @ts-ignore
             const translationsToSeed = i18nSeed[langCode as keyof typeof i18nSeed] || i18nSeed.en;
             batch.set(transRef, translationsToSeed);
         }
@@ -426,3 +428,5 @@ export const seedDatabase = async (): Promise<void> => {
         console.log("Database already contains data, skipping seed.");
     }
 };
+
+    

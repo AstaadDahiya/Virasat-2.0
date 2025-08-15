@@ -1,8 +1,9 @@
 
+
 "use client";
 
 import React, { createContext, useState, useContext, ReactNode, useEffect, useCallback, useMemo } from 'react';
-import { TranslationManager } from '@/lib/i18n-manager';
+import { TranslationManager, LanguageDetector } from '@/lib/i18n-manager';
 import { db } from '@/lib/firebase/config';
 
 export const languages = [
@@ -38,27 +39,28 @@ interface LanguageContextType {
   setLanguage: (language: LanguageCode) => void;
   t: (key: string, values?: { [key: string]: string | number }) => string;
   loading: boolean;
+  translations: { [key: string]: any };
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 // Instantiate the manager outside the component to act as a singleton
 const translationManager = new TranslationManager(db);
+const languageDetector = new LanguageDetector();
 
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   const [language, setLanguage] = useState<LanguageCode>('en');
-  const [translations, setTranslations] = useState<{ [key: string]: string }>({});
+  const [translations, setTranslations] = useState<{ [key: string]: any }>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const initLanguage = async () => {
-      const savedLang = localStorage.getItem('language') as LanguageCode | null;
-      const initialLang = savedLang || 'en';
-      
       setLoading(true);
-      const loadedTranslations = await translationManager.loadTranslations(initialLang);
+      const { language: detectedLang } = await languageDetector.detectOptimalLanguage();
+      
+      const loadedTranslations = await translationManager.loadTranslations(detectedLang);
       setTranslations(loadedTranslations);
-      setLanguage(initialLang);
+      setLanguage(detectedLang);
       setLoading(false);
       
       // Preload common languages in the background
@@ -68,7 +70,6 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   }, []);
   
   useEffect(() => {
-    // This effect handles Right-to-Left (RTL) language support.
     const rtlLanguages = ['ur', 'sd', 'ks'];
     if (rtlLanguages.includes(language)) {
         document.documentElement.dir = 'rtl';
@@ -94,7 +95,12 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const t = useCallback((key: string, values?: { [key: string]: string | number }): string => {
-    let translatedText = translations[key] || key;
+    // Support nested keys
+    let translatedText = key.split('.').reduce((obj, k) => obj && obj[k], translations);
+    
+    if(!translatedText) {
+        translatedText = key; // Fallback to key if not found
+    }
 
     if (values) {
         Object.entries(values).forEach(([placeholder, value]) => {
@@ -105,7 +111,7 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     return translatedText;
   }, [translations]);
   
-  const value = useMemo(() => ({ language, setLanguage: handleSetLanguage, t, loading }), [language, handleSetLanguage, t, loading]);
+  const value = useMemo(() => ({ language, setLanguage: handleSetLanguage, t, loading, translations }), [language, handleSetLanguage, t, loading, translations]);
 
   return (
     <LanguageContext.Provider value={value}>
@@ -121,3 +127,5 @@ export const useLanguage = (): LanguageContextType => {
   }
   return context;
 };
+
+    

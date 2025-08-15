@@ -1,10 +1,25 @@
 
+
 export type TranslationKey = string;
 
 // This object now serves as the master list of keys for seeding the database.
 // The application fetches translations from Firestore, not from this file directly.
 export const translations = {
-    en: {
+    // English (Base language)
+    'en': {
+        welcome: "Welcome to Our Multi-Language Platform",
+        description: "Experience our website in your preferred language. We support 22 Indian languages with automatic detection and smooth switching.",
+        loading: "Loading content...",
+        auto_detection: "🔍 Auto Detection",
+        auto_desc: "Automatically detects your browser's language preference",
+        manual_switch: "🌍 Manual Switching",
+        manual_desc: "Choose from 22 Indian languages anytime",
+        real_time: "⚡ Real-time",
+        real_time_desc: "Content updates instantly when language changes",
+        language_changed: "Language changed successfully!",
+        error_loading: "Error loading translations. Please try again.",
+        search_languages: "Search languages...",
+        no_results: "No languages found matching your search.",
         'Home': 'Home',
         'Products': 'Products',
         'Artisans': 'Artisans',
@@ -76,7 +91,7 @@ export const translations = {
         'Terms of Service': 'Terms of Service',
         'Privacy Policy': 'Privacy Policy',
         'dashboardOverviewTitle': 'Dashboard Overview',
-        'dashboardOverviewSubtitle': 'Welcome back! Here\'s a snapshot of your shop\'s activity.',
+        'dashboardOverviewSubtitle': "Welcome back! Here's a snapshot of your shop's activity.",
         'quickStartGuideTitle': 'Quick Start Guide',
         'quickStartGuideSubtitle': 'Follow these steps to get your shop up and running.',
         'quickStartStep1Title': 'Setup Profile',
@@ -177,7 +192,7 @@ export const translations = {
         'toastCopied': 'Copied to clipboard!',
         'checkingForMicrophone': 'Checking for microphone...',
         'micAccessRequiredTitle': 'Microphone Access Required',
-        'micAccessRequiredDescription': 'To use the AI Storyteller, you need to grant this site permission to access your microphone. Please check your browser\'s site settings.',
+        'micAccessRequiredDescription': "To use the AI Storyteller, you need to grant this site permission to access your microphone. Please check your browser's site settings.",
         'pricingOptimizerTitle': 'Pricing Optimizer',
         'pricingOptimizerSubtitle': 'Get AI-powered suggestions for pricing your products.',
         'suggestPrice': 'Suggest a Price',
@@ -271,24 +286,24 @@ export const translations = {
         'noShipmentsDescription': 'When you book a shipment through the Logistics Hub, it will appear here.',
         'analytics': 'Analytics',
         'handbookTitle': 'Artisan Handbook',
-        'handbookSubtitle': 'Welcome to Virasat! Here\'s a quick guide to setting up your shop and starting to sell.',
+        'handbookSubtitle': "Welcome to Virasat! Here's a quick guide to setting up your shop and starting to sell.",
         'handbookWelcomeTitle': 'Welcome to the Virasat Family!',
         'handbookWelcomeContent': 'We are thrilled to partner with you to bring your incredible crafts to a global audience. This handbook is your guide to mastering the platform, from setting up your digital storefront to leveraging our powerful AI tools to grow your business.',
         'handbookChapter1': 'Chapter 1',
         'handbookChapter1Title': 'Getting Started - Your First Steps',
         'handbookChapter1Subtitle': 'Your journey on Virasat begins with setting up your unique identity.',
         'handbookStep1Title': 'Complete Your Profile (Dashboard > Settings)',
-        'handbookStep1Content': 'Your profile is your story. Upload a profile picture, write your bio, and share the history of your craft. Use our automatic translation feature to share your story in both English and Hindi effortlessly.',
+        'handbookStep1Content': "Your profile is your story. Upload a profile picture, write your bio, and share the history of your craft. Use our automatic translation feature to share your story in both English and Hindi effortlessly.",
         'handbookStep2Title': 'Add Your First Product (Dashboard > Products > Add Product)',
-        'handbookStep2Content': 'Showcase your creations. Upload high-quality images and write a compelling name and description. Don\'t worry about translating—just write in your preferred language, and our AI will handle the rest, making your products accessible to a wider audience.',
+        'handbookStep2Content': "Showcase your creations. Upload high-quality images and write a compelling name and description. Don't worry about translating—just write in your preferred language, and our AI will handle the rest, making your products accessible to a wider audience.",
         'handbookChapter2': 'Chapter 2',
         'handbookChapter2Title': 'Supercharge Your Shop with AI Tools',
         'handbookChapter2Subtitle': 'Virasat provides a suite of AI-powered tools designed to save you time and help you sell more.',
         'handbookAiStorytellerContent': 'Transform your spoken story into a professional product description. Just press "Record," share the inspiration and details behind your product, and the AI will write a beautiful description for you.',
-        'handbookVisualEnhancerContent': 'Create realistic lifestyle photos of your products. Upload a clean photo of your product, describe a scene, and the AI will generate a beautiful mockup.',
-        'handbookMarketingSuiteContent': 'Generate engaging social media posts, email newsletters, and ad copy. Select a product, define your target audience, and the AI will create tailored content.',
-        'handbookPricingOptimizerContent': 'Suggests the best price for your products based on market data. Enter your material and labor costs, and the AI will recommend a competitive price.',
-        'handbookTrendHarmonizerContent': 'Analyzes current market trends and gives you ideas. Select a product, and the AI will provide a report on popular styles, colors, and patterns.',
+        'handbookVisualEnhancerContent': "Create realistic lifestyle photos of your products. Upload a clean photo of your product, describe a scene, and the AI will generate a beautiful mockup.",
+        'handbookMarketingSuiteContent': "Generate engaging social media posts, email newsletters, and ad copy. Select a product, define your target audience, and the AI will create tailored content.",
+        'handbookPricingOptimizerContent': "Suggests the best price for your products based on market data. Enter your material and labor costs, and the AI will recommend a competitive price.",
+        'handbookTrendHarmonizerContent': "Analyzes current market trends and gives you ideas. Select a product, and the AI will provide a report on popular styles, colors, and patterns.",
         'handbookChapter3': 'Chapter 3',
         'handbookChapter3Title': 'Managing Your Business',
         'handbookAnalyticsContent': 'Keep track of your shop’s performance. View your total revenue, see which products are selling best, and understand what your customers love.',
@@ -297,9 +312,64 @@ export const translations = {
         'handbookReadyToJoinContent': 'Register as an artisan today and start sharing your masterpieces with the world.',
         'createArtisanAccount': 'Create Artisan Account',
         'language_preference_title': 'Choose Your Language',
-        'language_preference_description': 'Select your preferred language to experience Virasat in your native tongue.'
+        'language_preference_description': 'Select your preferred language to experience Virasat in your native tongue.',
+        menu: {
+            home: "Home",
+            about: "About",
+            services: "Services",
+            contact: "Contact",
+            blog: "Blog"
+        },
+        common: {
+            save: "Save",
+            cancel: "Cancel",
+            submit: "Submit",
+            edit: "Edit",
+            delete: "Delete",
+            confirm: "Confirm",
+            close: "Close",
+            next: "Next",
+            previous: "Previous",
+            loading: "Loading...",
+            error: "Error",
+            success: "Success"
+        }
     },
-    hi: {
+    'hi': {
+        welcome: "हमारे बहुभाषी मंच पर आपका स्वागत है",
+        description: "अपनी पसंदीदा भाषा में हमारी वेबसाइट का अनुभव करें। हम स्वचालित पहचान और सुगम स्विचिंग के साथ 22 भारतीय भाषाओं का समर्थन करते हैं।",
+        loading: "सामग्री लोड हो रही है...",
+        auto_detection: "🔍 स्वचालित पहचान",
+        auto_desc: "स्वचालित रूप से आपकी ब्राउज़र की भाषा प्राथमिकता का पता लगाता है",
+        manual_switch: "🌍 मैनुअल स्विचिंग",
+        manual_desc: "कभी भी 22 भारतीय भाषाओं में से चुनें",
+        real_time: "⚡ रियल-टाइम",
+        real_time_desc: "भाषा बदलने पर सामग्री तुरंत अपडेट हो जाती है",
+        language_changed: "भाषा सफलतापूर्वक बदल गई!",
+        error_loading: "अनुवाद लोड करने में त्रुटि। कृपया पुनः प्रयास करें।",
+        search_languages: "भाषाएं खोजें...",
+        no_results: "आपकी खोज से मेल खाने वाली कोई भाषा नहीं मिली।",
+        menu: {
+            home: "होम",
+            about: "हमारे बारे में",
+            services: "सेवाएं",
+            contact: "संपर्क",
+            blog: "ब्लॉग"
+        },
+        common: {
+            save: "सहेजें",
+            cancel: "रद्द करें",
+            submit: "जमा करें",
+            edit: "संपादित करें",
+            delete: "हटाएं",
+            confirm: "पुष्टि करें",
+            close: "बंद करें",
+            next: "अगला",
+            previous: "पिछला",
+            loading: "लोड हो रहा है...",
+            error: "त्रुटि",
+            success: "सफलता"
+        },
         'Home': 'होम',
         'Products': 'उत्पाद',
         'Artisans': 'कारीगर',
@@ -594,7 +664,41 @@ export const translations = {
         'language_preference_title': 'अपनी भाषा चुनें',
         'language_preference_description': 'विरासत का अपनी मूल भाषा में अनुभव करने के लिए अपनी पसंदीदा भाषा चुनें।'
     },
-    bn: {
+    'bn': {
+        welcome: "আমাদের বহুভাষিক প্ল্যাটফর্মে আপনাকে স্বাগতম",
+        description: "আপনার পছন্দের ভাষায় আমাদের ওয়েবসাইট অভিজ্ঞতা নিন। আমরা স্বয়ংক্রিয় সনাক্তকরণ এবং মসৃণ স্যুইচিং সহ ২২টি ভারতীয় ভাষা সমর্থন করি।",
+        loading: "বিষয়বস্তু লোড হচ্ছে...",
+        auto_detection: "🔍 স্বয়ংক্রিয় সনাক্তকরণ",
+        auto_desc: "স্বয়ংক্রিয়ভাবে আপনার ব্রাউজারের ভাষা পছন্দ শনাক্ত করে",
+        manual_switch: "🌍 ম্যানুয়াল স্যুইচিং",
+        manual_desc: "যেকোনো সময় ২২টি ভারতীয় ভাষার মধ্যে থেকে বেছে নিন",
+        real_time: "⚡ রিয়েল-টাইম",
+        real_time_desc: "ভাষা পরিবর্তন করলে বিষয়বস্তু তৎক্ষণাৎ আপডেট হয়",
+        language_changed: "ভাষা সফলভাবে পরিবর্তিত হয়েছে!",
+        error_loading: "অনুবাদ লোড করতে ত্রুটি। অনুগ্রহ করে আবার চেষ্টা করুন।",
+        search_languages: "ভাষা খুঁজুন...",
+        no_results: "আপনার অনুসন্ধানের সাথে মিলে এমন কোনো ভাষা পাওয়া যায়নি।",
+        menu: {
+            home: "হোম",
+            about: "আমাদের সম্পর্কে",
+            services: "সেবা",
+            contact: "যোগাযোগ",
+            blog: "ব্লগ"
+        },
+        common: {
+            save: "সংরক্ষণ",
+            cancel: "বাতিল",
+            submit: "জমা দিন",
+            edit: "সম্পাদনা",
+            delete: "মুছে ফেলুন",
+            confirm: "নিশ্চিত করুন",
+            close: "বন্ধ করুন",
+            next: "পরবর্তী",
+            previous: "পূর্ববর্তী",
+            loading: "লোড হচ্ছে...",
+            error: "ত্রুটি",
+            success: "সফল"
+        },
         'Home': 'হোম',
         'Products': 'পণ্য',
         'Artisans': 'কারিগর',
@@ -667,7 +771,84 @@ export const translations = {
         'Privacy Policy': 'গোপনীয়তা নীতি',
         'language_preference_title': 'আপনার ভাষা পছন্দ করুন',
         'language_preference_description': 'আপনার মাতৃভাষায় ভিরাসাত অভিজ্ঞতা করতে আপনার পছন্দের ভাষা নির্বাচন করুন।'
+    },
+    'ta': {
+        welcome: "எங்கள் பல மொழி தளத்திற்கு வரவேற்கிறோம்",
+        description: "உங்கள் விருப்பமான மொழியில் எங்கள் இணையதளத்தை அனுபவிக்கவும். தானியங்கு கண்டறிதல் மற்றும் மென்மையான மாற்றத்துடன் 22 இந்திய மொழிகளை நாங்கள் ஆதரிக்கிறோம்.",
+        loading: "உள்ளடக்கம் ஏற்றப்படுகிறது...",
+        auto_detection: "🔍 தானியங்கு கண்டறிதல்",
+        auto_desc: "உங்கள் உலாவியின் மொழி விருப்பத்தை தானாகவே கண்டறிகிறது",
+        manual_switch: "🌍 கைமுறை மாற்றம்",
+        manual_desc: "எந்த நேரத்திலும் 22 இந்திய மொழிகளிலிருந்து தேர்ந்தெடுக்கவும்",
+        real_time: "⚡ நிகழ் நேரம்",
+        real_time_desc: "மொழி மாற்றும்போது உள்ளடக்கம் உடனடியாக புதுப்பிக்கப்படும்",
+        language_changed: "மொழி வெற்றிகரமாக மாற்றப்பட்டது!",
+        error_loading: "மொழிபெயர்ப்புகளை ஏற்றுவதில் பிழை. மீண்டும் முயற்சிக்கவும்.",
+        search_languages: "மொழிகளைத் தேடு...",
+        no_results: "உங்கள் தேடலுக்கு பொருந்தும் மொழிகள் எதுவும் கிடைக்கவில்லை।",
+        menu: {
+            home: "முகப்பு",
+            about: "எங்களைப் பற்றி",
+            services: "சேவைகள்",
+            contact: "தொடர்பு",
+            blog: "வலைப்பதிவு"
+        },
+        common: {
+            save: "சேமி",
+            cancel: "ரத்து",
+            submit: "சமர்ப்பிக்க",
+            edit: "திருத்து",
+            delete: "அழி",
+            confirm: "உறுதிப்படுத்து",
+            close: "மூடு",
+            next: "அடுத்தது",
+            previous: "முந்தைய",
+            loading: "ஏற்றப்படுகிறது...",
+            error: "பிழை",
+            success: "வெற்றி"
+        }
+    },
+    'te': {
+        welcome: "మా బహుభాషా వేదికకు స్వాగతం",
+        description: "మీ ఇష్టమైన భాషలో మా వెబ్‌సైట్‌ను అనుభవించండి. మేము ఆటోమేటిక్ డిటెక్షన్ మరియు సమర్ధవంతమైన స్విచింగ్‌తో 22 భారతీయ భాషలకు మద్దతు ఇస్తున్నాము.",
+        loading: "కంటెంట్ లోడ్ అవుతోంది...",
+        auto_detection: "🔍 ఆటోమేటిక్ డిటెక్షన్",
+        auto_desc: "మీ బ్రౌజర్ భాషా ప్రాధాన్యతను స్వయంచాలకంగా గుర్తిస్తుంది",
+        manual_switch: "🌍 మాన్యువల్ స్విచింగ్",
+        manual_desc: "ఎప్పుడైనా 22 భారతీయ భాషల నుండి ఎంచుకోండి",
+        real_time: "⚡ రియల్-టైమ్",
+        real_time_desc: "భాష మారినప్పుడు కంటెంట్ తక్షణమే అప్‌డేట్ అవుతుంది",
+        language_changed: "భాష విజయవంతంగా మార్చబడింది!",
+        error_loading: "అనువాదాలు లోడ్ చేయడంలో లోపం. దయచేసి మళ్లీ ప్రయత్నించండి.",
+        search_languages: "భాషలను శోధించండి...",
+        no_results: "మీ శోధనకు సరిపోయే భాషలు ఏవీ కనుగొనబడలేదు।",
+        menu: {
+            home: "హోమ్",
+            about: "మా గురించి",
+            services: "సేవలు",
+            contact: "సంప్రదించండి",
+            blog: "బ్లాగ్"
+        },
+        common: {
+            save: "సేవ్ చేయండి",
+            cancel: "రద్దు చేయండి",
+            submit: "సమర్పించండి",
+            edit: "ఎడిట్ చేయండి",
+            delete: "తొలగించండి",
+            confirm: "నిర్ధారించండి",
+            close: "మూసివేయండి",
+            next: "తదుపరి",
+            previous: "మునుపటి",
+            loading: "లోడ్ అవుతోంది...",
+            error: "లోపం",
+            success: "విజయం"
+        }
     }
 };
+for (const lang of ['as','brx','doi','gu','kn','ks','kok','mai','ml','mni','mr','ne','or','pa','sa','sat','sd','ur']) {
+    // @ts-ignore
+    translations[lang] = { ...translations.en };
+}
+    
 
     
