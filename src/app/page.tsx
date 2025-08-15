@@ -8,12 +8,14 @@ import Link from "next/link";
 import Image from "next/image";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { ArrowRight, Loader2 } from "lucide-react";
-import { useLanguage } from "@/context/language-context";
+import { ArrowRight, Loader2, Languages } from "lucide-react";
+import { useLanguage, languages } from "@/context/language-context";
 import { useData } from "@/context/data-context";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function Home() {
-  const { t } = useLanguage();
+  const { t, setLanguage, language } = useLanguage();
   const { products, artisans, loading } = useData();
 
   const featuredProducts = products.slice(0, 4);
@@ -46,6 +48,31 @@ export default function Home() {
         </section>
 
         <section className="py-16 md:py-24">
+          <div className="container mx-auto px-4">
+            <Card className="bg-secondary/50">
+                <CardHeader className="text-center">
+                    <CardTitle className="text-3xl font-headline flex items-center justify-center gap-3"><Languages/> {t('language_preference_title')}</CardTitle>
+                    <CardDescription>{t('language_preference_description')}</CardDescription>
+                </CardHeader>
+                <CardContent className="flex justify-center">
+                   <Select onValueChange={(value) => setLanguage(value as any)} defaultValue={language}>
+                       <SelectTrigger className="w-full max-w-sm">
+                           <SelectValue placeholder="Select a language" />
+                       </SelectTrigger>
+                       <SelectContent>
+                           {languages.map(lang => (
+                               <SelectItem key={lang.code} value={lang.code}>
+                                   {lang.name} ({lang.nativeName})
+                               </SelectItem>
+                           ))}
+                       </SelectContent>
+                   </Select>
+                </CardContent>
+            </Card>
+          </div>
+        </section>
+
+        <section className="pb-16 md:pb-24">
           <div className="container mx-auto px-4">
             <div className="flex items-center justify-between mb-8">
                <h2 className="font-headline text-3xl font-bold md:text-4xl">

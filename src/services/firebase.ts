@@ -9,6 +9,7 @@ import type { User } from 'firebase/auth';
 import { getLogisticsAdvice as getLogisticsAdviceFlow } from "@/ai/flows/logistics-advisor";
 import { products as seedProducts, artisans as seedArtisans } from "@/lib/data";
 import { translations as i18nSeed } from "@/lib/i18n";
+import { languages } from "@/context/language-context";
 
 // Defines the shape of the data coming from the form, excluding fields that are handled separately.
 type ProductInsertData = Omit<Product, 'id' | 'images' | 'artisanId' | 'createdAt'>;
@@ -366,6 +367,12 @@ export const getTranslations = async (lang: string): Promise<{ [key: string]: st
             return docSnap.data() as { [key: string]: string };
         } else {
             console.log(`No translation document for language: ${lang}`);
+            // Fallback to English if the requested language doesn't exist
+            const enDocRef = doc(db, 'translations', 'en');
+            const enDocSnap = await getDoc(enDocRef);
+            if(enDocSnap.exists()) {
+                return enDocSnap.data() as { [key: string]: string };
+            }
             return null;
         }
     } catch(e) {
@@ -401,9 +408,12 @@ export const seedDatabase = async (): Promise<void> => {
         }
         
         // Seed Translations
-        for (const [lang, translations] of Object.entries(i18nSeed)) {
-            const transRef = doc(db, 'translations', lang);
-            batch.set(transRef, translations);
+        for (const lang of languages) {
+            const langCode = lang.code;
+            const transRef = doc(db, 'translations', langCode);
+            // Use specific translations if available, otherwise fallback to English
+            const translationsToSeed = i18nSeed[langCode as keyof typeof i18nSeed] || i18nSeed.en;
+            batch.set(transRef, translationsToSeed);
         }
         
         try {

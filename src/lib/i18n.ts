@@ -1,9 +1,10 @@
 
 export type TranslationKey = string;
 
+// This object now serves as the master list of keys for seeding the database.
+// The application fetches translations from Firestore, not from this file directly.
 export const translations = {
     en: {
-        // Site Header
         'Home': 'Home',
         'Products': 'Products',
         'Artisans': 'Artisans',
@@ -21,16 +22,12 @@ export const translations = {
         'Added {{name}} to your cart.': 'Added {{name}} to your cart.',
         'Not enough stock': 'Not enough stock',
         'You cannot add more than the {{stock}} items available.': 'You cannot add more than the {{stock}} items available.',
-        
-        // Home Page
         'Handcrafted Stories, Timeless Treasures': 'Handcrafted Stories, Timeless Treasures',
         'Discover unique, handmade goods from skilled artisans around the world.': 'Discover unique, handmade goods from skilled artisans around the world.',
         'Explore Products': 'Explore Products',
         'Featured Products': 'Featured Products',
         'View All': 'View All',
         'Meet the Artisans': 'Meet the Artisans',
-
-        // Products Page
         'Our Collection': 'Our Collection',
         'Explore a curated selection of handcrafted goods, each with a unique story and soul.': 'Explore a curated selection of handcrafted goods, each with a unique story and soul.',
         'Search for products...': 'Search for products...',
@@ -39,20 +36,13 @@ export const translations = {
         'Price Range': 'Price Range',
         'No Products Found': 'No Products Found',
         'Try adjusting your search or filters.': 'Try adjusting your search or filters.',
-
-        // Product Detail Page
         '(12 reviews)': '(12 reviews)',
         'Materials': 'Materials',
         'in stock': 'in stock',
         'Add to Cart': 'Add to Cart',
         'Out of Stock': 'Out of Stock',
         'Sold by': 'Sold by',
-
-        // Artisans Page
-        'Meet Our Artisans': 'Meet Our Artisans',
         'The heart and soul of Virasat. Discover the stories and crafts of the talented individuals behind our products.': 'The heart and soul of Virasat. Discover the stories and crafts of the talented individuals behind our products.',
-
-        // Artisan Detail Page
         'About': 'About',
         'Contact': 'Contact',
         'Products by': 'Products by',
@@ -67,15 +57,9 @@ export const translations = {
         'Sending...': 'Sending...',
         'Message Sent!': 'Message Sent!',
         'The artisan has been notified and will get back to you soon.': 'The artisan has been notified and will get back to you soon.',
-
-        // Product Card
         'by': 'by',
         'View Details': 'View Details',
-        
-        // Artisan Card
         'View Profile': 'View Profile',
-
-        // Site Footer
         "Connecting you with the world's finest artisans.": "Connecting you with the world's finest artisans.",
         'Shop': 'Shop',
         'All Products': 'All Products',
@@ -91,8 +75,6 @@ export const translations = {
         'All rights reserved.': 'All rights reserved.',
         'Terms of Service': 'Terms of Service',
         'Privacy Policy': 'Privacy Policy',
-
-        // Dashboard
         'dashboardOverviewTitle': 'Dashboard Overview',
         'dashboardOverviewSubtitle': 'Welcome back! Here\'s a snapshot of your shop\'s activity.',
         'quickStartGuideTitle': 'Quick Start Guide',
@@ -115,13 +97,9 @@ export const translations = {
         'salesOverTimeDescription': 'A summary of your sales for the past 6 months.',
         'recentActivityTitle': 'Recent Activity',
         'recentActivityDescription': 'Latest sales, reviews, and messages.',
-
-        // Dashboard Sidebar
         'aiTools': 'AI Tools',
         'settings': 'Settings',
         'backToSite': 'Back to Site',
-
-        // Dashboard My Products
         'myProducts': 'My Products',
         'myProductsSubtitle': 'Manage all your listed products here.',
         'addProduct': 'Add Product',
@@ -132,8 +110,6 @@ export const translations = {
         'toggleMenu': 'Toggle menu',
         'edit': 'Edit',
         'delete': 'Delete',
-
-        // Add/Edit Product Form
         'addProductSubtitle': 'Add a new item to your collection.',
         'editProductSubtitle': 'Make changes to your existing product.',
         'productDetails': 'Product Details',
@@ -148,8 +124,6 @@ export const translations = {
         'toastProductAddedTitle': 'Product Added!',
         'toastProductAddedDescription': 'Your new product is now live.',
         'toastErrorTitle': 'An Error Occurred',
-
-        // Dashboard Settings
         'settingsTitle': 'Settings',
         'settingsSubtitle': 'Manage your profile and account settings.',
         'artisanProfile': 'Artisan Profile',
@@ -180,8 +154,6 @@ export const translations = {
         'notificationEmailDescription': 'Receive emails about new sales, messages, and features.',
         'notificationPushLabel': 'Push Notifications',
         'notificationPushDescription': 'Receive push notifications on your devices (Coming soon).',
-        
-        // AI Tool Pages
         'aiStorytellerTitle': 'AI Storyteller',
         'aiStorytellerSubtitle': 'Transform your spoken stories into compelling product descriptions.',
         'recordAStory': 'Record a Story',
@@ -206,7 +178,6 @@ export const translations = {
         'checkingForMicrophone': 'Checking for microphone...',
         'micAccessRequiredTitle': 'Microphone Access Required',
         'micAccessRequiredDescription': 'To use the AI Storyteller, you need to grant this site permission to access your microphone. Please check your browser\'s site settings.',
-
         'pricingOptimizerTitle': 'Pricing Optimizer',
         'pricingOptimizerSubtitle': 'Get AI-powered suggestions for pricing your products.',
         'suggestPrice': 'Suggest a Price',
@@ -234,7 +205,6 @@ export const translations = {
         'reasoning': 'Reasoning',
         'analyzingMarketData': 'Analyzing market data...',
         'toastPriceSuggestionError': 'Could not fetch price suggestion.',
-
         'marketingSuiteTitle': 'Marketing Suite',
         'marketingSuiteSubtitle': 'Generate engaging marketing content for your products instantly.',
         'generateMarketingContent': 'Generate Marketing Content',
@@ -247,7 +217,6 @@ export const translations = {
         'toastProductNotFound': 'Product not found',
         'emailNewsletter': 'Email Newsletter',
         'adCopy': 'Ad Copy',
-        
         'visualEnhancerTitle': 'Visual Enhancer',
         'visualEnhancerSubtitle': 'Create beautiful lifestyle mockups of your products.',
         'generateLifestyleMockup': 'Generate Lifestyle Mockup',
@@ -261,7 +230,6 @@ export const translations = {
         'download': 'Download',
         'toastMockupError': 'Could not generate mockup.',
         'toastProcessImageError': 'Could not process the uploaded image.',
-
         'trendHarmonizerTitle': 'Trend Harmonizer',
         'trendHarmonizerSubtitle': 'Align your creations with current market trends without losing authenticity.',
         'analyzeProductTrends': 'Analyze Product Trends',
@@ -272,7 +240,6 @@ export const translations = {
         'trendAnalysis': 'Trend Analysis',
         'actionableSuggestions': 'Actionable Suggestions',
         'toastTrendAnalysisError': 'Could not fetch trend analysis.',
-
         'logisticsHubTitle': 'Logistics Hub',
         'logisticsHubSubtitle': 'Get AI-powered advice for shipping and logistics.',
         'getShippingAdvice': 'Get Shipping Advice',
@@ -298,15 +265,39 @@ export const translations = {
         'declaration': 'Declaration',
         'shippingOptions': 'Shipping Options',
         'bookAndGenerateLabel': 'Book & Generate Label',
-
-        // Shipments Page
         'shipments': 'Shipments',
         'shipmentsSubtitle': 'View history and track all your booked shipments.',
         'noShipments': 'No Shipments Yet',
         'noShipmentsDescription': 'When you book a shipment through the Logistics Hub, it will appear here.',
-
-        // Analytics Page
         'analytics': 'Analytics',
+        'handbookTitle': 'Artisan Handbook',
+        'handbookSubtitle': 'Welcome to Virasat! Here\'s a quick guide to setting up your shop and starting to sell.',
+        'handbookWelcomeTitle': 'Welcome to the Virasat Family!',
+        'handbookWelcomeContent': 'We are thrilled to partner with you to bring your incredible crafts to a global audience. This handbook is your guide to mastering the platform, from setting up your digital storefront to leveraging our powerful AI tools to grow your business.',
+        'handbookChapter1': 'Chapter 1',
+        'handbookChapter1Title': 'Getting Started - Your First Steps',
+        'handbookChapter1Subtitle': 'Your journey on Virasat begins with setting up your unique identity.',
+        'handbookStep1Title': 'Complete Your Profile (Dashboard > Settings)',
+        'handbookStep1Content': 'Your profile is your story. Upload a profile picture, write your bio, and share the history of your craft. Use our automatic translation feature to share your story in both English and Hindi effortlessly.',
+        'handbookStep2Title': 'Add Your First Product (Dashboard > Products > Add Product)',
+        'handbookStep2Content': 'Showcase your creations. Upload high-quality images and write a compelling name and description. Don\'t worry about translating—just write in your preferred language, and our AI will handle the rest, making your products accessible to a wider audience.',
+        'handbookChapter2': 'Chapter 2',
+        'handbookChapter2Title': 'Supercharge Your Shop with AI Tools',
+        'handbookChapter2Subtitle': 'Virasat provides a suite of AI-powered tools designed to save you time and help you sell more.',
+        'handbookAiStorytellerContent': 'Transform your spoken story into a professional product description. Just press "Record," share the inspiration and details behind your product, and the AI will write a beautiful description for you.',
+        'handbookVisualEnhancerContent': 'Create realistic lifestyle photos of your products. Upload a clean photo of your product, describe a scene, and the AI will generate a beautiful mockup.',
+        'handbookMarketingSuiteContent': 'Generate engaging social media posts, email newsletters, and ad copy. Select a product, define your target audience, and the AI will create tailored content.',
+        'handbookPricingOptimizerContent': 'Suggests the best price for your products based on market data. Enter your material and labor costs, and the AI will recommend a competitive price.',
+        'handbookTrendHarmonizerContent': 'Analyzes current market trends and gives you ideas. Select a product, and the AI will provide a report on popular styles, colors, and patterns.',
+        'handbookChapter3': 'Chapter 3',
+        'handbookChapter3Title': 'Managing Your Business',
+        'handbookAnalyticsContent': 'Keep track of your shop’s performance. View your total revenue, see which products are selling best, and understand what your customers love.',
+        'handbookShippingContent': 'Our AI Logistics Hub takes the guesswork out of shipping. Get expert advice on packaging, find the cheapest carriers, and book shipments with a single click.',
+        'handbookReadyToJoinTitle': 'Ready to Join Virasat?',
+        'handbookReadyToJoinContent': 'Register as an artisan today and start sharing your masterpieces with the world.',
+        'createArtisanAccount': 'Create Artisan Account',
+        'language_preference_title': 'Choose Your Language',
+        'language_preference_description': 'Select your preferred language to experience Virasat in your native tongue.'
     },
     hi: {
         'Home': 'होम',
@@ -326,14 +317,12 @@ export const translations = {
         'Added {{name}} to your cart.': '{{name}} को आपकी कार्ट में जोड़ा गया।',
         'Not enough stock': 'पर्याप्त स्टॉक नहीं है',
         'You cannot add more than the {{stock}} items available.': 'आप उपलब्ध {{stock}} आइटम से अधिक नहीं जोड़ सकते।',
-
         'Handcrafted Stories, Timeless Treasures': 'हस्तनिर्मित कहानियाँ, कालातीत खजाने',
         'Discover unique, handmade goods from skilled artisans around the world.': 'दुनिया भर के कुशल कारीगरों से अद्वितीय, हस्तनिर्मित सामान खोजें।',
         'Explore Products': 'उत्पाद देखें',
         'Featured Products': 'विशेष रुप से प्रदर्शित उत्पाद',
         'View All': 'सभी देखें',
         'Meet the Artisans': 'कारीगरों से मिलें',
-
         'Our Collection': 'हमारा संग्रह',
         'Explore a curated selection of handcrafted goods, each with a unique story and soul.': 'हस्तनिर्मित वस्तुओं के क्यूरेटेड चयन का अन्वेषण करें, प्रत्येक की एक अनूठी कहानी और आत्मा है।',
         'Search for products...': 'उत्पादों के लिए खोजें...',
@@ -342,17 +331,13 @@ export const translations = {
         'Price Range': 'मूल्य सीमा',
         'No Products Found': 'कोई उत्पाद नहीं मिला',
         'Try adjusting your search or filters.': 'अपनी खोज या फ़िल्टर समायोजित करने का प्रयास करें।',
-
         '(12 reviews)': '(12 समीक्षाएं)',
         'Materials': 'सामग्री',
         'in stock': 'स्टॉक में',
         'Add to Cart': 'कार्ट में डालें',
         'Out of Stock': 'स्टॉक खत्म',
         'Sold by': 'द्वारा बेचा गया',
-        'by': 'द्वारा',
-        'View Details': 'विवरण देखें',
-        'View Profile': 'प्रोफ़ाइल देखें',
-
+        'The heart and soul of Virasat. Discover the stories and crafts of the talented individuals behind our products.': 'विरासत का दिल और आत्मा। हमारे उत्पादों के पीछे प्रतिभाशाली व्यक्तियों की कहानियों और शिल्पों की खोज करें।',
         'About': 'के बारे में',
         'Contact': 'संपर्क करें',
         'Products by': 'द्वारा उत्पाद',
@@ -367,7 +352,9 @@ export const translations = {
         'Sending...': 'भेज रहा है...',
         'Message Sent!': 'संदेश भेजा गया!',
         'The artisan has been notified and will get back to you soon.': 'कारीगर को सूचित कर दिया गया है और वह जल्द ही आपसे संपर्क करेगा।',
-
+        'by': 'द्वारा',
+        'View Details': 'विवरण देखें',
+        'View Profile': 'प्रोफ़ाइल देखें',
         "Connecting you with the world's finest artisans.": "आपको दुनिया के बेहतरीन कारीगरों से जोड़ना।",
         'Shop': 'दुकान',
         'All Products': 'सभी उत्पाद',
@@ -383,7 +370,6 @@ export const translations = {
         'All rights reserved.': 'सर्वाधिकार सुरक्षित।',
         'Terms of Service': 'सेवा की शर्तें',
         'Privacy Policy': 'गोपनीयता नीति',
-
         'dashboardOverviewTitle': 'डैशबोर्ड अवलोकन',
         'dashboardOverviewSubtitle': 'वापसी पर स्वागत है! यहां आपकी दुकान की गतिविधि का एक स्नैपशॉट है।',
         'quickStartGuideTitle': 'त्वरित आरंभ मार्गदर्शिका',
@@ -406,11 +392,9 @@ export const translations = {
         'salesOverTimeDescription': 'पिछले 6 महीनों की आपकी बिक्री का सारांश।',
         'recentActivityTitle': 'हाल की गतिविधि',
         'recentActivityDescription': 'नवीनतम बिक्री, समीक्षाएं और संदेश।',
-
         'aiTools': 'एआई उपकरण',
         'settings': 'सेटिंग्स',
         'backToSite': 'साइट पर वापस जाएं',
-
         'myProducts': 'मेरे उत्पाद',
         'myProductsSubtitle': 'यहां अपने सभी सूचीबद्ध उत्पादों का प्रबंधन करें।',
         'addProduct': 'उत्पाद जोड़ें',
@@ -421,7 +405,6 @@ export const translations = {
         'toggleMenu': 'मेनू टॉगल करें',
         'edit': 'संपादित करें',
         'delete': 'हटाएं',
-
         'addProductSubtitle': 'अपने संग्रह में एक नया आइटम जोड़ें।',
         'editProductSubtitle': 'अपने मौजूदा उत्पाद में परिवर्तन करें।',
         'productDetails': 'उत्पाद विवरण',
@@ -436,7 +419,6 @@ export const translations = {
         'toastProductAddedTitle': 'उत्पाद जोड़ा गया!',
         'toastProductAddedDescription': 'आपका नया उत्पाद अब लाइव है।',
         'toastErrorTitle': 'एक त्रुटि हुई',
-        
         'settingsTitle': 'सेटिंग्स',
         'settingsSubtitle': 'अपनी प्रोफ़ाइल और खाता सेटिंग्स प्रबंधित करें।',
         'artisanProfile': 'कारीगर प्रोफ़ाइल',
@@ -467,7 +449,6 @@ export const translations = {
         'notificationEmailDescription': 'नई बिक्री, संदेशों और सुविधाओं के बारे में ईमेल प्राप्त करें।',
         'notificationPushLabel': 'पुश सूचनाएं',
         'notificationPushDescription': 'अपने उपकरणों पर पुश सूचनाएं प्राप्त करें (जल्द ही आ रहा है)।',
-
         'aiStorytellerTitle': 'एआई कथाकार',
         'aiStorytellerSubtitle': 'अपनी बोली गई कहानियों को आकर्षक उत्पाद विवरणों में बदलें।',
         'recordAStory': 'एक कहानी रिकॉर्ड करें',
@@ -554,7 +535,6 @@ export const translations = {
         'trendAnalysis': 'रुझान विश्लेषण',
         'actionableSuggestions': 'कार्रवाई योग्य सुझाव',
         'toastTrendAnalysisError': 'रुझान विश्लेषण प्राप्त नहीं किया जा सका।',
-
         'logisticsHubTitle': 'लॉजिस्टिक्स हब',
         'logisticsHubSubtitle': 'शिपिंग और लॉजिस्टिक्स के लिए AI-संचालित सलाह प्राप्त करें।',
         'getShippingAdvice': 'शिपिंग सलाह प्राप्त करें',
@@ -580,15 +560,11 @@ export const translations = {
         'declaration': 'घोषणा',
         'shippingOptions': 'शिपिंग विकल्प',
         'bookAndGenerateLabel': 'बुक करें और लेबल जेनरेट करें',
-
         'shipments': 'शिपमेंट्स',
         'shipmentsSubtitle': 'इतिहास देखें और अपने सभी बुक किए गए शिपमेंट को ट्रैक करें।',
         'noShipments': 'अभी तक कोई शिपमेंट नहीं',
         'noShipmentsDescription': 'जब आप लॉजिस्टिक्स हब के माध्यम से एक शिपमेंट बुक करते हैं, तो यह यहां दिखाई देगा।',
-
         'analytics': 'एनालिटिक्स',
-
-        // Handbook
         'handbookTitle': 'कारीगर हैंडबुक',
         'handbookSubtitle': 'विरासत में आपका स्वागत है! अपनी दुकान स्थापित करने और बिक्री शुरू करने के लिए यहां एक त्वरित मार्गदर्शिका दी गई है।',
         'handbookWelcomeTitle': 'विरासत परिवार में आपका स्वागत है!',
@@ -615,5 +591,81 @@ export const translations = {
         'handbookReadyToJoinTitle': 'विरासत से जुड़ने के लिए तैयार हैं?',
         'handbookReadyToJoinContent': 'आज ही एक कारीगर के रूप में पंजीकरण करें और अपनी उत्कृष्ट कृतियों को दुनिया के साथ साझा करना शुरू करें।',
         'createArtisanAccount': 'कारीगर खाता बनाएँ',
+        'language_preference_title': 'अपनी भाषा चुनें',
+        'language_preference_description': 'विरासत का अपनी मूल भाषा में अनुभव करने के लिए अपनी पसंदीदा भाषा चुनें।'
+    },
+    bn: {
+        'Home': 'হোম',
+        'Products': 'পণ্য',
+        'Artisans': 'কারিগর',
+        'Change language': 'ভাষা পরিবর্তন করুন',
+        'Search': 'অনুসন্ধান করুন',
+        'Shopping Cart': 'শপিং কার্ট',
+        'Artisan Dashboard': 'কারিগর ড্যাশবোর্ড',
+        'Toggle Menu': 'মেনু টগল করুন',
+        'Your cart is empty': 'আপনার কার্ট খালি',
+        'Find something beautiful to add!': 'যোগ করার জন্য সুন্দর কিছু খুঁজুন!',
+        'Continue Shopping': 'কেনাকাটা চালিয়ে যান',
+        'Subtotal': 'উপমোট',
+        'Checkout': 'চেকআউট',
+        'Item added!': 'আইটেম যোগ করা হয়েছে!',
+        'Added {{name}} to your cart.': '{{name}} আপনার কার্টে যোগ করা হয়েছে।',
+        'Not enough stock': 'পর্যাপ্ত স্টক নেই',
+        'You cannot add more than the {{stock}} items available.': 'আপনি উপলব্ধ {{stock}} টি আইটেমের বেশি যোগ করতে পারবেন না।',
+        'Handcrafted Stories, Timeless Treasures': 'হস্তনির্মিত গল্প, চিরন্তন সম্পদ',
+        'Discover unique, handmade goods from skilled artisans around the world.': 'বিশ্বজুড়ে দক্ষ কারিগরদের কাছ থেকে অনন্য, হস্তনির্মিত পণ্য আবিষ্কার করুন।',
+        'Explore Products': 'পণ্য অন্বেষণ করুন',
+        'Featured Products': 'বৈশিষ্ট্যযুক্ত পণ্য',
+        'View All': 'সব দেখুন',
+        'Meet the Artisans': 'কারিগরদের সাথে দেখা করুন',
+        'Our Collection': 'আমাদের সংগ্রহ',
+        'Explore a curated selection of handcrafted goods, each with a unique story and soul.': 'হস্তনির্মিত পণ্যগুলির একটি কিউরেটেড নির্বাচন অন্বেষণ করুন, প্রতিটির একটি অনন্য গল্প এবং আত্মা রয়েছে।',
+        'Search for products...': 'পণ্যের জন্য অনুসন্ধান করুন...',
+        'Select a category': 'একটি বিভাগ নির্বাচন করুন',
+        'All Categories': 'সমস্ত বিভাগ',
+        'Price Range': 'মূল্য পরিসীমা',
+        'No Products Found': 'কোন পণ্য পাওয়া যায়নি',
+        'Try adjusting your search or filters.': 'আপনার অনুসন্ধান বা ফিল্টার সামঞ্জস্য করার চেষ্টা করুন।',
+        '(12 reviews)': '(১২টি পর্যালোচনা)',
+        'Materials': 'উপাদান',
+        'in stock': 'স্টকে আছে',
+        'Add to Cart': 'কার্টে যোগ করুন',
+        'Out of Stock': 'স্টক নেই',
+        'Sold by': 'বিক্রেতা',
+        'The heart and soul of Virasat. Discover the stories and crafts of the talented individuals behind our products.': 'ভিরাসাতের হৃদয় ও আত্মা। আমাদের পণ্যগুলির পিছনের প্রতিভাবান ব্যক্তিদের গল্প এবং কারুশিল্প আবিষ্কার করুন।',
+        'About': 'সম্পর্কে',
+        'Contact': 'যোগাযোগ',
+        'Products by': 'দ্বারা পণ্য',
+        'This artisan has not listed any products yet.': 'এই কারিগর এখনও কোন পণ্য তালিকাভুক্ত করেনি।',
+        'Your Name': 'আপনার নাম',
+        'Jane Doe': 'জেন ডো',
+        'Your Email': 'আপনার ইমেল',
+        'jane.doe@example.com': 'jane.doe@example.com',
+        'Message': 'বার্তা',
+        'Inquire about a custom order or ask a question...': 'একটি কাস্টম অর্ডার সম্পর্কে জিজ্ঞাসা করুন বা একটি প্রশ্ন জিজ্ঞাসা করুন...',
+        'Send Message': 'বার্তা পাঠান',
+        'Sending...': 'পাঠানো হচ্ছে...',
+        'Message Sent!': 'বার্তা পাঠানো হয়েছে!',
+        'The artisan has been notified and will get back to you soon.': 'কারিগরকে অবহিত করা হয়েছে এবং শীঘ্রই আপনার সাথে যোগাযোগ করবে।',
+        'by': 'দ্বারা',
+        'View Details': 'বিস্তারিত দেখুন',
+        'View Profile': 'প্রোফাইল দেখুন',
+        "Connecting you with the world's finest artisans.": "আপনাকে বিশ্বের সেরা কারিগরদের সাথে সংযুক্ত করছে।",
+        'Shop': 'দোকান',
+        'All Products': 'সমস্ত পণ্য',
+        'Block-Printing': 'ব্লক-প্রিন্টিং',
+        'Wood Carving': 'কাঠ খোদাই',
+        'Embroidery': 'সূচিকর্ম',
+        'Our Artisans': 'আমাদের কারিগর',
+        'Our Story': 'আমাদের গল্প',
+        'Careers': 'ক্যারিয়ার',
+        'For Artisans': 'কারিগরদের জন্য',
+        'Sell on VIRASAT': 'ভিরাসাতে বিক্রি করুন',
+        'Artisan Handbook': 'কারিগর হ্যান্ডবুক',
+        'All rights reserved.': 'সর্বস্বত্ব সংরক্ষিত।',
+        'Terms of Service': 'পরিষেবার শর্তাবলী',
+        'Privacy Policy': 'গোপনীয়তা নীতি',
+        'language_preference_title': 'আপনার ভাষা পছন্দ করুন',
+        'language_preference_description': 'আপনার মাতৃভাষায় ভিরাসাত অভিজ্ঞতা করতে আপনার পছন্দের ভাষা নির্বাচন করুন।'
     }
-}
+};

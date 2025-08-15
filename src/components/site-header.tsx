@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Menu, Search, Languages, ShoppingCart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Logo } from "./logo";
-import { useLanguage } from "@/context/language-context";
+import { useLanguage, languages } from "@/context/language-context";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,6 +19,7 @@ import { ThemeToggle } from "./theme-toggle";
 import { useCart } from "@/context/cart-context";
 import { useState } from "react";
 import { CartDrawer } from "./cart-drawer";
+import { ScrollArea } from "./ui/scroll-area";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -66,12 +67,13 @@ export function SiteHeader() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setLanguage('en')} disabled={language === 'en'}>
-                English
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setLanguage('hi')} disabled={language === 'hi'}>
-                हिंदी (Hindi)
-              </DropdownMenuItem>
+              <ScrollArea className="h-72">
+                {languages.map((lang) => (
+                    <DropdownMenuItem key={lang.code} onClick={() => setLanguage(lang.code)} disabled={language === lang.code}>
+                        {lang.name}
+                    </DropdownMenuItem>
+                ))}
+              </ScrollArea>
             </DropdownMenuContent>
           </DropdownMenu>
           <Button variant="ghost" size="icon" asChild>
