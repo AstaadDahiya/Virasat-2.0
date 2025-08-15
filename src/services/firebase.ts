@@ -1,9 +1,9 @@
 
 "use server";
 
-import { db, storage } from "@/lib/firebase/config";
+import { db } from "@/lib/firebase/config";
 import { addDoc, collection, doc, getDoc, getDocs, query, serverTimestamp, setDoc, updateDoc, writeBatch } from "firebase/firestore";
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { BlobServiceClient } from "@azure/storage-blob";
 import type { Artisan, Product, ShipmentData, LogisticsInput, LogisticsOutput } from "@/lib/types";
 import type { User } from 'firebase/auth';
 import { getLogisticsAdvice as getLogisticsAdviceFlow } from "@/ai/flows/logistics-advisor";
@@ -12,15 +12,38 @@ import { products as seedProducts, artisans as seedArtisans } from "@/lib/data";
 // Defines the shape of the data coming from the form, excluding fields that are handled separately.
 type ProductInsertData = Omit<Product, 'id' | 'images' | 'artisanId' | 'createdAt'>;
 
+const getBlobServiceClient = () => {
+    const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
+    if (!connectionString) {
+        throw new Error("Azure Storage connection string is not configured.");
+    }
+    return BlobServiceClient.fromConnectionString(connectionString);
+};
 
-// WORKAROUND FOR FREE PLAN: Return placeholder URLs instead of uploading to Firebase Storage.
 const uploadImages = async (images: File[], artisanId: string): Promise<string[]> => {
     if (!images || images.length === 0) return [];
     
-    // Return one placeholder for each image the user "uploaded".
-    const placeholderUrls = images.map((_, index) => `https://placehold.co/600x600.png?text=Image+${index+1}`);
-    console.log(`Using placeholder image URLs instead of Firebase Storage: ${placeholderUrls.join(', ')}`);
-    return placeholderUrls;
+    try {
+        const blobServiceClient = getBlobServiceClient();
+        const containerName = process.env.AZURE_STORAGE_CONTAINER_NAME || 'images';
+        const containerClient = blobServiceClient.getContainerClient(containerName);
+
+        const uploadPromises = images.map(async (file) => {
+            const blobName = `${artisanId}-${Date.now()}-${file.name}`;
+            const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+            const buffer = Buffer.from(await file.arrayBuffer());
+            await blockBlobClient.uploadData(buffer, {
+                blobHTTPHeaders: { blobContentType: file.type }
+            });
+            return blockBlobClient.url;
+        });
+
+        return await Promise.all(uploadPromises);
+
+    } catch (error) {
+        console.error("Error uploading to Azure Blob Storage:", error);
+        throw new Error("Failed to upload images.");
+    }
 };
 
 export const addProduct = async (productData: ProductInsertData, images: File[], artisanId: string): Promise<string> => {
@@ -113,7 +136,6 @@ export const ensureArtisanProfile = async (user: User): Promise<void> => {
     if (!docSnap.exists()) {
         try {
             await setDoc(artisanRef, {
-                // id: user.uid, // id is the doc key, no need to store it inside the doc
                 name: user.email?.split('@')[0] || 'New Artisan',
                 name_hi: 'नया कारीगर',
                 bio: 'Welcome to Virasat! Please update your bio.',
@@ -132,18 +154,17 @@ export const ensureArtisanProfile = async (user: User): Promise<void> => {
 };
 
 
-// WORKAROUND FOR FREE PLAN: Return a placeholder URL instead of uploading to Firebase Storage.
 export const updateArtisanProfile = async (artisanId: string, data: Partial<Artisan>, newImageFile?: File): Promise<string> => {
     const artisanRef = doc(db, 'artisans', artisanId);
     let imageUrl = data.profileImage;
 
-    // If a new image was "uploaded", use a new placeholder. Otherwise keep the old one.
     if (newImageFile) {
-        imageUrl = 'https://placehold.co/100x100.png';
-        console.log(`Using placeholder profile image URL instead of Firebase Storage.`);
+        const urls = await uploadImages([newImageFile], artisanId);
+        if(urls.length > 0) {
+            imageUrl = urls[0];
+        }
     }
     
-    // Create a new object for updating, ensuring not to pass the File object to Firestore
     const updateData = { ...data, profileImage: imageUrl };
 
     await updateDoc(artisanRef, updateData);
@@ -161,7 +182,6 @@ export const saveShipment = async (shipmentData: ShipmentData, artisanId: string
         throw new Error("Authentication required. You must be logged in to save a shipment.");
     }
     
-    // Simulate label generation and tracking number
     const trackingNumber = `VRST${Date.now()}`;
     const shippingLabelUrl = `https://api.virasat.com/labels/${trackingNumber}.pdf`;
 
@@ -201,7 +221,6 @@ export const seedDatabase = async (): Promise<void> => {
         console.log("Database is empty, proceeding with seeding...");
         const batch = writeBatch(db);
 
-        // Seed artisans and keep track of their new Firestore IDs
         const artisanIdMap = new Map<string, string>();
         for (const artisanData of seedArtisans) {
             const tempId = `artisan-${seedArtisans.indexOf(artisanData) + 1}`;
@@ -211,7 +230,6 @@ export const seedDatabase = async (): Promise<void> => {
             console.log(`Staged artisan: ${artisanData.name}`);
         }
 
-        // Seed products, replacing temporary artisan IDs with new Firestore IDs
         for (const productData of seedProducts) {
             const productRef = doc(collection(db, 'products'));
             const finalArtisanId = artisanIdMap.get(productData.artisanId);
