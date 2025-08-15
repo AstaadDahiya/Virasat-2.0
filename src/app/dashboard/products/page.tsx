@@ -82,20 +82,20 @@ export default function DashboardProductsPage() {
     <div className="space-y-8">
        <div className="flex items-center justify-between">
          <div>
-            <h1 className="text-3xl font-bold font-headline">{t('myProducts')}</h1>
-            <p className="text-muted-foreground">{t('myProductsSubtitle')}</p>
+            <h1 className="text-3xl font-bold font-headline">{t('dashboard.myProducts.title')}</h1>
+            <p className="text-muted-foreground">{t('dashboard.myProducts.subtitle')}</p>
         </div>
         <Button asChild>
           <Link href="/dashboard/products/new">
-            <PlusCircle className="mr-2 h-4 w-4" /> {t('addProduct')}
+            <PlusCircle className="mr-2 h-4 w-4" /> {t('dashboard.myProducts.addProduct')}
           </Link>
         </Button>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>{t('allProducts')}</CardTitle>
-          <CardDescription>{t('allProductsDescription')}</CardDescription>
+          <CardTitle>{t('dashboard.myProducts.allProducts')}</CardTitle>
+          <CardDescription>{t('dashboard.myProducts.allProductsDescription')}</CardDescription>
         </CardHeader>
         <CardContent>
           {loading ? (
@@ -107,14 +107,14 @@ export default function DashboardProductsPage() {
                 <TableHeader>
                 <TableRow>
                     <TableHead className="hidden w-[100px] sm:table-cell">
-                    {t('tableHeaderImage')}
+                    {t('dashboard.tableHeaders.image')}
                     </TableHead>
-                    <TableHead>{t('tableHeaderName')}</TableHead>
-                    <TableHead>{t('tableHeaderCategory')}</TableHead>
-                    <TableHead className="hidden md:table-cell text-right">{t('tableHeaderPrice')}</TableHead>
-                    <TableHead className="hidden md:table-cell text-right">{t('tableHeaderStock')}</TableHead>
+                    <TableHead>{t('dashboard.tableHeaders.name')}</TableHead>
+                    <TableHead>{t('dashboard.tableHeaders.category')}</TableHead>
+                    <TableHead className="hidden md:table-cell text-right">{t('dashboard.tableHeaders.price')}</TableHead>
+                    <TableHead className="hidden md:table-cell text-right">{t('dashboard.tableHeaders.stock')}</TableHead>
                     <TableHead>
-                    <span className="sr-only">{t('tableHeaderActions')}</span>
+                    <span className="sr-only">{t('dashboard.tableHeaders.actions')}</span>
                     </TableHead>
                 </TableRow>
                 </TableHeader>
@@ -146,16 +146,16 @@ export default function DashboardProductsPage() {
                             variant="ghost"
                             >
                             <MoreHorizontal className="h-4 w-4" />
-                            <span className="sr-only">{t('toggleMenu')}</span>
+                            <span className="sr-only">{t('nav.toggleMenu')}</span>
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>{t('tableHeaderActions')}</DropdownMenuLabel>
+                            <DropdownMenuLabel>{t('dashboard.tableHeaders.actions')}</DropdownMenuLabel>
                              <DropdownMenuItem asChild>
-                                <Link href={`/dashboard/products/edit/${product.id}`}>{t('edit')}</Link>
+                                <Link href={`/dashboard/products/edit/${product.id}`}>{t('common.edit')}</Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem className="text-destructive" onClick={() => handleDeleteClick(product)}>
-                                {t('delete')}
+                                {t('common.delete')}
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                         </DropdownMenu>

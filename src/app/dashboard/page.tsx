@@ -36,26 +36,26 @@ export default function DashboardPage() {
   const quickStartSteps = [
       {
           step: 1,
-          title: t('quickStartStep1Title'),
-          description: t('quickStartStep1Description'),
+          title: t('dashboard.quickStart.step1Title'),
+          description: t('dashboard.quickStart.step1Description'),
           href: "/dashboard/settings"
       },
       {
           step: 2,
-          title: t('quickStartStep2Title'),
-          description: t('quickStartStep2Description'),
+          title: t('dashboard.quickStart.step2Title'),
+          description: t('dashboard.quickStart.step2Description'),
           href: "/dashboard/products/new"
       },
       {
           step: 3,
-          title: t('quickStartStep3Title'),
-          description: t('quickStartStep3Description'),
+          title: t('dashboard.quickStart.step3Title'),
+          description: t('dashboard.quickStart.step3Description'),
           href: "/dashboard/tools/marketing-suite"
       },
       {
           step: 4,
-          title: t('quickStartStep4Title'),
-          description: t('quickStartStep4Description'),
+          title: t('dashboard.quickStart.step4Title'),
+          description: t('dashboard.quickStart.step4Description'),
           href: "/dashboard/settings"
       }
   ]
@@ -63,13 +63,13 @@ export default function DashboardPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold font-headline">{t('dashboardOverviewTitle')}</h1>
-        <p className="text-muted-foreground">{t('dashboardOverviewSubtitle')}</p>
+        <h1 className="text-3xl font-bold font-headline">{t('dashboard.overview.title')}</h1>
+        <p className="text-muted-foreground">{t('dashboard.overview.subtitle')}</p>
       </div>
       
        <div>
-        <h2 className="text-2xl font-bold font-headline">{t('quickStartGuideTitle')}</h2>
-        <p className="text-muted-foreground mb-4">{t('quickStartGuideSubtitle')}</p>
+        <h2 className="text-2xl font-bold font-headline">{t('dashboard.quickStart.title')}</h2>
+        <p className="text-muted-foreground mb-4">{t('dashboard.quickStart.subtitle')}</p>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {quickStartSteps.map(step => (
                  <Card key={step.step} className="hover:bg-secondary/50 transition-colors">
@@ -91,11 +91,11 @@ export default function DashboardPage() {
             <CardHeader>
             <div className="flex justify-between items-center">
                 <div>
-                <CardTitle>{t('recentProducts')}</CardTitle>
-                <CardDescription>{t('recentProductsDescription')}</CardDescription>
+                <CardTitle>{t('dashboard.overview.recentProducts')}</CardTitle>
+                <CardDescription>{t('dashboard.overview.recentProductsDescription')}</CardDescription>
                 </div>
                 <Button asChild variant="outline" size="sm">
-                <Link href="/dashboard/products">{t('viewAll')}</Link>
+                <Link href="/dashboard/products">{t('common.viewAll')}</Link>
                 </Button>
             </div>
             </CardHeader>
@@ -108,10 +108,10 @@ export default function DashboardPage() {
                 <Table>
                     <TableHeader>
                     <TableRow>
-                        <TableHead>{t('tableHeaderName')}</TableHead>
-                        <TableHead>{t('tableHeaderCategory')}</TableHead>
-                        <TableHead className="text-right">{t('tableHeaderPrice')}</TableHead>
-                        <TableHead className="text-right">{t('tableHeaderStock')}</TableHead>
+                        <TableHead>{t('dashboard.tableHeaders.name')}</TableHead>
+                        <TableHead>{t('dashboard.tableHeaders.category')}</TableHead>
+                        <TableHead className="text-right">{t('dashboard.tableHeaders.price')}</TableHead>
+                        <TableHead className="text-right">{t('dashboard.tableHeaders.stock')}</TableHead>
                     </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -133,8 +133,8 @@ export default function DashboardPage() {
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>{t('salesOverTimeTitle')}</CardTitle>
-            <CardDescription>{t('salesOverTimeDescription')}</CardDescription>
+            <CardTitle>{t('dashboard.overview.salesOverTimeTitle')}</CardTitle>
+            <CardDescription>{t('dashboard.overview.salesOverTimeDescription')}</CardDescription>
           </CardHeader>
           <CardContent>
              <ResponsiveContainer width="100%" height={300}>
@@ -154,8 +154,8 @@ export default function DashboardPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>{t('recentActivityTitle')}</CardTitle>
-            <CardDescription>{t('recentActivityDescription')}</CardDescription>
+            <CardTitle>{t('dashboard.overview.recentActivityTitle')}</CardTitle>
+            <CardDescription>{t('dashboard.overview.recentActivityDescription')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-start gap-4">

@@ -15,15 +15,15 @@ export default function AddProductPage() {
                     <PlusCircle className="h-6 w-6 text-primary" />
                 </div>
                 <div>
-                    <h1 className="text-3xl font-bold font-headline">{t('addProduct')}</h1>
-                    <p className="text-muted-foreground">{t('addProductSubtitle')}</p>
+                    <h1 className="text-3xl font-bold font-headline">{t('dashboard.myProducts.addProduct')}</h1>
+                    <p className="text-muted-foreground">{t('dashboard.myProducts.addProductSubtitle')}</p>
                 </div>
             </div>
             
             <Card>
                 <CardHeader>
-                    <CardTitle>{t('productDetails')}</CardTitle>
-                    <CardDescription>{t('productDetailsDescription')}</CardDescription>
+                    <CardTitle>{t('dashboard.myProducts.productDetails')}</CardTitle>
+                    <CardDescription>{t('dashboard.myProducts.detailsDescription')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <AddProductForm />

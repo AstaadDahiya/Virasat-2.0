@@ -19,15 +19,15 @@ export default function EditProductPage() {
                     <Edit className="h-6 w-6 text-primary" />
                 </div>
                 <div>
-                    <h1 className="text-3xl font-bold font-headline">{t('edit')} {t('product')}</h1>
-                    <p className="text-muted-foreground">{t('editProductSubtitle')}</p>
+                    <h1 className="text-3xl font-bold font-headline">{t('common.edit')} {t('dashboard.aiTools.logisticsHub.product')}</h1>
+                    <p className="text-muted-foreground">{t('dashboard.myProducts.editProductSubtitle')}</p>
                 </div>
             </div>
             
             <Card>
                 <CardHeader>
-                    <CardTitle>{t('productDetails')}</CardTitle>
-                    <CardDescription>{t('productDetailsDescription')}</CardDescription>
+                    <CardTitle>{t('dashboard.myProducts.productDetails')}</CardTitle>
+                    <CardDescription>{t('dashboard.myProducts.detailsDescription')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <EditProductForm productId={id} />

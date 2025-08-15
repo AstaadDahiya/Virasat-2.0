@@ -71,32 +71,32 @@ export function DashboardSidebar() {
   const aiToolsItems = [
      {
       href: "/dashboard/tools/description-generator",
-      label: 'AI Storyteller',
+      label: t('dashboard.aiTools.storyteller.title'),
       icon: WandSparkles,
     },
     {
       href: "/dashboard/tools/pricing-optimizer",
-      label: 'Pricing Optimizer',
+      label: t('dashboard.aiTools.pricingOptimizer.title'),
       icon: DollarSign,
     },
     {
       href: "/dashboard/tools/marketing-suite",
-      label: 'Marketing Suite',
+      label: t('dashboard.aiTools.marketingSuite.title'),
       icon: Megaphone,
     },
     {
       href: "/dashboard/tools/visual-enhancer",
-      label: 'Visual Enhancer',
+      label: t('dashboard.aiTools.visualEnhancer.title'),
       icon: Camera,
     },
     {
       href: "/dashboard/tools/trend-harmonizer",
-      label: 'Trend Harmonizer',
+      label: t('dashboard.aiTools.trendHarmonizer.title'),
       icon: TrendingUp,
     },
      {
       href: "/dashboard/tools/logistics-hub",
-      label: 'Logistics Hub',
+      label: t('dashboard.aiTools.logisticsHub.title'),
       icon: Ship,
     },
   ];
@@ -140,7 +140,7 @@ export function DashboardSidebar() {
                 ))}
             </SidebarGroup>
             <SidebarGroup>
-                 <SidebarGroupLabel>{t('aiTools')}</SidebarGroupLabel>
+                 <SidebarGroupLabel>{t('dashboard.aiTools.title')}</SidebarGroupLabel>
                  {aiToolsItems.map((item) => (
                     <SidebarMenuItem key={item.href}>
                     <SidebarMenuButton
