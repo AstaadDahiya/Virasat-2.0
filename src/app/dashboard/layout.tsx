@@ -11,6 +11,7 @@ import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 export default function DashboardLayout({
   children,
@@ -40,12 +41,14 @@ export default function DashboardLayout({
 
   return (
     <SidebarProvider>
-      <Sidebar>
-        <DashboardSidebar />
-      </Sidebar>
-      <SidebarInset>
-        <div className="p-4 sm:p-6 lg:p-8">{children}</div>
-      </SidebarInset>
+      <div className="font-sans">
+        <Sidebar>
+          <DashboardSidebar />
+        </Sidebar>
+        <SidebarInset>
+          <div className="p-4 sm:p-6 lg:p-8">{children}</div>
+        </SidebarInset>
+      </div>
     </SidebarProvider>
   );
 }
