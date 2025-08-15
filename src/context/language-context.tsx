@@ -1,7 +1,8 @@
 
 "use client";
 
-import React, { createContext, useState, useContext, ReactNode, useEffect, useCallback, useRef } from 'react';
+import React, { createContext, useState, useContext, ReactNode, useEffect, useCallback } from 'react';
+import { getTranslations } from '@/services/firebase';
 
 type Language = 'en' | 'hi';
 
@@ -9,70 +10,65 @@ interface LanguageContextType {
   language: Language;
   setLanguage: (language: Language) => void;
   t: (key: string, values?: { [key: string]: string | number }) => string;
+  loading: boolean;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
-// AI flow is imported but not used directly here anymore. The call is in `t`.
-import { translateText } from '@/ai/flows/translate-text';
-
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   const [language, setLanguage] = useState<Language>('en');
-  const translationsRef = useRef<Map<string, string>>(new Map());
-  const pendingTranslations = useRef(new Set<string>());
-  // We need a state to force re-renders when translations are updated.
-  const [, setForceUpdate] = useState({});
+  const [translations, setTranslations] = useState<{ [key: string]: string }>({});
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const storedLanguage = localStorage.getItem('language') as Language | null;
-    if (storedLanguage) {
-      setLanguage(storedLanguage);
+  const fetchTranslations = useCallback(async (lang: Language) => {
+    setLoading(true);
+    try {
+      const cachedTranslations = localStorage.getItem(`translations_${lang}`);
+      if (cachedTranslations) {
+        setTranslations(JSON.parse(cachedTranslations));
+      }
+      
+      const newTranslations = await getTranslations(lang);
+      if (newTranslations) {
+        setTranslations(newTranslations);
+        localStorage.setItem(`translations_${lang}`, JSON.stringify(newTranslations));
+      }
+      
+    } catch (error) {
+      console.error(`Failed to fetch translations for ${lang}`, error);
+    } finally {
+        setLoading(false);
     }
   }, []);
+
+  useEffect(() => {
+    const storedLanguage = (localStorage.getItem('language') as Language) || 'en';
+    setLanguage(storedLanguage);
+    fetchTranslations(storedLanguage);
+  }, [fetchTranslations]);
 
   const handleSetLanguage = (lang: Language) => {
     setLanguage(lang);
     localStorage.setItem('language', lang);
-    translationsRef.current.clear(); // Clear old translations on language change
-    pendingTranslations.current.clear();
-    setForceUpdate({}); // Force a re-render for all components
+    fetchTranslations(lang);
   };
 
   const t = useCallback((key: string, values?: { [key: string]: string | number }): string => {
-    let resultText = key;
-    if (language === 'hi') {
-        const translatedText = translationsRef.current.get(key);
-        if (translatedText) {
-            resultText = translatedText;
-        } else if (!pendingTranslations.current.has(key)) {
-            pendingTranslations.current.add(key);
-            translateText({ text: key, targetLanguage: 'Hindi' })
-                .then(result => {
-                    if (result.translatedText) {
-                        translationsRef.current.set(key, result.translatedText);
-                        // Force a re-render now that we have a new translation
-                        setForceUpdate({});
-                    }
-                })
-                .catch(err => console.error(`Failed to translate "${key}":`, err))
-                .finally(() => {
-                    pendingTranslations.current.delete(key);
-                });
-        }
-    }
+    let translatedText = translations[key] || key;
 
     if (values) {
         Object.entries(values).forEach(([placeholder, value]) => {
-            resultText = resultText.replace(new RegExp(`{{\\s*${placeholder}\\s*}}`, 'g'), String(value));
+            translatedText = translatedText.replace(new RegExp(`{{\\s*${placeholder}\\s*}}`, 'g'), String(value));
         });
     }
     
-    return resultText;
-
-  }, [language]);
+    return translatedText;
+  }, [translations]);
+  
+  const value = { language, setLanguage: handleSetLanguage, t, loading };
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage: handleSetLanguage, t }}>
+    <LanguageContext.Provider value={value}>
       {children}
     </LanguageContext.Provider>
   );

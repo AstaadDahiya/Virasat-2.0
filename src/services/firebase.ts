@@ -1,5 +1,4 @@
 
-
 "use server";
 
 import { db } from "@/lib/firebase/config";
@@ -9,6 +8,7 @@ import type { Artisan, Product, ShipmentData, LogisticsInput, LogisticsOutput, P
 import type { User } from 'firebase/auth';
 import { getLogisticsAdvice as getLogisticsAdviceFlow } from "@/ai/flows/logistics-advisor";
 import { products as seedProducts, artisans as seedArtisans } from "@/lib/data";
+import { translations as i18nSeed } from "@/lib/i18n";
 
 // Defines the shape of the data coming from the form, excluding fields that are handled separately.
 type ProductInsertData = Omit<Product, 'id' | 'images' | 'artisanId' | 'createdAt'>;
@@ -351,13 +351,29 @@ export const getShipments = async (artisanId: string): Promise<Shipment[]> => {
     } catch (e: any) {
         if (e.code === 'failed-precondition') {
           console.error("Firestore index missing for getShipments query. Please create a composite index for the 'shipments' collection on 'artisan_id' (ascending) and 'createdAt' (descending).");
-          // Return empty array to prevent app crash while allowing user to create the index.
           return [];
         }
         console.error("Error getting shipments: ", e);
         throw new Error("Failed to get shipments");
     }
 }
+
+export const getTranslations = async (lang: string): Promise<{ [key: string]: string } | null> => {
+    try {
+        const docRef = doc(db, 'translations', lang);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            return docSnap.data() as { [key: string]: string };
+        } else {
+            console.log(`No translation document for language: ${lang}`);
+            return null;
+        }
+    } catch(e) {
+        console.error("Error getting translations: ", e);
+        throw new Error("Failed to get translations.");
+    }
+};
+
 
 export const seedDatabase = async (): Promise<void> => {
     console.log("Checking if database needs seeding...");
@@ -366,13 +382,13 @@ export const seedDatabase = async (): Promise<void> => {
         console.log("Database is empty, proceeding with seeding...");
         const batch = writeBatch(db);
 
+        // Seed Artisans and Products
         const artisanIdMap = new Map<string, string>();
         for (const artisanData of seedArtisans) {
             const tempId = `artisan-${seedArtisans.indexOf(artisanData) + 1}`;
             const artisanRef = doc(collection(db, 'artisans'));
             batch.set(artisanRef, artisanData);
             artisanIdMap.set(tempId, artisanRef.id);
-            console.log(`Staged artisan: ${artisanData.name}`);
         }
 
         for (const productData of seedProducts) {
@@ -381,10 +397,13 @@ export const seedDatabase = async (): Promise<void> => {
             if (finalArtisanId) {
                 const productWithRealArtisanId = { ...productData, artisanId: finalArtisanId, createdAt: serverTimestamp() };
                 batch.set(productRef, productWithRealArtisanId);
-                console.log(`Staged product: ${productData.name}`);
-            } else {
-                console.warn(`Could not find artisan for product: ${productData.name}`);
             }
+        }
+        
+        // Seed Translations
+        for (const [lang, translations] of Object.entries(i18nSeed)) {
+            const transRef = doc(db, 'translations', lang);
+            batch.set(transRef, translations);
         }
         
         try {

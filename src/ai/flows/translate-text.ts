@@ -1,11 +1,11 @@
+
 'use server';
 
 /**
- * @fileOverview A simple text translation AI flow.
- *
- * - translateText - A function that translates text to a target language.
- * - TranslateTextInput - The input type for the translateText function.
- * - TranslateTextOutput - The return type for the translateText function.
+ * @fileOverview This file is no longer used for on-the-fly translations in the UI.
+ * The new i18n system fetches full translation documents from Firestore.
+ * This flow can be kept for potential future use cases, like one-off translations
+ * within a form, but it's not part of the main UI rendering path anymore.
  */
 
 import { ai } from '@/ai/genkit';

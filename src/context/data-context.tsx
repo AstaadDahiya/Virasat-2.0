@@ -5,6 +5,8 @@ import React, { createContext, useState, useContext, ReactNode, useEffect, useCa
 import { Product, Artisan, Shipment } from '@/lib/types';
 import { getProducts, getArtisans, seedDatabase, getShipments } from '@/services/firebase';
 import { useAuth } from './auth-context';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '@/lib/firebase/config';
 
 interface DataContextType {
   products: Product[];
@@ -32,8 +34,6 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     try {
       setError(null);
       
-      // We only seed the database if it's the very first load and no products exist.
-      // This is a simplified check. A more robust system might use a 'version' flag.
       const productCollection = await getDocs(collection(db, 'products'));
       if (productCollection.empty) {
         await seedDatabase();
@@ -76,7 +76,6 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   }, [user]);
 
   useEffect(() => {
-    // This effect runs once on mount to load initial data.
     const loadInitialData = async () => {
       setLoading(true);
       try {
@@ -88,10 +87,10 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
           setProducts(JSON.parse(cachedProducts));
           setArtisans(JSON.parse(cachedArtisans));
           if(cachedShipments) setShipments(JSON.parse(cachedShipments));
-          setLoading(false); // Stop loading indicator early with cached data
-          await fetchData(false); // Then refresh data in the background
+          setLoading(false); 
+          await fetchData(false); 
         } else {
-          await fetchData(true); // Fetch data with loading indicator if no cache
+          await fetchData(true);
         }
       } catch (err) {
         console.error("Failed to fetch initial data:", err);
