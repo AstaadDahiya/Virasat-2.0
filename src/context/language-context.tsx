@@ -105,7 +105,7 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
       const newTranslations = await translationManager.loadTranslations(lang);
       setTranslations(newTranslations);
       setLanguage(lang);
-      localStorage.setItem('preferredLanguage', lang);
+      localStorage.setItem('language', lang);
     } catch (error) {
         console.error(`Failed to switch language to ${lang}`, error);
     } finally {
