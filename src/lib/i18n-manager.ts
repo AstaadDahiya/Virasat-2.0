@@ -130,15 +130,18 @@ export class TranslationManager {
             } else {
                 for (let fallbackLang of this.fallbackChain) {
                     if (fallbackLang !== langCode) {
+                        console.warn(`No translations for '${langCode}', attempting fallback to '${fallbackLang}'`);
+                        // IMPORTANT: Directly fetch the fallback, don't recursively call loadTranslations to avoid loops
                         const fallbackRef = doc(this.db, 'translations', fallbackLang);
                         const fallbackSnap = await getDoc(fallbackRef);
                         if (fallbackSnap.exists()) {
-                            console.warn(`Using ${fallbackLang} as fallback for ${langCode}`);
                             return fallbackSnap.data() as Translations;
                         }
                     }
                 }
-                throw new Error(`No translations found for ${langCode}`);
+                // This error is thrown if the primary language and all fallbacks fail.
+                // It's critical if 'en' itself is missing.
+                throw new Error(`No translations found for ${langCode} or any of its fallbacks.`);
             }
         } catch (error) {
             console.error(`Error loading translations for ${langCode}:`, error);

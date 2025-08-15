@@ -58,25 +58,42 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const initLanguage = async () => {
       setLoading(true);
+      console.log("LanguageProvider: Initializing language...");
 
-      // Check if seeding is needed before doing anything else
-      const enTranslationsRef = doc(db, 'translations', 'en');
-      const enTranslationsSnap = await getDoc(enTranslationsRef);
-      if (!enTranslationsSnap.exists()) {
-        console.log("No English translations found, seeding database...");
-        await seedDatabase();
-        console.log("Seeding complete.");
+      try {
+        // Check if seeding is needed before doing anything else
+        const enTranslationsRef = doc(db, 'translations', 'en');
+        const enTranslationsSnap = await getDoc(enTranslationsRef);
+        if (!enTranslationsSnap.exists()) {
+          console.log("LanguageProvider: No English translations found, seeding database...");
+          await seedDatabase();
+          console.log("LanguageProvider: Seeding complete.");
+        } else {
+            console.log("LanguageProvider: English translations found, skipping seed.");
+        }
+        
+        const { language: detectedLang } = await languageDetector.detectOptimalLanguage();
+        console.log(`LanguageProvider: Detected language is ${detectedLang}`);
+        
+        const loadedTranslations = await translationManager.loadTranslations(detectedLang);
+        setTranslations(loadedTranslations);
+        setLanguage(detectedLang);
+        
+        // Preload common languages in the background
+        translationManager.preloadLanguages(['en', 'hi', 'bn']);
+      } catch (error) {
+          console.error("LanguageProvider: CRITICAL - Failed to initialize language system.", error);
+          // In case of a catastrophic failure, set some very basic English words
+          setTranslations({ 
+              welcome: "Welcome", 
+              loading: "Loading...",
+              common: { loading: "Loading..."}
+          });
+          setLanguage('en');
+      } finally {
+        setLoading(false);
+        console.log("LanguageProvider: Initialization finished.");
       }
-      
-      const { language: detectedLang } = await languageDetector.detectOptimalLanguage();
-      
-      const loadedTranslations = await translationManager.loadTranslations(detectedLang);
-      setTranslations(loadedTranslations);
-      setLanguage(detectedLang);
-      setLoading(false);
-      
-      // Preload common languages in the background
-      translationManager.preloadLanguages(['en', 'hi', 'bn']);
     };
     initLanguage();
   }, []);
@@ -107,11 +124,11 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const t = useCallback((key: string, values?: { [key: string]: string | number }): string => {
-    // Support nested keys
-    let translatedText = key.split('.').reduce((obj, k) => obj && obj[k], translations);
+    const fallback = key.split('.').pop() || key;
+    let translatedText = key.split('.').reduce((obj, k) => (obj && typeof obj === 'object' ? obj[k] : undefined), translations);
     
-    if(!translatedText) {
-        translatedText = key; // Fallback to key if not found
+    if(!translatedText || typeof translatedText !== 'string') {
+        translatedText = fallback;
     }
 
     if (values) {
@@ -127,7 +144,14 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <LanguageContext.Provider value={value}>
-      {children}
+      {loading ? (
+        <div className="flex h-screen w-full items-center justify-center">
+            <div className="text-center">
+                <p className="text-2xl font-bold font-headline text-primary animate-pulse">VIRASAT</p>
+                <p className="text-muted-foreground">{value.t('common.loading')}</p>
+            </div>
+        </div>
+      ) : children}
     </LanguageContext.Provider>
   );
 };

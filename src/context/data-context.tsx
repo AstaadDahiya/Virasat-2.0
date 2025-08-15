@@ -1,10 +1,12 @@
 
+
 "use client";
 
 import React, { createContext, useState, useContext, ReactNode, useEffect, useCallback } from 'react';
 import { Product, Artisan, Shipment } from '@/lib/types';
 import { getProducts, getArtisans, getShipments } from '@/services/firebase';
 import { useAuth } from './auth-context';
+import { useLanguage } from './language-context';
 
 interface DataContextType {
   products: Product[];
@@ -19,6 +21,7 @@ const DataContext = createContext<DataContextType | undefined>(undefined);
 
 export const DataProvider = ({ children }: { children: ReactNode }) => {
   const { user } = useAuth();
+  const { loading: languageLoading } = useLanguage();
   const [products, setProducts] = useState<Product[]>([]);
   const [artisans, setArtisans] = useState<Artisan[]>([]);
   const [shipments, setShipments] = useState<Shipment[]>([]);
@@ -69,6 +72,11 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   }, [user]);
 
   useEffect(() => {
+    // Do not fetch data until the language system is ready.
+    if (languageLoading) {
+        return;
+    }
+
     const loadInitialData = async () => {
       setLoading(true);
       try {
@@ -97,7 +105,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     };
     
     loadInitialData();
-  }, [fetchData]);
+  }, [languageLoading, fetchData]);
 
   const refreshData = useCallback(async () => {
     await fetchData(false);
