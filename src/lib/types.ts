@@ -43,7 +43,7 @@ export const ShippingRateSchema = z.object({
     carrier: z.string().describe('Name of the shipping carrier (e.g., "Delhivery", "Blue Dart", "India Post").'),
     serviceType: z.string().describe('Type of service (e.g., "Standard", "Express").'),
     totalCost: z.number().describe('Total shipping cost in INR.'),
-    estimatedDeliveryDate: z.string().describe('Estimated delivery date (e.g., "2024-12-25").'),
+    estimatedDeliveryDate: z.string().describe('Estimated delivery date or range (e.g., "3-5 days").'),
 });
 export type ShippingRate = z.infer<typeof ShippingRateSchema>;
 
