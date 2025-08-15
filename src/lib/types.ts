@@ -16,6 +16,7 @@ export type Product = {
   stock: number;
   materials: string[];
   materials_hi: string[];
+  createdAt?: number; // Changed to number to store milliseconds
 };
 
 export type Artisan = {

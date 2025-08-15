@@ -1,8 +1,9 @@
 
+
 "use server";
 
 import { db } from "@/lib/firebase/config";
-import { addDoc, collection, doc, getDoc, getDocs, query, serverTimestamp, setDoc, updateDoc, writeBatch } from "firebase/firestore";
+import { addDoc, collection, doc, getDoc, getDocs, query, serverTimestamp, setDoc, updateDoc, writeBatch, Timestamp } from "firebase/firestore";
 import { BlobServiceClient } from "@azure/storage-blob";
 import type { Artisan, Product, ShipmentData, LogisticsInput, LogisticsOutput } from "@/lib/types";
 import type { User } from 'firebase/auth';
@@ -10,7 +11,7 @@ import { getLogisticsAdvice as getLogisticsAdviceFlow } from "@/ai/flows/logisti
 import { products as seedProducts, artisans as seedArtisans } from "@/lib/data";
 
 // Defines the shape of the data coming from the form, excluding fields that are handled separately.
-type ProductInsertData = Omit<Product, 'id' | 'images' | 'artisanId' | 'createdAt'>;
+type ProductInsertData = Omit<Product, 'id' | 'images' | 'artisanId'>;
 
 const getBlobServiceClient = () => {
     const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
@@ -77,7 +78,14 @@ export const getProducts = async (): Promise<Product[]> => {
     try {
         const q = query(collection(db, 'products'));
         const querySnapshot = await getDocs(q);
-        const products = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Product));
+        const products = querySnapshot.docs.map(doc => {
+            const data = doc.data();
+            // Convert Firestore Timestamps to serializable format (milliseconds)
+            if (data.createdAt && data.createdAt instanceof Timestamp) {
+                data.createdAt = data.createdAt.toMillis();
+            }
+            return { id: doc.id, ...data } as Product;
+        });
         return products;
     } catch (e) {
         console.error("Error getting documents: ", e);
@@ -90,7 +98,12 @@ export const getProduct = async (id: string): Promise<Product | null> => {
         const docRef = doc(db, 'products', id);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
-            return { id: docSnap.id, ...docSnap.data() } as Product;
+             const data = docSnap.data();
+            // Convert Firestore Timestamps to serializable format (milliseconds)
+            if (data.createdAt && data.createdAt instanceof Timestamp) {
+                data.createdAt = data.createdAt.toMillis();
+            }
+            return { id: docSnap.id, ...data } as Product;
         } else {
             console.log("No such product!");
             return null;
