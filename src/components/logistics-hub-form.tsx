@@ -31,7 +31,7 @@ import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 import { Badge } from "./ui/badge";
 
 const formSchema = z.object({
-  productId: z.string({ required_error: "Please select a product." }),
+  productId: z.string({ required_error: "Please select a product." }).min(1, "Please select a product."),
   packageWeightKg: z.coerce.number().min(0.1, { message: "Weight must be at least 0.1 kg." }),
   length: z.coerce.number().min(1, { message: "Length is required." }),
   width: z.coerce.number().min(1, { message: "Width is required." }),
@@ -52,8 +52,13 @@ export function LogisticsHubForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      productId: "",
+      destination: "",
       packageWeightKg: 1,
       declaredValue: 1000,
+      length: undefined, // Using undefined and coerce in zod will allow placeholder to show
+      width: undefined,
+      height: undefined,
     },
   });
 
@@ -271,3 +276,5 @@ export function LogisticsHubForm() {
     </div>
   );
 }
+
+    
