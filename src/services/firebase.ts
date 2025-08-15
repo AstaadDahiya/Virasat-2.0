@@ -275,7 +275,7 @@ export const saveShipment = async (shipmentData: ShipmentData, artisanId: string
     const trackingNumber = `VRST${Date.now()}`;
     const shippingLabelUrl = `https://api.virasat.com/labels/${trackingNumber}.pdf`;
 
-    const shipmentToSave = {
+    const shipmentToSave: { [key: string]: any } = {
       artisan_id: artisanId,
       product_id: shipmentData.productId,
       destination: shipmentData.destination,
@@ -291,10 +291,17 @@ export const saveShipment = async (shipmentData: ShipmentData, artisanId: string
       ai_packaging_advice: shipmentData.aiPackagingAdvice,
       ai_risk_advice: shipmentData.aiRiskAdvice,
       ai_carrier_choice_advice: shipmentData.aiCarrierChoiceAdvice,
-      ai_hs_code: shipmentData.aiHsCode,
-      ai_customs_declaration: shipmentData.aiCustomsDeclaration,
       createdAt: serverTimestamp(),
     };
+    
+    // Conditionally add customs fields to avoid 'undefined' errors
+    if(shipmentData.aiHsCode) {
+        shipmentToSave.ai_hs_code = shipmentData.aiHsCode;
+    }
+    if(shipmentData.aiCustomsDeclaration) {
+        shipmentToSave.ai_customs_declaration = shipmentData.aiCustomsDeclaration;
+    }
+
 
     try {
         await addDoc(collection(db, "shipments"), shipmentToSave);
