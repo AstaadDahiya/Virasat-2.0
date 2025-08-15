@@ -15,11 +15,11 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { getLogisticsAdvice } from "@/ai/flows/logistics-advisor";
 import {
-  getLogisticsAdvice,
   type LogisticsOutput,
   type ShippingRate,
-} from "@/ai/flows/logistics-advisor";
+} from "@/lib/types";
 import { Loader2, Info, FileText, Bot, PackageCheck, ShieldCheck, ShipWheel, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
