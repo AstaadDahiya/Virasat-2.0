@@ -14,7 +14,6 @@ import {
   LayoutGrid,
   Box,
   WandSparkles,
-  CircleHelp,
   User,
   LogOut,
   Home,
@@ -23,8 +22,6 @@ import {
   Megaphone,
   Camera,
   TrendingUp,
-  Languages,
-  LineChart,
   Ship,
   Package
 } from "lucide-react";
@@ -60,10 +57,7 @@ export function DashboardSidebar() {
       label: t('shipments'),
       icon: Package,
     },
-  ];
-
-  const toolsItems = [
-    {
+     {
       href: "/dashboard/tools/description-generator",
       label: t('aiStorytellerTitle'),
       icon: WandSparkles,
@@ -116,25 +110,8 @@ export function DashboardSidebar() {
 
       <SidebarContent className="p-2">
         <SidebarMenu>
+          <p className="px-2 text-xs text-muted-foreground mb-2 group-data-[collapsible=icon]:hidden">Dashboard</p>
           {menuItems.map((item) => (
-            <SidebarMenuItem key={item.href}>
-              <SidebarMenuButton
-                asChild
-                isActive={isActive(item.href)}
-                tooltip={{ children: item.label }}
-              >
-                <Link href={item.href}>
-                  <item.icon />
-                  <span>{item.label}</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
-        </SidebarMenu>
-        
-        <SidebarMenu className="mt-4">
-           <p className="px-2 text-xs text-muted-foreground mb-2 group-data-[collapsible=icon]:hidden">{t('aiTools')}</p>
-           {toolsItems.map((item) => (
             <SidebarMenuItem key={item.href}>
               <SidebarMenuButton
                 asChild

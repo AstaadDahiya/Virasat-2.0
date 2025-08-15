@@ -66,27 +66,7 @@ export default function DashboardPage() {
         <h1 className="text-3xl font-bold font-headline">{t('dashboardOverviewTitle')}</h1>
         <p className="text-muted-foreground">{t('dashboardOverviewSubtitle')}</p>
       </div>
-
-       <div>
-        <h2 className="text-2xl font-bold font-headline">Quick Start Guide</h2>
-        <p className="text-muted-foreground mb-4">New to Virasat? Here are some quick steps to get your shop running.</p>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {quickStartSteps.map(step => (
-                 <Card key={step.step} className="hover:bg-secondary/50 transition-colors">
-                    <Link href={step.href} className="block h-full">
-                       <CardContent className="p-6 h-full flex flex-col">
-                         <div className="flex justify-between items-start">
-                           <p className="text-lg font-bold font-headline">{step.step}. {step.title}</p>
-                           <ArrowUpRight className="text-muted-foreground shrink-0"/>
-                         </div>
-                         <p className="text-muted-foreground text-sm mt-1 flex-grow">{step.description}</p>
-                       </CardContent>
-                    </Link>
-                 </Card>
-            ))}
-        </div>
-      </div>
-
+      
        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -128,6 +108,26 @@ export default function DashboardPage() {
             <p className="text-xs text-muted-foreground">Based on 215 reviews</p>
           </CardContent>
         </Card>
+      </div>
+
+       <div>
+        <h2 className="text-2xl font-bold font-headline">Quick Start Guide</h2>
+        <p className="text-muted-foreground mb-4">New to Virasat? Here are some quick steps to get your shop running.</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {quickStartSteps.map(step => (
+                 <Card key={step.step} className="hover:bg-secondary/50 transition-colors">
+                    <Link href={step.href} className="block h-full">
+                       <CardContent className="p-6 h-full flex flex-col">
+                         <div className="flex justify-between items-start">
+                           <p className="text-lg font-bold font-headline">{step.step}. {step.title}</p>
+                           <ArrowUpRight className="text-muted-foreground shrink-0"/>
+                         </div>
+                         <p className="text-muted-foreground text-sm mt-1 flex-grow">{step.description}</p>
+                       </CardContent>
+                    </Link>
+                 </Card>
+            ))}
+        </div>
       </div>
       
        <Card>
@@ -244,5 +244,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-    
