@@ -359,21 +359,21 @@ export const getShipments = async (artisanId: string): Promise<Shipment[]> => {
     }
 }
 
-export const getTranslations = async (lang: string): Promise<{ [key: string]: string } | null> => {
+export const getTranslations = async (lang: string): Promise<{ [key: string]: string }> => {
     try {
         const docRef = doc(db, 'translations', lang);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
             return docSnap.data() as { [key: string]: string };
         } else {
-            console.log(`No translation document for language: ${lang}`);
+            console.warn(`No translation document for language: ${lang}, falling back to English.`);
             // Fallback to English if the requested language doesn't exist
             const enDocRef = doc(db, 'translations', 'en');
             const enDocSnap = await getDoc(enDocRef);
             if(enDocSnap.exists()) {
                 return enDocSnap.data() as { [key: string]: string };
             }
-            return null;
+            return {};
         }
     } catch(e) {
         console.error("Error getting translations: ", e);
@@ -426,5 +426,3 @@ export const seedDatabase = async (): Promise<void> => {
         console.log("Database already contains data, skipping seed.");
     }
 };
-
-    

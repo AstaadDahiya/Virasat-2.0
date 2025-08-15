@@ -1,8 +1,9 @@
 
 "use client";
 
-import React, { createContext, useState, useContext, ReactNode, useEffect, useCallback } from 'react';
-import { getTranslations } from '@/services/firebase';
+import React, { createContext, useState, useContext, ReactNode, useEffect, useCallback, useMemo } from 'react';
+import { TranslationManager } from '@/lib/i18n-manager';
+import { db } from '@/lib/firebase/config';
 
 export const languages = [
     { name: "English", code: "en", nativeName: "English" },
@@ -30,7 +31,7 @@ export const languages = [
     { name: "Urdu", code: "ur", nativeName: "اردو" },
 ];
 
-type LanguageCode = typeof languages[number]['code'];
+export type LanguageCode = typeof languages[number]['code'];
 
 interface LanguageContextType {
   language: LanguageCode;
@@ -41,43 +42,56 @@ interface LanguageContextType {
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
+// Instantiate the manager outside the component to act as a singleton
+const translationManager = new TranslationManager(db);
+
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   const [language, setLanguage] = useState<LanguageCode>('en');
   const [translations, setTranslations] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState(true);
 
-  const fetchTranslations = useCallback(async (lang: LanguageCode) => {
+  useEffect(() => {
+    const initLanguage = async () => {
+      const savedLang = localStorage.getItem('language') as LanguageCode | null;
+      const initialLang = savedLang || 'en';
+      
+      setLoading(true);
+      const loadedTranslations = await translationManager.loadTranslations(initialLang);
+      setTranslations(loadedTranslations);
+      setLanguage(initialLang);
+      setLoading(false);
+      
+      // Preload common languages in the background
+      translationManager.preloadLanguages(['en', 'hi', 'bn']);
+    };
+    initLanguage();
+  }, []);
+  
+  useEffect(() => {
+    // This effect handles Right-to-Left (RTL) language support.
+    const rtlLanguages = ['ur', 'sd', 'ks'];
+    if (rtlLanguages.includes(language)) {
+        document.documentElement.dir = 'rtl';
+    } else {
+        document.documentElement.dir = 'ltr';
+    }
+    document.documentElement.lang = language;
+  }, [language]);
+
+
+  const handleSetLanguage = useCallback(async (lang: LanguageCode) => {
     setLoading(true);
     try {
-      const cachedTranslations = localStorage.getItem(`translations_${lang}`);
-      if (cachedTranslations) {
-        setTranslations(JSON.parse(cachedTranslations));
-      }
-      
-      const newTranslations = await getTranslations(lang);
-      if (newTranslations) {
-        setTranslations(newTranslations);
-        localStorage.setItem(`translations_${lang}`, JSON.stringify(newTranslations));
-      }
-      
+      const newTranslations = await translationManager.loadTranslations(lang);
+      setTranslations(newTranslations);
+      setLanguage(lang);
+      localStorage.setItem('language', lang);
     } catch (error) {
-      console.error(`Failed to fetch translations for ${lang}`, error);
+        console.error(`Failed to switch language to ${lang}`, error);
     } finally {
         setLoading(false);
     }
   }, []);
-
-  useEffect(() => {
-    const storedLanguage = (localStorage.getItem('language') as LanguageCode) || 'en';
-    setLanguage(storedLanguage);
-    fetchTranslations(storedLanguage);
-  }, [fetchTranslations]);
-
-  const handleSetLanguage = (lang: LanguageCode) => {
-    setLanguage(lang);
-    localStorage.setItem('language', lang);
-    fetchTranslations(lang);
-  };
 
   const t = useCallback((key: string, values?: { [key: string]: string | number }): string => {
     let translatedText = translations[key] || key;
@@ -91,7 +105,7 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     return translatedText;
   }, [translations]);
   
-  const value = { language, setLanguage: handleSetLanguage, t, loading };
+  const value = useMemo(() => ({ language, setLanguage: handleSetLanguage, t, loading }), [language, handleSetLanguage, t, loading]);
 
   return (
     <LanguageContext.Provider value={value}>
@@ -107,5 +121,3 @@ export const useLanguage = (): LanguageContextType => {
   }
   return context;
 };
-
-    
