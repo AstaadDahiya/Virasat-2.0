@@ -101,14 +101,6 @@ export function DashboardSidebar() {
     },
   ];
 
-  const helpItems = [
-     {
-      href: "/dashboard/handbook",
-      label: t('artisanHandbook'),
-      icon: BookOpen,
-    },
-  ]
-
   const isActive = (href: string) => {
     return pathname === href;
   };
@@ -150,23 +142,6 @@ export function DashboardSidebar() {
             <SidebarGroup>
                  <SidebarGroupLabel>{t('aiTools')}</SidebarGroupLabel>
                  {aiToolsItems.map((item) => (
-                    <SidebarMenuItem key={item.href}>
-                    <SidebarMenuButton
-                        asChild
-                        isActive={isActive(item.href)}
-                        tooltip={{ children: item.label }}
-                    >
-                        <Link href={item.href}>
-                        <item.icon />
-                        <span>{item.label}</span>
-                        </Link>
-                    </SidebarMenuButton>
-                    </SidebarMenuItem>
-                ))}
-            </SidebarGroup>
-            <SidebarGroup>
-                 <SidebarGroupLabel>Help & Support</SidebarGroupLabel>
-                 {helpItems.map((item) => (
                     <SidebarMenuItem key={item.href}>
                     <SidebarMenuButton
                         asChild
