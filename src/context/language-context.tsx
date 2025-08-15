@@ -14,13 +14,13 @@ interface LanguageContextType {
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
-// In-memory cache for translations
+// In-memory cache for translations, cleared on language change.
 const translationCache = new Map<string, string>();
 
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   const [language, setLanguage] = useState<Language>('en'); // Default to English
   // State to hold dynamic translations fetched from the AI
-  const [translations, setTranslations] = useState<Map<string, string>>(translationCache);
+  const [translations, setTranslations] = useState<Map<string, string>>(new Map());
   // Track which keys are currently being fetched
   const pendingTranslations = useRef(new Set<string>());
   const isMounted = useRef(false);
@@ -34,54 +34,54 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const handleSetLanguage = (lang: Language) => {
-    setLanguage(lang);
-    localStorage.setItem('language', lang);
+    if (lang !== language) {
+        setLanguage(lang);
+        localStorage.setItem('language', lang);
+        // Clear cache when language changes
+        translationCache.clear();
+        setTranslations(new Map());
+    }
   };
 
   const t = useCallback((key: string, values?: { [key: string]: string | number }): string => {
-    if (language === 'en') {
-      let result = key;
-       if (values) {
-         Object.entries(values).forEach(([placeholder, value]) => {
-            result = result.replace(new RegExp(`{{\\s*${placeholder}\\s*}}`, 'g'), String(value));
-        });
-      }
-      return result;
-    }
+    let resultText = key;
+    if (language !== 'en') {
+        const cachedTranslation = translationCache.get(key);
+        if (cachedTranslation) {
+            resultText = cachedTranslation;
+        } else if (isMounted.current && !pendingTranslations.current.has(key)) {
+            pendingTranslations.current.add(key);
 
-    // If translation is in the cache, use it
-    if (translations.has(key)) {
-      let translated = translations.get(key)!;
-      if (values) {
-         Object.entries(values).forEach(([placeholder, value]) => {
-            translated = translated.replace(new RegExp(`{{\\s*${placeholder}\\s*}}`, 'g'), String(value));
-        });
-      }
-      return translated;
+            translateText({ text: key, targetLanguage: 'Hindi' })
+                .then(result => {
+                    if (result.translatedText) {
+                        translationCache.set(key, result.translatedText);
+                        // Update state only if component is still mounted
+                        if(isMounted.current) {
+                           setTranslations(prev => new Map(prev).set(key, result.translatedText));
+                        }
+                    }
+                })
+                .catch(err => console.error(`Failed to translate "${key}":`, err))
+                .finally(() => {
+                    pendingTranslations.current.delete(key);
+                });
+        }
     }
-
-    // If component is mounted and translation is not in the cache, fetch it.
-    if (isMounted.current && !pendingTranslations.current.has(key)) {
-      pendingTranslations.current.add(key); // Mark as pending
-      
-      translateText({ text: key, targetLanguage: 'Hindi' })
-        .then(result => {
-          // Store in both component state and module-level cache
-          translationCache.set(key, result.translatedText); 
-          setTranslations(prev => new Map(prev).set(key, result.translatedText));
-        })
-        .catch(err => {
-          console.error(`Failed to translate "${key}":`, err);
-          // Don't cache errors, allow retries.
-        })
-        .finally(() => {
-           pendingTranslations.current.delete(key); // Remove from pending list
+    
+    if (values) {
+        Object.entries(values).forEach(([placeholder, value]) => {
+            resultText = resultText.replace(new RegExp(`{{\\s*${placeholder}\\s*}}`, 'g'), String(value));
         });
     }
 
-    // Return the English key as a fallback while the translation is loading
-    return key;
-  }, [language, translations]);
+    return resultText;
+  }, [language]);
+
+
+  useEffect(() => {
+      // This effect can be used to force a re-render on all components when the language changes.
+  }, [language]);
 
   return (
     <LanguageContext.Provider value={{ language, setLanguage: handleSetLanguage, t }}>
