@@ -385,48 +385,64 @@ export const getTranslations = async (lang: string): Promise<{ [key: string]: st
 
 export const seedDatabase = async (): Promise<void> => {
     console.log("Checking if database needs seeding...");
-    const productsSnapshot = await getDocs(query(collection(db, 'products')));
-    if (productsSnapshot.empty) {
-        console.log("Database is empty, proceeding with seeding...");
-        const batch = writeBatch(db);
+    
+    // Check if the 'en' translation document exists as a sentinel
+    const enTransRef = doc(db, 'translations', 'en');
+    const enTransSnap = await getDoc(enTransRef);
 
-        // Seed Artisans and Products
-        const artisanIdMap = new Map<string, string>();
-        for (const artisanData of seedArtisans) {
-            const tempId = `artisan-${seedArtisans.indexOf(artisanData) + 1}`;
-            const artisanRef = doc(collection(db, 'artisans'));
-            batch.set(artisanRef, artisanData);
-            artisanIdMap.set(tempId, artisanRef.id);
-        }
+    if (enTransSnap.exists()) {
+        console.log("English translations exist, skipping seed.");
+        return;
+    }
 
-        for (const productData of seedProducts) {
-            const productRef = doc(collection(db, 'products'));
-            const finalArtisanId = artisanIdMap.get(productData.artisanId);
-            if (finalArtisanId) {
-                const productWithRealArtisanId = { ...productData, artisanId: finalArtisanId, createdAt: serverTimestamp() };
-                batch.set(productRef, productWithRealArtisanId);
-            }
+    console.log("Database needs seeding, proceeding...");
+    const batch = writeBatch(db);
+
+    // First, immediately write the English translations to ensure fallback is available.
+    try {
+      console.log("Writing critical 'en' translations first...");
+      await setDoc(enTransRef, i18nSeed.en);
+      console.log("'en' translations committed.");
+    } catch (error) {
+      console.error("CRITICAL: Failed to write 'en' translations.", error);
+      // If this fails, the app can't start, so we throw.
+      throw new Error("Could not seed essential English translations.");
+    }
+    
+    // Seed Artisans and Products
+    const artisanIdMap = new Map<string, string>();
+    for (const artisanData of seedArtisans) {
+        const tempId = `artisan-${seedArtisans.indexOf(artisanData) + 1}`;
+        const artisanRef = doc(collection(db, 'artisans'));
+        batch.set(artisanRef, artisanData);
+        artisanIdMap.set(tempId, artisanRef.id);
+    }
+
+    for (const productData of seedProducts) {
+        const productRef = doc(collection(db, 'products'));
+        const finalArtisanId = artisanIdMap.get(productData.artisanId);
+        if (finalArtisanId) {
+            const productWithRealArtisanId = { ...productData, artisanId: finalArtisanId, createdAt: serverTimestamp() };
+            batch.set(productRef, productWithRealArtisanId);
         }
-        
-        // Seed Translations
-        for (const lang of languages) {
-            const langCode = lang.code;
-            const transRef = doc(db, 'translations', langCode);
-            // Use specific translations if available, otherwise fallback to English
-            // @ts-ignore
-            const translationsToSeed = i18nSeed[langCode as keyof typeof i18nSeed] || i18nSeed.en;
-            batch.set(transRef, translationsToSeed);
-        }
-        
-        try {
-            await batch.commit();
-            console.log("Database seeded successfully!");
-        } catch (error) {
-            console.error("Error seeding database: ", error);
-        }
-    } else {
-        console.log("Database already contains data, skipping seed.");
+    }
+    
+    // Seed the rest of the translations
+    for (const lang of languages) {
+        const langCode = lang.code;
+        // Skip 'en' since we already wrote it.
+        if (langCode === 'en') continue;
+
+        const transRef = doc(db, 'translations', langCode);
+        // @ts-ignore
+        const translationsToSeed = i18nSeed[langCode as keyof typeof i18nSeed] || i18nSeed.en;
+        batch.set(transRef, translationsToSeed);
+    }
+    
+    try {
+        await batch.commit();
+        console.log("Database seeding complete for all other data!");
+    } catch (error) {
+        console.error("Error committing the rest of the seed data: ", error);
     }
 };
-
-    

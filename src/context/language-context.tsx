@@ -1,11 +1,9 @@
 
-
 "use client";
 
 import React, { createContext, useState, useContext, ReactNode, useEffect, useCallback, useMemo } from 'react';
 import { TranslationManager, LanguageDetector } from '@/lib/i18n-manager';
 import { db } from '@/lib/firebase/config';
-import { getDoc, doc } from 'firebase/firestore';
 import { seedDatabase } from '@/services/firebase';
 
 export const languages = [
@@ -58,19 +56,11 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const initLanguage = async () => {
       setLoading(true);
-      console.log("LanguageProvider: Initializing language...");
+      console.log("LanguageProvider: Initializing language system...");
 
       try {
-        // Check if seeding is needed before doing anything else
-        const enTranslationsRef = doc(db, 'translations', 'en');
-        const enTranslationsSnap = await getDoc(enTranslationsRef);
-        if (!enTranslationsSnap.exists()) {
-          console.log("LanguageProvider: No English translations found, seeding database...");
-          await seedDatabase();
-          console.log("LanguageProvider: Seeding complete.");
-        } else {
-            console.log("LanguageProvider: English translations found, skipping seed.");
-        }
+        // This function now ensures 'en' translations exist before proceeding.
+        await seedDatabase(); 
         
         const { language: detectedLang } = await languageDetector.detectOptimalLanguage();
         console.log(`LanguageProvider: Detected language is ${detectedLang}`);
@@ -115,7 +105,7 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
       const newTranslations = await translationManager.loadTranslations(lang);
       setTranslations(newTranslations);
       setLanguage(lang);
-      localStorage.setItem('language', lang);
+      localStorage.setItem('preferredLanguage', lang);
     } catch (error) {
         console.error(`Failed to switch language to ${lang}`, error);
     } finally {
