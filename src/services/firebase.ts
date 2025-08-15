@@ -4,7 +4,7 @@
 
 import { db } from "@/lib/firebase/config";
 import { addDoc, collection, doc, getDoc, getDocs, query, serverTimestamp, setDoc, updateDoc, writeBatch, Timestamp, deleteDoc, where, orderBy } from "firebase/firestore";
-import { BlobServiceClient } from "@azure/storage-blob";
+import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import type { Artisan, Product, ShipmentData, LogisticsInput, LogisticsOutput, ProductFormData, Shipment } from "@/lib/types";
 import type { User } from 'firebase/auth';
 import { getLogisticsAdvice as getLogisticsAdviceFlow } from "@/ai/flows/logistics-advisor";
@@ -15,31 +15,19 @@ import { languages } from "@/context/language-context";
 // Defines the shape of the data coming from the form, excluding fields that are handled separately.
 type ProductInsertData = Omit<Product, 'id' | 'images' | 'artisanId' | 'createdAt'>;
 
-const getBlobServiceClient = () => {
-    const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
-    if (!connectionString) {
-        throw new Error("Azure Storage connection string is not configured.");
-    }
-    return BlobServiceClient.fromConnectionString(connectionString);
-};
+const storage = getStorage();
 
-const deleteBlob = async (blobUrl: string) => {
-    if (!blobUrl) return;
+const deleteImage = async (imageUrl: string) => {
+    if (!imageUrl || imageUrl.includes('placehold.co')) return;
     try {
-        const blobServiceClient = getBlobServiceClient();
-        const containerName = process.env.AZURE_STORAGE_CONTAINER_NAME || 'images';
-        const containerClient = blobServiceClient.getContainerClient(containerName);
-        const blobName = blobUrl.split('/').pop();
-        if(blobName) {
-            const blockBlobClient = containerClient.getBlockBlobClient(blobName);
-            await blockBlobClient.delete();
-            console.log(`Deleted blob: ${blobName}`);
-        }
-    } catch(error: any) {
-        // It's okay if the blob doesn't exist, we can ignore that error.
-        if (error.statusCode !== 404) {
-            console.error("Error deleting blob from Azure:", error);
-            // We don't re-throw here to allow the Firestore deletion to proceed.
+        const imageRef = ref(storage, imageUrl);
+        await deleteObject(imageRef);
+        console.log(`Deleted image: ${imageUrl}`);
+    } catch (error: any) {
+        // It's okay if the file doesn't exist, we can ignore that error.
+        if (error.code !== 'storage/object-not-found') {
+            console.error("Error deleting image from Firebase Storage:", error);
+            // We don't re-throw here to allow other operations to proceed.
         }
     }
 }
@@ -48,24 +36,15 @@ const uploadImages = async (images: File[], artisanId: string): Promise<string[]
     if (!images || images.length === 0) return [];
     
     try {
-        const blobServiceClient = getBlobServiceClient();
-        const containerName = process.env.AZURE_STORAGE_CONTAINER_NAME || 'images';
-        const containerClient = blobServiceClient.getContainerClient(containerName);
-
         const uploadPromises = images.map(async (file) => {
-            const blobName = `${artisanId}-${Date.now()}-${file.name}`;
-            const blockBlobClient = containerClient.getBlockBlobClient(blobName);
-            const buffer = Buffer.from(await file.arrayBuffer());
-            await blockBlobClient.uploadData(buffer, {
-                blobHTTPHeaders: { blobContentType: file.type }
-            });
-            return blockBlobClient.url;
+            const imageRef = ref(storage, `products/${artisanId}/${Date.now()}-${file.name}`);
+            const snapshot = await uploadBytes(imageRef, file);
+            return await getDownloadURL(snapshot.ref);
         });
 
         return await Promise.all(uploadPromises);
-
     } catch (error) {
-        console.error("Error uploading to Azure Blob Storage:", error);
+        console.error("Error uploading to Firebase Storage:", error);
         throw new Error("Failed to upload images.");
     }
 };
@@ -115,7 +94,7 @@ export const updateProduct = async (productId: string, productData: ProductFormD
     
     // 3. Delete the removed images from storage
     if (imagesToDelete.length > 0) {
-        await Promise.all(imagesToDelete.map(url => deleteBlob(url)));
+        await Promise.all(imagesToDelete.map(url => deleteImage(url)));
     }
 
     // 4. Combine existing and new image URLs for the final update
@@ -144,9 +123,9 @@ export const deleteProduct = async (productId: string): Promise<void> => {
 
         const product = productSnap.data() as Product;
         
-        // Delete all associated images from Azure Blob Storage
+        // Delete all associated images from Firebase Storage
         if (product.images && product.images.length > 0) {
-            const deletePromises = product.images.map(url => deleteBlob(url));
+            const deletePromises = product.images.map(url => deleteImage(url));
             await Promise.all(deletePromises);
         }
 
@@ -162,7 +141,7 @@ export const deleteProduct = async (productId: string): Promise<void> => {
 
 export const getProducts = async (): Promise<Product[]> => {
     try {
-        const q = query(collection(db, 'products'));
+        const q = query(collection(db, 'products'), orderBy('createdAt', 'desc'));
         const querySnapshot = await getDocs(q);
         const products = querySnapshot.docs.map(doc => {
             const data = doc.data();
@@ -265,11 +244,11 @@ export const updateArtisanProfile = async (artisanId: string, data: Partial<Omit
     if (newImageFile) {
         const urls = await uploadImages([newImageFile], artisanId);
         if(urls.length > 0) {
-            imageUrl = urls[0];
-            // If there was an old image and it wasn't a placeholder, delete it
-            if(docSnap.exists() && docSnap.data().profileImage && !docSnap.data().profileImage.includes('placehold.co')) {
-                await deleteBlob(docSnap.data().profileImage);
+            // Delete the old image before setting the new one
+            if(imageUrl) {
+                await deleteImage(imageUrl);
             }
+            imageUrl = urls[0];
         }
     }
     
@@ -397,17 +376,6 @@ export const seedDatabase = async (): Promise<void> => {
 
     console.log("Database needs seeding, proceeding...");
     const batch = writeBatch(db);
-
-    // First, immediately write the English translations to ensure fallback is available.
-    try {
-      console.log("Writing critical 'en' translations first...");
-      await setDoc(enTransRef, i18nSeed.en);
-      console.log("'en' translations committed.");
-    } catch (error) {
-      console.error("CRITICAL: Failed to write 'en' translations.", error);
-      // If this fails, the app can't start, so we throw.
-      throw new Error("Could not seed essential English translations.");
-    }
     
     // Seed Artisans and Products
     const artisanIdMap = new Map<string, string>();
@@ -427,22 +395,19 @@ export const seedDatabase = async (): Promise<void> => {
         }
     }
     
-    // Seed the rest of the translations
+    // Seed the translations
     for (const lang of languages) {
         const langCode = lang.code;
-        // Skip 'en' since we already wrote it.
-        if (langCode === 'en') continue;
-
         const transRef = doc(db, 'translations', langCode);
-        // @ts-ignore
-        const translationsToSeed = i18nSeed[langCode as keyof typeof i18nSeed] || i18nSeed.en;
+        const translationsToSeed = (i18nSeed as any)[langCode] || i18nSeed.en;
         batch.set(transRef, translationsToSeed);
     }
     
     try {
         await batch.commit();
-        console.log("Database seeding complete for all other data!");
+        console.log("Database seeding complete for all data!");
     } catch (error) {
-        console.error("Error committing the rest of the seed data: ", error);
+        console.error("Error committing the seed data: ", error);
+        throw new Error("Failed to seed database.");
     }
 };
