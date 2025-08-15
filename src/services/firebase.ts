@@ -11,7 +11,7 @@ import { getLogisticsAdvice as getLogisticsAdviceFlow } from "@/ai/flows/logisti
 import { products as seedProducts, artisans as seedArtisans } from "@/lib/data";
 
 // Defines the shape of the data coming from the form, excluding fields that are handled separately.
-type ProductInsertData = Omit<Product, 'id' | 'images' | 'artisanId'>;
+type ProductInsertData = Omit<Product, 'id' | 'images' | 'artisanId' | 'createdAt'>;
 
 const getBlobServiceClient = () => {
     const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
@@ -265,3 +265,6 @@ export const seedDatabase = async (): Promise<void> => {
         console.log("Database already contains data, skipping seed.");
     }
 };
+
+
+    
