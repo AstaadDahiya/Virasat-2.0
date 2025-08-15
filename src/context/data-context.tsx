@@ -21,7 +21,7 @@ const DataContext = createContext<DataContextType | undefined>(undefined);
 
 export const DataProvider = ({ children }: { children: ReactNode }) => {
   const { user } = useAuth();
-  const { loading: languageLoading } = useLanguage();
+  const { language, loading: languageLoading } = useLanguage(); // Depend on language
   const [products, setProducts] = useState<Product[]>([]);
   const [artisans, setArtisans] = useState<Artisan[]>([]);
   const [shipments, setShipments] = useState<Shipment[]>([]);
@@ -84,6 +84,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         const cachedArtisans = localStorage.getItem('artisans');
         const cachedShipments = localStorage.getItem('shipments');
         
+        // Use cached data for initial fast render, then fetch fresh data.
         if (cachedProducts && cachedArtisans) {
           setProducts(JSON.parse(cachedProducts));
           setArtisans(JSON.parse(cachedArtisans));
@@ -105,7 +106,8 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     };
     
     loadInitialData();
-  }, [languageLoading, fetchData]);
+    // Re-fetch all data whenever the language changes.
+  }, [languageLoading, language, fetchData]);
 
   const refreshData = useCallback(async () => {
     await fetchData(false);

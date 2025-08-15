@@ -49,50 +49,64 @@ const translationManager = new TranslationManager(db);
 const languageDetector = new LanguageDetector();
 
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
-  const [language, setLanguage] = useState<LanguageCode>('en');
+  const [language, setLanguageState] = useState<LanguageCode>('en');
   const [translations, setTranslations] = useState<{ [key: string]: any }>({});
   const [loading, setLoading] = useState(true);
 
-  const switchLanguage = useCallback(async (langCode: LanguageCode) => {
+  const setLanguage = useCallback(async (langCode: LanguageCode) => {
+    if (loading || langCode === language) {
+        return;
+    }
     setLoading(true);
     try {
       const newTranslations = await translationManager.loadTranslations(langCode);
       localStorage.setItem('language', langCode);
-      setLanguage(langCode);
+      setLanguageState(langCode);
       setTranslations(newTranslations);
+      console.log(`Language successfully switched to ${langCode}`);
     } catch (error) {
       console.error(`Failed to switch language to ${langCode}`, error);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [loading, language]);
 
   useEffect(() => {
     const initLanguage = async () => {
       console.log("LanguageProvider: Initializing language system...");
       
-      // Ensure translations are seeded before proceeding.
+      // This function now guarantees that the 'en' document exists before returning.
       await seedDatabase();
 
       let initialLang: LanguageCode = 'en';
       let detectionSource = 'default';
 
-      const savedLang = localStorage.getItem('language');
-      if (savedLang && languageDetector.isLanguageSupported(savedLang)) {
-        initialLang = savedLang as LanguageCode;
-        detectionSource = 'saved_preference';
-      } else {
-        const { language: detectedLang, source } = await languageDetector.detectOptimalLanguage();
-        initialLang = detectedLang as LanguageCode;
-        detectionSource = source;
+      try {
+        const savedLang = localStorage.getItem('language');
+        if (savedLang && languageDetector.isLanguageSupported(savedLang)) {
+          initialLang = savedLang as LanguageCode;
+          detectionSource = 'saved_preference';
+        } else {
+          const { language: detectedLang, source } = await languageDetector.detectOptimalLanguage();
+          initialLang = detectedLang as LanguageCode;
+          detectionSource = source;
+        }
+      } catch (e) {
+          console.error("Error during language detection, falling back to 'en'", e)
+          initialLang = 'en';
+          detectionSource = 'error_fallback';
       }
       
       console.log(`LanguageProvider: Setting initial language to ${initialLang} (source: ${detectionSource})`);
-      await switchLanguage(initialLang);
+      const initialTranslations = await translationManager.loadTranslations(initialLang);
+      
+      setLanguageState(initialLang);
+      setTranslations(initialTranslations);
+      setLoading(false);
     };
 
     initLanguage();
-  }, [switchLanguage]);
+  }, []);
   
   useEffect(() => {
     const rtlLanguages = ['ur', 'sd', 'ks'];
@@ -122,7 +136,7 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     return translatedText;
   }, [translations]);
   
-  const value = useMemo(() => ({ language, setLanguage: switchLanguage, t, loading, translations }), [language, switchLanguage, t, loading, translations]);
+  const value = useMemo(() => ({ language, setLanguage, t, loading, translations }), [language, setLanguage, t, loading, translations]);
 
   return (
     <LanguageContext.Provider value={value}>
