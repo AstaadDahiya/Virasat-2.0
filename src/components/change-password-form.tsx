@@ -18,7 +18,6 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/context/auth-context";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
-import { useLanguage } from "@/context/language-context";
 import { DialogFooter } from "./ui/dialog";
 
 const formSchema = z.object({
@@ -32,7 +31,6 @@ const formSchema = z.object({
 export function ChangePasswordForm() {
   const { toast } = useToast();
   const { updatePassword } = useAuth();
-  const { t } = useLanguage();
   const [loading, setLoading] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -48,13 +46,13 @@ export function ChangePasswordForm() {
     try {
       await updatePassword(values.password);
       toast({
-        title: t('toasts.profileUpdated'),
+        title: "Password updated successfully!",
       });
       form.reset();
     } catch (err: any) {
       toast({
         variant: "destructive",
-        title: t('toasts.errorTitle'),
+        title: "Error",
         description: err.message,
       });
     } finally {
@@ -71,7 +69,7 @@ export function ChangePasswordForm() {
                 name="password"
                 render={({ field }) => (
                 <FormItem>
-                    <FormLabel>{t('dashboard.settings.updatePassword')}</FormLabel>
+                    <FormLabel>New Password</FormLabel>
                     <FormControl>
                     <Input type="password" {...field} />
                     </FormControl>
@@ -84,7 +82,7 @@ export function ChangePasswordForm() {
                 name="confirmPassword"
                 render={({ field }) => (
                 <FormItem>
-                    <FormLabel>{t('dashboard.settings.confirmNewPasswordLabel')}</FormLabel>
+                    <FormLabel>Confirm New Password</FormLabel>
                     <FormControl>
                     <Input type="password" {...field} />
                     </FormControl>
@@ -96,7 +94,7 @@ export function ChangePasswordForm() {
         <DialogFooter>
           <Button type="submit" disabled={loading}>
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {loading ? t('dashboard.settings.updatingProfile') : t('dashboard.settings.updatePassword')}
+            {loading ? "Updating..." : "Update Password"}
           </Button>
         </DialogFooter>
       </form>

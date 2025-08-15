@@ -4,7 +4,6 @@
 import { SettingsForm } from "@/components/settings-form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Cog, Bell, KeyRound } from "lucide-react";
-import { useLanguage } from "@/context/language-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,7 +13,6 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { ChangePasswordForm } from "@/components/change-password-form";
 
 export default function SettingsPage() {
-    const { t } = useLanguage();
     const { user } = useAuth();
     return (
         <div className="space-y-8 max-w-4xl mx-auto">
@@ -23,15 +21,15 @@ export default function SettingsPage() {
                     <Cog className="h-6 w-6 text-primary" />
                 </div>
                 <div>
-                    <h1 className="text-3xl font-bold font-headline">{t('dashboard.settings.title')}</h1>
-                    <p className="text-muted-foreground">{t('dashboard.settings.subtitle')}</p>
+                    <h1 className="text-3xl font-bold font-headline">Settings</h1>
+                    <p className="text-muted-foreground">Manage your profile and account settings.</p>
                 </div>
             </div>
             
             <Card>
                 <CardHeader>
-                    <CardTitle>{t('dashboard.settings.artisanProfile')}</CardTitle>
-                    <CardDescription>{t('dashboard.settings.profileDescription')}</CardDescription>
+                    <CardTitle>Artisan Profile</CardTitle>
+                    <CardDescription>Update your public-facing artisan information.</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <SettingsForm />

@@ -3,12 +3,10 @@
 
 import { EditProductForm } from "@/components/edit-product-form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useLanguage } from "@/context/language-context";
 import { Edit } from "lucide-react";
 import { useParams } from "next/navigation";
 
 export default function EditProductPage() {
-    const { t } = useLanguage();
     const params = useParams();
     const id = Array.isArray(params.id) ? params.id[0] : params.id;
 
@@ -19,15 +17,15 @@ export default function EditProductPage() {
                     <Edit className="h-6 w-6 text-primary" />
                 </div>
                 <div>
-                    <h1 className="text-3xl font-bold font-headline">{t('common.edit')} {t('dashboard.aiTools.logisticsHub.product')}</h1>
-                    <p className="text-muted-foreground">{t('dashboard.myProducts.editProductSubtitle')}</p>
+                    <h1 className="text-3xl font-bold font-headline">Edit Product</h1>
+                    <p className="text-muted-foreground">Make changes to your existing product.</p>
                 </div>
             </div>
             
             <Card>
                 <CardHeader>
-                    <CardTitle>{t('dashboard.myProducts.productDetails')}</CardTitle>
-                    <CardDescription>{t('dashboard.myProducts.detailsDescription')}</CardDescription>
+                    <CardTitle>Product Details</CardTitle>
+                    <CardDescription>Provide the necessary information for your product.</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <EditProductForm productId={id} />

@@ -4,12 +4,10 @@
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { ProductFilters } from "@/components/product-filters";
-import { useLanguage } from "@/context/language-context";
 import { useData } from "@/context/data-context";
 import { Loader2 } from "lucide-react";
 
 export default function ProductsPage() {
-  const { t } = useLanguage();
   const { products, loading } = useData();
 
   return (
@@ -18,9 +16,9 @@ export default function ProductsPage() {
       <main className="flex-1">
         <div className="container mx-auto px-4 py-12">
           <div className="text-center mb-12">
-            <h1 className="font-headline text-4xl md:text-5xl font-bold">{t('product.ourCollection')}</h1>
+            <h1 className="font-headline text-4xl md:text-5xl font-bold">Our Collection</h1>
             <p className="text-muted-foreground mt-2 max-w-2xl mx-auto">
-              {t('product.collectionDescription')}
+              Explore a curated selection of handcrafted goods, each with a unique story and soul.
             </p>
           </div>
           {loading ? (

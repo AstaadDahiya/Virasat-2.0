@@ -4,12 +4,10 @@
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { ArtisanCard } from "@/components/artisan-card";
-import { useLanguage } from "@/context/language-context";
 import { useData } from "@/context/data-context";
 import { Loader2 } from "lucide-react";
 
 export default function ArtisansPage() {
-  const { t } = useLanguage();
   const { artisans, loading } = useData();
 
   return (
@@ -18,9 +16,9 @@ export default function ArtisansPage() {
       <main className="flex-1">
         <div className="container mx-auto px-4 py-12">
           <div className="text-center mb-12">
-            <h1 className="font-headline text-4xl md:text-5xl font-bold">{t('Meet Our Artisans')}</h1>
+            <h1 className="font-headline text-4xl md:text-5xl font-bold">Meet Our Artisans</h1>
             <p className="text-muted-foreground mt-2 max-w-2xl mx-auto">
-              {t('The heart and soul of Virasat. Discover the stories and crafts of the talented individuals behind our products.')}
+              The heart and soul of Virasat. Discover the stories and crafts of the talented individuals behind our products.
             </p>
           </div>
           {loading ? (

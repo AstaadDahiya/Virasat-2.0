@@ -9,28 +9,19 @@ import { Button } from "@/components/ui/button";
 import { Menu, Search, Globe, ShoppingCart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Logo } from "./logo";
-import { useLanguage, languages } from "@/context/language-context";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { ThemeToggle } from "./theme-toggle";
 import { useCart } from "@/context/cart-context";
 import { useState } from "react";
 import { CartDrawer } from "./cart-drawer";
-import { ScrollArea } from "./ui/scroll-area";
 
 const navLinks = [
-  { href: "/", label: "nav.home" },
-  { href: "/products", label: "nav.products" },
-  { href: "/artisans", label: "nav.artisans" },
+  { href: "/", label: "Home" },
+  { href: "/products", label: "Products" },
+  { href: "/artisans", label: "Artisans" },
 ];
 
 export function SiteHeader() {
   const pathname = usePathname();
-  const { t, setLanguage, language } = useLanguage();
   const { cartCount } = useCart();
   const [isCartOpen, setIsCartOpen] = useState(false);
 
@@ -52,7 +43,7 @@ export function SiteHeader() {
                   pathname === link.href ? "text-foreground" : "text-foreground/60"
                 )}
               >
-                {t(link.label as any)}
+                {link.label}
               </Link>
             ))}
           </nav>
@@ -60,44 +51,27 @@ export function SiteHeader() {
 
         <div className="flex flex-1 items-center justify-end space-x-1">
            <ThemeToggle />
-           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <Globe className="h-5 w-5" />
-                <span className="sr-only">{t('nav.changeLanguage')}</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <ScrollArea className="h-72">
-                {languages.map((lang) => (
-                    <DropdownMenuItem key={lang.code} onClick={() => setLanguage(lang.code)} disabled={language === lang.code}>
-                        {lang.name}
-                    </DropdownMenuItem>
-                ))}
-              </ScrollArea>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <Button variant="ghost" size="icon" asChild>
+           <Button variant="ghost" size="icon" asChild>
              <Link href="/products/search">
                 <Search />
-                <span className="sr-only">{t('common.search')}</span>
+                <span className="sr-only">Search</span>
              </Link>
           </Button>
           <Button variant="ghost" size="icon" className="relative" onClick={() => setIsCartOpen(true)}>
              <ShoppingCart />
-             <span className="sr-only">{t('nav.shoppingCart')}</span>
+             <span className="sr-only">Shopping Cart</span>
              {cartCount > 0 && (
                 <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">{cartCount}</span>
              )}
           </Button>
           <Button asChild>
-            <Link href="/dashboard">{t('nav.artisanDashboard')}</Link>
+            <Link href="/dashboard">Artisan Dashboard</Link>
           </Button>
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="md:hidden">
                 <Menu />
-                <span className="sr-only">{t('nav.toggleMenu')}</span>
+                <span className="sr-only">Toggle Menu</span>
               </Button>
             </SheetTrigger>
             <SheetContent side="left">
@@ -115,7 +89,7 @@ export function SiteHeader() {
                       pathname === link.href ? "text-foreground font-semibold" : "text-foreground/60"
                     )}
                   >
-                    {t(link.label as any)}
+                    {link.label}
                   </Link>
                 ))}
               </nav>

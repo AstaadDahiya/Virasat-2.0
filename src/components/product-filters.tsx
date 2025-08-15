@@ -8,7 +8,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Slider } from '@/components/ui/slider';
 import { ProductCard } from './product-card';
 import { Search } from 'lucide-react';
-import { useLanguage } from '@/context/language-context';
 import { useData } from '@/context/data-context';
 
 interface ProductFiltersProps {
@@ -16,7 +15,6 @@ interface ProductFiltersProps {
 }
 
 export function ProductFilters({ products }: ProductFiltersProps) {
-  const { t, language } = useLanguage();
   const { artisans } = useData();
   const [searchTerm, setSearchTerm] = useState('');
   const [category, setCategory] = useState('all');
@@ -35,22 +33,18 @@ export function ProductFilters({ products }: ProductFiltersProps) {
   }, [products, maxPrice]);
 
   const categories = useMemo(() => {
-    return [...new Set(products.map(p => language === 'hi' ? p.category_hi : p.category))]
-  }, [products, language]);
+    return [...new Set(products.map(p => p.category))]
+  }, [products]);
 
 
   const filteredProducts = useMemo(() => {
     return products.filter(product => {
-      const name = language === 'hi' ? product.name_hi : product.name;
-      const description = language === 'hi' ? product.description_hi : product.description;
-      const productCategory = language === 'hi' ? product.category_hi : product.category;
-
-      const matchesSearch = name.toLowerCase().includes(searchTerm.toLowerCase()) || description.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesCategory = category === 'all' || productCategory === category;
+      const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) || product.description.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory = category === 'all' || product.category === category;
       const matchesPrice = product.price >= priceRange[0] && product.price <= priceRange[1];
       return matchesSearch && matchesCategory && matchesPrice;
     });
-  }, [products, searchTerm, category, priceRange, language]);
+  }, [products, searchTerm, category, priceRange]);
 
   return (
     <div>
@@ -59,7 +53,7 @@ export function ProductFilters({ products }: ProductFiltersProps) {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
           <Input
             type="text"
-            placeholder={t('product.searchPlaceholder')}
+            placeholder={"Search for products..."}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10"
@@ -68,10 +62,10 @@ export function ProductFilters({ products }: ProductFiltersProps) {
         <div>
           <Select value={category} onValueChange={setCategory}>
             <SelectTrigger>
-              <SelectValue placeholder={t('product.selectCategory')} />
+              <SelectValue placeholder={"Select a category"} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">{t('product.allCategories')}</SelectItem>
+              <SelectItem value="all">All Categories</SelectItem>
               {categories.map(cat => (
                 <SelectItem key={cat} value={cat}>{cat}</SelectItem>
               ))}
@@ -80,7 +74,7 @@ export function ProductFilters({ products }: ProductFiltersProps) {
         </div>
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
-            <span>{t('product.priceRange')}</span>
+            <span>Price Range</span>
             <span className="font-medium text-primary">₹{priceRange[0]} - ₹{priceRange[1]}</span>
           </div>
           <Slider
@@ -101,8 +95,8 @@ export function ProductFilters({ products }: ProductFiltersProps) {
         </div>
       ) : (
         <div className="text-center py-16">
-          <h3 className="text-2xl font-headline">{t('product.noProductsFound')}</h3>
-          <p className="text-muted-foreground mt-2">{t('product.adjustFilters')}</p>
+          <h3 className="text-2xl font-headline">No Products Found</h3>
+          <p className="text-muted-foreground mt-2">Try adjusting your search or filters.</p>
         </div>
       )}
     </div>

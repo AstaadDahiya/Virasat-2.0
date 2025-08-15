@@ -16,8 +16,6 @@ import {
 } from 'recharts';
 import { useData } from "@/context/data-context";
 import { useMemo } from "react";
-import { Product } from "@/lib/types";
-import { useLanguage } from "@/context/language-context";
 
 // Helper to group data by a specific time period (e.g., day, week)
 const groupDataByTime = (data: any[], dateKey: string, valueKey: string, unit: 'day' | 'week' | 'month') => {
@@ -62,7 +60,6 @@ const groupDataByTime = (data: any[], dateKey: string, valueKey: string, unit: '
 
 export default function AnalyticsPage() {
   const { shipments, products, loading } = useData();
-  const { t } = useLanguage();
 
   const analyticsData = useMemo(() => {
     if (loading || !shipments || !products) {
@@ -116,7 +113,7 @@ export default function AnalyticsPage() {
            <LineChartIcon className="h-6 w-6 text-primary" />
         </div>
         <div>
-          <h1 className="text-3xl font-bold font-headline">{t('analytics')}</h1>
+          <h1 className="text-3xl font-bold font-headline">Analytics</h1>
           <p className="text-muted-foreground">A detailed look at your shop's performance.</p>
         </div>
       </div>

@@ -34,21 +34,19 @@ import { usePathname } from "next/navigation";
 import { Button } from "./ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Logo } from "./logo";
-import { useLanguage } from "@/context/language-context";
 import { useAuth } from "@/context/auth-context";
 import { ThemeToggle } from "./theme-toggle";
 
 export function DashboardSidebar() {
   const pathname = usePathname();
   const { state } = useSidebar();
-  const { t } = useLanguage();
   const { user, signOut } = useAuth();
 
 
   const mainMenuItems = [
     {
       href: "/dashboard",
-      label: t('dashboard.overview.title'),
+      label: "Dashboard Overview",
       icon: LayoutGrid,
     },
      {
@@ -58,7 +56,7 @@ export function DashboardSidebar() {
     },
     {
       href: "/dashboard/products",
-      label: t('dashboard.myProducts.title'),
+      label: "My Products",
       icon: Box,
     },
     {
@@ -71,32 +69,32 @@ export function DashboardSidebar() {
   const aiToolsItems = [
      {
       href: "/dashboard/tools/description-generator",
-      label: t('dashboard.aiTools.storyteller.title'),
+      label: 'AI Storyteller',
       icon: WandSparkles,
     },
     {
       href: "/dashboard/tools/pricing-optimizer",
-      label: t('dashboard.aiTools.pricingOptimizer.title'),
+      label: "Pricing Optimizer",
       icon: DollarSign,
     },
     {
       href: "/dashboard/tools/marketing-suite",
-      label: t('dashboard.aiTools.marketingSuite.title'),
+      label: 'Marketing Suite',
       icon: Megaphone,
     },
     {
       href: "/dashboard/tools/visual-enhancer",
-      label: t('dashboard.aiTools.visualEnhancer.title'),
+      label: 'Visual Enhancer',
       icon: Camera,
     },
     {
       href: "/dashboard/tools/trend-harmonizer",
-      label: t('dashboard.aiTools.trendHarmonizer.title'),
+      label: 'Trend Harmonizer',
       icon: TrendingUp,
     },
      {
       href: "/dashboard/tools/logistics-hub",
-      label: t('dashboard.aiTools.logisticsHub.title'),
+      label: 'Logistics Hub',
       icon: Ship,
     },
   ];
@@ -140,7 +138,7 @@ export function DashboardSidebar() {
                 ))}
             </SidebarGroup>
             <SidebarGroup>
-                 <SidebarGroupLabel>{t('dashboard.aiTools.title')}</SidebarGroupLabel>
+                 <SidebarGroupLabel>AI Tools</SidebarGroupLabel>
                  {aiToolsItems.map((item) => (
                     <SidebarMenuItem key={item.href}>
                     <SidebarMenuButton
@@ -163,20 +161,20 @@ export function DashboardSidebar() {
         <SidebarMenu>
           <SidebarMenuItem>
             <div className="flex justify-between items-center w-full">
-              <SidebarMenuButton asChild isActive={pathname === '/dashboard/settings'} tooltip={{ children: t('dashboard.settings.title') }} className="flex-grow">
+              <SidebarMenuButton asChild isActive={pathname === '/dashboard/settings'} tooltip={{ children: "Settings" }} className="flex-grow">
                 <Link href="/dashboard/settings">
                   <Cog />
-                  <span>{t('dashboard.settings.title')}</span>
+                  <span>Settings</span>
                 </Link>
               </SidebarMenuButton>
                {state === 'expanded' && <ThemeToggle />}
             </div>
           </SidebarMenuItem>
            <SidebarMenuItem>
-            <SidebarMenuButton asChild tooltip={{ children: t('common.backToSite') }}>
+            <SidebarMenuButton asChild tooltip={{ children: "Back to Site" }}>
               <Link href="/">
                 <Home />
-                <span>{t('common.backToSite')}</span>
+                <span>Back to Site</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

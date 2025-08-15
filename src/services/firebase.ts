@@ -1,5 +1,4 @@
 
-
 "use server";
 
 import { db } from "@/lib/firebase/config";
@@ -8,9 +7,7 @@ import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "fire
 import type { Artisan, Product, ShipmentData, LogisticsInput, LogisticsOutput, ProductFormData, Shipment } from "@/lib/types";
 import type { User } from 'firebase/auth';
 import { getLogisticsAdvice as getLogisticsAdviceFlow } from "@/ai/flows/logistics-advisor";
-import { products as seedProducts, artisans as seedArtisans } from "@/lib/data";
-import { translations as i18nSeed } from "@/lib/i18n";
-import { languages } from "@/context/language-context";
+import { products as seedProductsData, artisans as seedArtisansData } from "@/lib/data";
 
 // Defines the shape of the data coming from the form, excluding fields that are handled separately.
 type ProductInsertData = Omit<Product, 'id' | 'images' | 'artisanId' | 'createdAt'>;
@@ -203,14 +200,10 @@ export const ensureArtisanProfile = async (user: User): Promise<void> => {
         try {
             await setDoc(artisanRef, {
                 name: user.email?.split('@')[0] || 'New Artisan',
-                name_hi: 'नया कारीगर',
                 bio: 'Welcome to Virasat! Please update your bio.',
-                bio_hi: 'विरासत में आपका स्वागत है! कृपया अपनी जीवनी अपडेट करें।',
                 craft: 'Not specified',
-                craft_hi: 'निर्दिष्ट नहीं है',
                 location: 'Not specified',
-                location_hi: 'निर्दिष्ट नहीं है',
-                profileImage: `https://placehold.co/100x100.png`
+                profileImage: `https://placehold.co/100x100.png`,
             });
         } catch (error) {
             console.error('Error creating artisan profile:', error);
@@ -239,7 +232,7 @@ export const updateArtisanProfile = async (artisanId: string, data: Partial<Omit
         }
     }
     
-    const updateData: Partial<Artisan> = { ...data };
+    const updateData: any = { ...data };
     if (imageUrl) {
         updateData.profileImage = imageUrl;
     }
@@ -326,51 +319,34 @@ export const getShipments = async (artisanId: string): Promise<Shipment[]> => {
     }
 }
 
-export const getTranslations = async (lang: string): Promise<{ [key: string]: string }> => {
-    try {
-        const docRef = doc(db, 'translations', lang);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-            return docSnap.data() as { [key: string]: string };
-        } else {
-            console.warn(`No translation document for language: ${lang}, falling back to English.`);
-            const enDocRef = doc(db, 'translations', 'en');
-            const enDocSnap = await getDoc(enDocRef);
-            if(enDocSnap.exists()) {
-                return enDocSnap.data() as { [key: string]: string };
-            }
-            return {};
-        }
-    } catch(e) {
-        console.error("Error getting translations: ", e);
-        throw new Error("Failed to get translations.");
-    }
-};
-
-
 export const seedDatabase = async (): Promise<void> => {
-    console.log("Checking if database needs seeding...");
-    const enTransRef = doc(db, 'translations', 'en');
-    const enTransSnap = await getDoc(enTransRef);
-
-    if (enTransSnap.exists()) {
-        console.log("English translations exist, skipping seed.");
+    const productsCollection = collection(db, 'products');
+    const productsSnapshot = await getDocs(query(productsCollection));
+    
+    if (!productsSnapshot.empty) {
+        console.log("Database already seeded. Skipping.");
         return;
     }
-
+    
     console.log("Database needs seeding, proceeding...");
     const batch = writeBatch(db);
     
-    // Seed Artisans and Products
     const artisanIdMap = new Map<string, string>();
-    for (const artisanData of seedArtisans) {
-        const tempId = `artisan-${seedArtisans.indexOf(artisanData) + 1}`;
+
+    // Remove _hi fields before seeding
+    const artisansToSeed = seedArtisansData.map(({ name_hi, bio_hi, location_hi, craft_hi, ...rest }) => rest);
+    
+    for (const artisanData of artisansToSeed) {
+        const tempId = `artisan-${artisansToSeed.indexOf(artisanData) + 1}`;
         const artisanRef = doc(collection(db, 'artisans'));
         batch.set(artisanRef, artisanData);
         artisanIdMap.set(tempId, artisanRef.id);
     }
+    
+    // Remove _hi fields before seeding
+    const productsToSeed = seedProductsData.map(({ name_hi, description_hi, category_hi, materials_hi, ...rest }) => rest);
 
-    for (const productData of seedProducts) {
+    for (const productData of productsToSeed) {
         const productRef = doc(collection(db, 'products'));
         const finalArtisanId = artisanIdMap.get(productData.artisanId);
         if (finalArtisanId) {
@@ -379,19 +355,9 @@ export const seedDatabase = async (): Promise<void> => {
         }
     }
     
-    // Seed the translations
-    for (const lang of languages) {
-        const langCode = lang.code;
-        const transRef = doc(db, 'translations', langCode);
-        const translationsToSeed = (i18nSeed as any)[langCode] || {};
-        if (Object.keys(translationsToSeed).length > 0) {
-            batch.set(transRef, translationsToSeed);
-        }
-    }
-    
     try {
         await batch.commit();
-        console.log("Database seeding complete for all data!");
+        console.log("Database seeding complete for products and artisans!");
     } catch (error) {
         console.error("Error committing the seed data: ", error);
         throw new Error("Failed to seed database.");

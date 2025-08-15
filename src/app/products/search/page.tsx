@@ -5,11 +5,9 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { ProductSearch } from "@/components/product-search";
 import { Loader2, Search } from "lucide-react";
-import { useLanguage } from "@/context/language-context";
 import { useData } from "@/context/data-context";
 
 export default function ProductsSearchPage() {
-  const { t } = useLanguage();
   const { products, artisans, loading } = useData();
   
   return (
@@ -22,9 +20,9 @@ export default function ProductsSearchPage() {
               <Search className="h-6 w-6 text-primary" />
             </div>
             <div>
-                <h1 className="font-headline text-4xl md:text-5xl font-bold">{t('Product Search')}</h1>
+                <h1 className="font-headline text-4xl md:text-5xl font-bold">Product Search</h1>
                 <p className="text-muted-foreground mt-2 max-w-2xl">
-                    {t("Find exactly what you're looking for. Filter by category, artisan, price, and more.")}
+                    Find exactly what you're looking for. Filter by category, artisan, price, and more.
                 </p>
             </div>
           </div>

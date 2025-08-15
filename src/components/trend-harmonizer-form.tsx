@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -21,7 +22,6 @@ import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { useLanguage } from "@/context/language-context";
 import { useData } from "@/context/data-context";
 
 const formSchema = z.object({
@@ -30,7 +30,6 @@ const formSchema = z.object({
 
 export function TrendHarmonizerForm() {
   const { toast } = useToast();
-  const { t, language } = useLanguage();
   const { products } = useData();
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<HarmonizeTrendsOutput | null>(null);
@@ -45,22 +44,22 @@ export function TrendHarmonizerForm() {
     try {
       const product = products.find(p => p.id === values.productId);
       if (!product) {
-          toast({ variant: "destructive", title: t('toastProductNotFound') });
+          toast({ variant: "destructive", title: "Product not found" });
           setLoading(false);
           return;
       }
 
       const output = await harmonizeTrends({
-          productCategory: language === 'hi' ? product.category_hi : product.category,
-          productDescription: language === 'hi' ? product.description_hi : product.description,
+          productCategory: product.category,
+          productDescription: product.description,
       });
       setResult(output);
     } catch (error) {
       console.error(error);
       toast({
         variant: "destructive",
-        title: t('toastErrorTitle'),
-        description: t('toastTrendAnalysisError'),
+        title: "Error",
+        description: "Could not analyze trends. Please try again.",
       });
     } finally {
       setLoading(false);
@@ -72,16 +71,16 @@ export function TrendHarmonizerForm() {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <FormField control={form.control} name="productId" render={({ field }) => (
-              <FormItem><FormLabel>{t('product')}</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder={t('selectProductToAnalyze')} /></SelectTrigger></FormControl><SelectContent><SelectContent>
+              <FormItem><FormLabel>Product</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Select a product to analyze" /></SelectTrigger></FormControl><SelectContent><SelectContent>
                 {products.map(product => (
-                    <SelectItem key={product.id} value={product.id}>{language === 'hi' ? product.name_hi : product.name}</SelectItem>
+                    <SelectItem key={product.id} value={product.id}>{product.name}</SelectItem>
                 ))}
               </SelectContent></SelectContent></Select><FormMessage /></FormItem>
           )}/>
           
           <Button type="submit" disabled={loading}>
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {loading ? t('analyzing') : t('analyzeTrends')}
+            {loading ? "Analyzing..." : "Analyze Trends"}
           </Button>
         </form>
       </Form>
@@ -103,7 +102,7 @@ export function TrendHarmonizerForm() {
         <div className="pt-6 grid md:grid-cols-2 gap-6">
             <Card>
                 <CardHeader>
-                    <CardTitle>{t('trendAnalysis')}</CardTitle>
+                    <CardTitle>Trend Analysis</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <p className="text-secondary-foreground whitespace-pre-wrap">{result.trendAnalysis}</p>
@@ -111,7 +110,7 @@ export function TrendHarmonizerForm() {
             </Card>
             <Card>
                 <CardHeader>
-                    <CardTitle>{t('actionableSuggestions')}</CardTitle>
+                    <CardTitle>Actionable Suggestions</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <p className="text-secondary-foreground whitespace-pre-wrap">{result.suggestions}</p>

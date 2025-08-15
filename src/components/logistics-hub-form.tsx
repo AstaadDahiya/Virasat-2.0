@@ -24,10 +24,8 @@ import { Loader2, Info, FileText, Bot, PackageCheck, ShieldCheck, ShipWheel, Spa
 import { useToast } from "@/hooks/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { useLanguage } from "@/context/language-context";
 import { useData } from "@/context/data-context";
 import { Separator } from "./ui/separator";
-import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 import { Badge } from "./ui/badge";
 import { useAuth } from "@/context/auth-context";
 
@@ -43,7 +41,6 @@ const formSchema = z.object({
 
 export function LogisticsHubForm() {
   const { toast } = useToast();
-  const { t, language } = useLanguage();
   const { products } = useData();
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
@@ -71,14 +68,14 @@ export function LogisticsHubForm() {
     try {
       const product = products.find(p => p.id === values.productId);
       if (!product) {
-          toast({ variant: "destructive", title: t('toastProductNotFound') });
+          toast({ variant: "destructive", title: "Product not found" });
           setLoading(false);
           return;
       }
       
       const output = await getLogisticsAdvice({
-          productName: language === 'hi' ? product.name_hi : product.name,
-          productMaterial: language === 'hi' ? product.materials_hi.join(', ') : product.materials.join(', '),
+          productName: product.name,
+          productMaterial: product.materials.join(', '),
           packageWeightKg: values.packageWeightKg,
           packageDimensionsCm: {
               length: values.length,
@@ -94,8 +91,8 @@ export function LogisticsHubForm() {
       console.error(error);
       toast({
         variant: "destructive",
-        title: t('toastErrorTitle'),
-        description: t('toastLogisticsError'),
+        title: "Error",
+        description: "Could not get logistics advice",
       });
     } finally {
       setLoading(false);
@@ -141,7 +138,7 @@ export function LogisticsHubForm() {
         console.error(error);
         toast({
             variant: "destructive",
-            title: t('toastErrorTitle'),
+            title: "Error",
             description: error instanceof Error ? error.message : "Could not save shipment.",
         });
     } finally {
@@ -156,39 +153,39 @@ export function LogisticsHubForm() {
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
            <Card>
                 <CardHeader>
-                    <CardTitle className="text-xl">{t('shippingDetails')}</CardTitle>
+                    <CardTitle className="text-xl">Shipping Details</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                          <FormField control={form.control} name="productId" render={({ field }) => (
-                            <FormItem><FormLabel>{t('product')}</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder={t('selectAProduct')} /></SelectTrigger></FormControl><SelectContent><SelectContent>
+                            <FormItem><FormLabel>Product</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Select a product" /></SelectTrigger></FormControl><SelectContent><SelectContent>
                                 {products.map(product => (
-                                    <SelectItem key={product.id} value={product.id}>{language === 'hi' ? product.name_hi : product.name}</SelectItem>
+                                    <SelectItem key={product.id} value={product.id}>{product.name}</SelectItem>
                                 ))}
                             </SelectContent></SelectContent></Select><FormMessage /></FormItem>
                         )}/>
                          <FormField control={form.control} name="destination" render={({ field }) => (
-                            <FormItem><FormLabel>{t('destination')}</FormLabel><FormControl><Input placeholder={t('destinationPlaceholder')} {...field} /></FormControl><FormMessage /></FormItem>
+                            <FormItem><FormLabel>Destination</FormLabel><FormControl><Input placeholder="e.g., Mumbai, India or New York, USA" {...field} /></FormControl><FormMessage /></FormItem>
                         )}/>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                         <FormField control={form.control} name="packageWeightKg" render={({ field }) => (
-                            <FormItem><FormLabel>{t('packageWeight')}</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>
+                            <FormItem><FormLabel>Weight (kg)</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>
                         )}/>
                         <FormField control={form.control} name="declaredValue" render={({ field }) => (
-                            <FormItem><FormLabel>{t('declaredValue')}</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>
+                            <FormItem><FormLabel>Value (₹)</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>
                         )}/>
                         <div className="lg:col-span-2">
-                             <FormLabel>{t('packageDimensions')}</FormLabel>
+                             <FormLabel>Dimensions (cm)</FormLabel>
                              <div className="flex gap-2">
                                 <FormField control={form.control} name="length" render={({ field }) => (
-                                    <FormItem className="flex-1"><FormControl><Input type="number" placeholder={t('length')} {...field} /></FormControl><FormMessage /></FormItem>
+                                    <FormItem className="flex-1"><FormControl><Input type="number" placeholder="L" {...field} /></FormControl><FormMessage /></FormItem>
                                 )}/>
                                  <FormField control={form.control} name="width" render={({ field }) => (
-                                    <FormItem className="flex-1"><FormControl><Input type="number" placeholder={t('width')} {...field} /></FormControl><FormMessage /></FormItem>
+                                    <FormItem className="flex-1"><FormControl><Input type="number" placeholder="W" {...field} /></FormControl><FormMessage /></FormItem>
                                 )}/>
                                  <FormField control={form.control} name="height" render={({ field }) => (
-                                    <FormItem className="flex-1"><FormControl><Input type="number" placeholder={t('height')} {...field} /></FormControl><FormMessage /></FormItem>
+                                    <FormItem className="flex-1"><FormControl><Input type="number" placeholder="H" {...field} /></FormControl><FormMessage /></FormItem>
                                 )}/>
                              </div>
                         </div>
@@ -198,7 +195,7 @@ export function LogisticsHubForm() {
           
           <Button type="submit" disabled={loading} size="lg">
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {loading ? t('gettingAdvice') : t('getAdvice')}
+            {loading ? "Getting advice..." : "Get Advice"}
           </Button>
         </form>
       </Form>
@@ -206,7 +203,7 @@ export function LogisticsHubForm() {
       {loading && (
         <div className="space-y-4 pt-4 text-center">
             <Loader2 className="h-10 w-10 animate-spin mx-auto text-primary" />
-            <p className="text-muted-foreground font-semibold">{t('analyzingMarketData')}</p>
+            <p className="text-muted-foreground font-semibold">Analyzing shipping data...</p>
         </div>
       )}
 
@@ -216,30 +213,30 @@ export function LogisticsHubForm() {
                 <div className="lg:col-span-1">
                     <Card className="sticky top-24">
                         <CardHeader>
-                            <CardTitle className="flex items-center gap-2"><Sparkles className="text-primary"/> {t('aiLogisticsAdvisor')}</CardTitle>
+                            <CardTitle className="flex items-center gap-2"><Sparkles className="text-primary"/> AI Logistics Advisor</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
                            <div className="space-y-1">
-                                <h4 className="font-semibold flex items-center gap-2"><PackageCheck size={16} />{t('packagingAdvice')}</h4>
+                                <h4 className="font-semibold flex items-center gap-2"><PackageCheck size={16} />Packaging Advice</h4>
                                 <p className="text-sm text-muted-foreground">{result.packagingAdvice}</p>
                            </div>
                            <Separator/>
                             <div className="space-y-1">
-                                <h4 className="font-semibold flex items-center gap-2"><ShieldCheck size={16} />{t('riskAndInsuranceAdvice')}</h4>
+                                <h4 className="font-semibold flex items-center gap-2"><ShieldCheck size={16} />Risk & Insurance Advice</h4>
                                 <p className="text-sm text-muted-foreground">{result.riskAndInsuranceAdvice}</p>
                            </div>
                            <Separator/>
                             <div className="space-y-1">
-                                <h4 className="font-semibold flex items-center gap-2"><ShipWheel size={16} />{t('carrierChoiceAdvice')}</h4>
+                                <h4 className="font-semibold flex items-center gap-2"><ShipWheel size={16} />Carrier Choice Advice</h4>
                                 <p className="text-sm text-muted-foreground">{result.carrierChoiceAdvice}</p>
                            </div>
                            {result.customsAdvice && (
                                <>
                                 <Separator/>
                                 <div className="space-y-1">
-                                    <h4 className="font-semibold flex items-center gap-2"><FileText size={16} />{t('customsAdvice')}</h4>
-                                    <p className="text-sm text-muted-foreground"><span className="font-semibold text-foreground">{t('hsCode')}:</span> {result.customsAdvice.hsCode}</p>
-                                    <p className="text-sm text-muted-foreground"><span className="font-semibold text-foreground">{t('declaration')}:</span> {result.customsAdvice.declarationText}</p>
+                                    <h4 className="font-semibold flex items-center gap-2"><FileText size={16} />Customs Advice</h4>
+                                    <p className="text-sm text-muted-foreground"><span className="font-semibold text-foreground">HS Code:</span> {result.customsAdvice.hsCode}</p>
+                                    <p className="text-sm text-muted-foreground"><span className="font-semibold text-foreground">Declaration:</span> {result.customsAdvice.declarationText}</p>
                                 </div>
                                </>
                            )}
@@ -248,7 +245,7 @@ export function LogisticsHubForm() {
                 </div>
 
                 <div className="lg:col-span-2 space-y-4">
-                     <h2 className="text-2xl font-bold font-headline">{t('shippingOptions')}</h2>
+                     <h2 className="text-2xl font-bold font-headline">Shipping Options</h2>
                      {result.shippingOptions.map((option: ShippingRate, index: number) => (
                          <Card key={index}>
                             <CardContent className="p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
@@ -269,7 +266,7 @@ export function LogisticsHubForm() {
                                 </div>
                                 <Button className="w-full md:w-auto" disabled={booking} onClick={() => handleBooking(option)}>
                                     {booking ? <Loader2 className="mr-2 animate-spin"/> :  <Bot className="mr-2"/>}
-                                    {booking ? "Booking..." : t('bookAndGenerateLabel')}
+                                    {booking ? "Booking..." : "Book & Save"}
                                 </Button>
                             </CardContent>
                          </Card>

@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useRef } from "react";
@@ -22,7 +23,6 @@ import { Loader2, Download, Upload, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
 import { Textarea } from "./ui/textarea";
-import { useLanguage } from "@/context/language-context";
 
 const formSchema = z.object({
   productImage: z.any().refine(file => file instanceof File, "Please upload an image."),
@@ -31,7 +31,6 @@ const formSchema = z.object({
 
 export function VisualEnhancerForm() {
   const { toast } = useToast();
-  const { t } = useLanguage();
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<GenerateLifestyleMockupOutput | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
@@ -83,8 +82,8 @@ export function VisualEnhancerForm() {
              console.error(error);
              toast({
                 variant: "destructive",
-                title: t('toastErrorTitle'),
-                description: t('toastMockupError'),
+                title: "Error",
+                description: "Could not generate mockup. Please try again.",
             });
         } finally {
             setLoading(false);
@@ -94,8 +93,8 @@ export function VisualEnhancerForm() {
       console.error(error);
       toast({
         variant: "destructive",
-        title: t('toastErrorTitle'),
-        description: t('toastProcessImageError'),
+        title: "Error",
+        description: "Could not process image. Please try uploading again.",
       });
       setLoading(false);
     }
@@ -121,7 +120,7 @@ export function VisualEnhancerForm() {
             name="productImage"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t('productImage')}</FormLabel>
+                <FormLabel>Product Image</FormLabel>
                 <FormControl>
                     <div>
                         <Input
@@ -137,7 +136,7 @@ export function VisualEnhancerForm() {
                             onClick={() => fileInputRef.current?.click()}
                             disabled={!!preview}
                         >
-                            <Upload className="mr-2" /> {t('uploadImage')}
+                            <Upload className="mr-2" /> Upload Image
                         </Button>
                     </div>
                 </FormControl>
@@ -160,10 +159,10 @@ export function VisualEnhancerForm() {
             name="sceneDescription"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t('sceneDescription')}</FormLabel>
+                <FormLabel>Scene Description</FormLabel>
                 <FormControl>
                   <Textarea
-                    placeholder={t('sceneDescriptionPlaceholder')}
+                    placeholder={"e.g., on a rustic wooden coffee table next to a steaming cup of tea."}
                     className="resize-none"
                     {...field}
                   />
@@ -174,7 +173,7 @@ export function VisualEnhancerForm() {
           />
           <Button type="submit" disabled={loading || !form.formState.isValid}>
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {loading ? t('generating') : t('generateMockup')}
+            {loading ? "Generating..." : "Generate Mockup"}
           </Button>
         </form>
       </Form>
@@ -182,17 +181,17 @@ export function VisualEnhancerForm() {
       {loading && (
         <div className="pt-4 flex flex-col items-center justify-center space-y-4">
             <div className="w-full aspect-square bg-muted rounded-lg animate-pulse"></div>
-            <p className="text-muted-foreground">{t('generatingMockupMessage')}</p>
+            <p className="text-muted-foreground">Generating your mockup, this can take up to 30 seconds...</p>
         </div>
       )}
 
       {result?.mockupImage && (
         <div className="pt-4 space-y-4">
             <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold font-headline">{t('generatedMockup')}</h3>
+                <h3 className="text-lg font-semibold font-headline">Generated Mockup</h3>
                 <Button onClick={handleDownload} variant="outline">
                     <Download className="mr-2" />
-                    {t('download')}
+                    Download
                 </Button>
             </div>
             <div className="p-2 border rounded-md inline-block">

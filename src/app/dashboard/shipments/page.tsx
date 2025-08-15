@@ -1,7 +1,6 @@
 
 "use client";
 
-import { useLanguage } from "@/context/language-context";
 import { useData } from "@/context/data-context";
 import { Loader2, Package } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,7 +11,6 @@ import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 
 export default function ShipmentsPage() {
-  const { t, language } = useLanguage();
   const { shipments, products, loading } = useData();
 
   const getProductById = (id: string) => products.find(p => p.id === id);
@@ -24,8 +22,8 @@ export default function ShipmentsPage() {
           <Package className="h-6 w-6 text-primary" />
         </div>
         <div>
-          <h1 className="text-3xl font-bold font-headline">{t('shipments')}</h1>
-          <p className="text-muted-foreground">{t('shipmentsSubtitle')}</p>
+          <h1 className="text-3xl font-bold font-headline">Shipments</h1>
+          <p className="text-muted-foreground">View and manage all your shipments.</p>
         </div>
       </div>
 
@@ -36,11 +34,11 @@ export default function ShipmentsPage() {
       ) : shipments.length === 0 ? (
         <div className="text-center py-16 border-2 border-dashed rounded-lg">
             <Package className="mx-auto h-12 w-12 text-muted-foreground" />
-            <h3 className="mt-4 text-lg font-medium">{t('noShipments')}</h3>
-            <p className="mt-1 text-sm text-muted-foreground">{t('noShipmentsDescription')}</p>
+            <h3 className="mt-4 text-lg font-medium">No Shipments Yet</h3>
+            <p className="mt-1 text-sm text-muted-foreground">When you book a shipment, it will appear here.</p>
             <Button asChild className="mt-6">
                 <Link href="/dashboard/tools/logistics-hub">
-                    {t('logisticsHubTitle')}
+                    Go to Logistics Hub
                 </Link>
             </Button>
         </div>
@@ -55,14 +53,14 @@ export default function ShipmentsPage() {
                         {product && (
                             <Image 
                                 src={product.images[0]} 
-                                alt={language === 'hi' ? product.name_hi : product.name}
+                                alt={product.name}
                                 width={64}
                                 height={64}
                                 className="rounded-md aspect-square object-cover"
                             />
                         )}
                         <div>
-                             <CardTitle className="text-base line-clamp-2">{product ? (language === 'hi' ? product.name_hi : product.name) : "Product not found"}</CardTitle>
+                             <CardTitle className="text-base line-clamp-2">{product ? product.name : "Product not found"}</CardTitle>
                              <CardDescription>To: {shipment.destination}</CardDescription>
                         </div>
                     </div>

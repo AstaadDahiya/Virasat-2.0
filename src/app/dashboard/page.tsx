@@ -13,7 +13,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useLanguage } from "@/context/language-context";
 import { useData } from "@/context/data-context";
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 
@@ -28,7 +27,6 @@ const chartData = [
 
 
 export default function DashboardPage() {
-  const { t, language } = useLanguage();
   const { products, loading } = useData();
   
   const recentProducts = products.slice(0, 5);
@@ -36,26 +34,26 @@ export default function DashboardPage() {
   const quickStartSteps = [
       {
           step: 1,
-          title: t('dashboard.quickStart.step1Title'),
-          description: t('dashboard.quickStart.step1Description'),
+          title: 'Setup Profile',
+          description: 'Fill in your artisan details and story.',
           href: "/dashboard/settings"
       },
       {
           step: 2,
-          title: t('dashboard.quickStart.step2Title'),
-          description: t('dashboard.quickStart.step2Description'),
+          title: 'Add a Product',
+          description: 'List your first handmade item for sale.',
           href: "/dashboard/products/new"
       },
       {
           step: 3,
-          title: t('dashboard.quickStart.step3Title'),
-          description: t('dashboard.quickStart.step3Description'),
+          title: 'Generate Content',
+          description: 'Use AI to create marketing materials.',
           href: "/dashboard/tools/marketing-suite"
       },
       {
           step: 4,
-          title: t('dashboard.quickStart.step4Title'),
-          description: t('dashboard.quickStart.step4Description'),
+          title: 'Connect Payouts',
+          description: 'Link your bank account to get paid.',
           href: "/dashboard/settings"
       }
   ]
@@ -63,13 +61,13 @@ export default function DashboardPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold font-headline">{t('dashboard.overview.title')}</h1>
-        <p className="text-muted-foreground">{t('dashboard.overview.subtitle')}</p>
+        <h1 className="text-3xl font-bold font-headline">Dashboard Overview</h1>
+        <p className="text-muted-foreground">Welcome back! Here's a snapshot of your shop's activity.</p>
       </div>
       
        <div>
-        <h2 className="text-2xl font-bold font-headline">{t('dashboard.quickStart.title')}</h2>
-        <p className="text-muted-foreground mb-4">{t('dashboard.quickStart.subtitle')}</p>
+        <h2 className="text-2xl font-bold font-headline">Quick Start Guide</h2>
+        <p className="text-muted-foreground mb-4">Follow these steps to get your shop up and running.</p>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {quickStartSteps.map(step => (
                  <Card key={step.step} className="hover:bg-secondary/50 transition-colors">
@@ -91,11 +89,11 @@ export default function DashboardPage() {
             <CardHeader>
             <div className="flex justify-between items-center">
                 <div>
-                <CardTitle>{t('dashboard.overview.recentProducts')}</CardTitle>
-                <CardDescription>{t('dashboard.overview.recentProductsDescription')}</CardDescription>
+                <CardTitle>Recent Products</CardTitle>
+                <CardDescription>A look at your most recently added items.</CardDescription>
                 </div>
                 <Button asChild variant="outline" size="sm">
-                <Link href="/dashboard/products">{t('common.viewAll')}</Link>
+                <Link href="/dashboard/products">View All</Link>
                 </Button>
             </div>
             </CardHeader>
@@ -108,17 +106,17 @@ export default function DashboardPage() {
                 <Table>
                     <TableHeader>
                     <TableRow>
-                        <TableHead>{t('dashboard.tableHeaders.name')}</TableHead>
-                        <TableHead>{t('dashboard.tableHeaders.category')}</TableHead>
-                        <TableHead className="text-right">{t('dashboard.tableHeaders.price')}</TableHead>
-                        <TableHead className="text-right">{t('dashboard.tableHeaders.stock')}</TableHead>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Category</TableHead>
+                        <TableHead className="text-right">Price</TableHead>
+                        <TableHead className="text-right">Stock</TableHead>
                     </TableRow>
                     </TableHeader>
                     <TableBody>
                     {recentProducts.map((product) => (
                         <TableRow key={product.id}>
-                        <TableCell className="font-medium">{language === 'hi' ? product.name_hi : product.name}</TableCell>
-                        <TableCell>{language === 'hi' ? product.category_hi : product.category}</TableCell>
+                        <TableCell className="font-medium">{product.name}</TableCell>
+                        <TableCell>{product.category}</TableCell>
                         <TableCell className="text-right">₹{product.price.toFixed(2)}</TableCell>
                         <TableCell className="text-right">{product.stock}</TableCell>
                         </TableRow>
@@ -133,8 +131,8 @@ export default function DashboardPage() {
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>{t('dashboard.overview.salesOverTimeTitle')}</CardTitle>
-            <CardDescription>{t('dashboard.overview.salesOverTimeDescription')}</CardDescription>
+            <CardTitle>Sales Over Time</CardTitle>
+            <CardDescription>A summary of your sales for the past 6 months.</CardDescription>
           </CardHeader>
           <CardContent>
              <ResponsiveContainer width="100%" height={300}>
@@ -154,8 +152,8 @@ export default function DashboardPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>{t('dashboard.overview.recentActivityTitle')}</CardTitle>
-            <CardDescription>{t('dashboard.overview.recentActivityDescription')}</CardDescription>
+            <CardTitle>Recent Activity</CardTitle>
+            <CardDescription>Latest sales, reviews, and messages.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-start gap-4">

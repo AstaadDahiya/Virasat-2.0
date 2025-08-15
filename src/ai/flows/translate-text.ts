@@ -46,11 +46,11 @@ const translateTextFlow = ai.defineFlow(
         translationPrompt({ text: textToTranslate, targetLanguage: input.targetLanguage })
       );
       const results = await Promise.all(translationPromises);
-      const translatedTexts = results.map(result => result.text());
+      const translatedTexts = results.map(result => result.text);
       return { translatedText: translatedTexts };
     } else {
-      const { output } = await translationPrompt({ text: input.text, targetLanguage: input.targetLanguage });
-      return { translatedText: output! };
+      const { text } = await translationPrompt({ text: input.text, targetLanguage: input.targetLanguage });
+      return { translatedText: text };
     }
   }
 );

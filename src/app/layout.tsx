@@ -4,7 +4,6 @@ import { Alegreya } from 'next/font/google';
 import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
 import { cn } from "@/lib/utils";
-import { LanguageProvider } from "@/context/language-context";
 import { DataProvider } from "@/context/data-context";
 import { AuthProvider } from "@/context/auth-context";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -32,7 +31,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={cn("min-h-screen bg-background font-body antialiased", alegreya.variable)}>
+      <body className={cn("min-h-screen bg-background font-sans antialiased", alegreya.variable)}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -40,13 +39,11 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <AuthProvider>
-            <LanguageProvider>
               <DataProvider>
                 <CartProvider>
                   {children}
                 </CartProvider>
               </DataProvider>
-            </LanguageProvider>
           </AuthProvider>
           <Toaster />
         </ThemeProvider>

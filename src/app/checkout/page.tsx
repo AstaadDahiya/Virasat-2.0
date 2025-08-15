@@ -9,8 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { useCart } from "@/context/cart-context";
-import { useLanguage } from "@/context/language-context";
-import { CreditCard, Lock, User, Mail, Home as HomeIcon, MapPin, Building, Smartphone } from "lucide-react";
+import { CreditCard, Lock } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
@@ -19,7 +18,6 @@ import { useEffect, useState } from "react";
 
 export default function CheckoutPage() {
     const { cartItems, cartTotal, clearCart } = useCart();
-    const { t, language } = useLanguage();
     const router = useRouter();
     const { toast } = useToast();
     const [isClient, setIsClient] = useState(false);
@@ -160,13 +158,13 @@ export default function CheckoutPage() {
                                             <div className="flex items-center gap-4">
                                                 <Image
                                                     src={item.images[0]}
-                                                    alt={language === 'hi' ? item.name_hi : item.name}
+                                                    alt={item.name}
                                                     width={64}
                                                     height={64}
                                                     className="rounded-md object-cover"
                                                 />
                                                 <div>
-                                                    <p className="font-semibold line-clamp-1">{language === 'hi' ? item.name_hi : item.name}</p>
+                                                    <p className="font-semibold line-clamp-1">{item.name}</p>
                                                     <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
                                                 </div>
                                             </div>
@@ -177,7 +175,7 @@ export default function CheckoutPage() {
                                 <Separator />
                                 <div className="space-y-2">
                                     <div className="flex justify-between">
-                                        <span>{t('subtotal')}</span>
+                                        <span>Subtotal</span>
                                         <span>₹{cartTotal.toFixed(2)}</span>
                                     </div>
                                     <div className="flex justify-between">

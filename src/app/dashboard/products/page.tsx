@@ -21,7 +21,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
-import { useLanguage } from "@/context/language-context";
 import Link from "next/link";
 import { useData } from "@/context/data-context";
 import {
@@ -40,7 +39,6 @@ import { deleteProduct } from "@/services/firebase";
 import { Product } from "@/lib/types";
 
 export default function DashboardProductsPage() {
-  const { t, language } = useLanguage();
   const { products, loading, refreshData } = useData();
   const [isDeleting, setIsDeleting] = useState(false);
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
@@ -60,7 +58,7 @@ export default function DashboardProductsPage() {
       await deleteProduct(productToDelete.id);
       toast({
         title: "Product Deleted",
-        description: `"${language === 'hi' ? productToDelete.name_hi : productToDelete.name}" has been deleted.`,
+        description: `"${productToDelete.name}" has been deleted.`,
       });
       await refreshData();
     } catch (error) {
@@ -82,20 +80,20 @@ export default function DashboardProductsPage() {
     <div className="space-y-8">
        <div className="flex items-center justify-between">
          <div>
-            <h1 className="text-3xl font-bold font-headline">{t('dashboard.myProducts.title')}</h1>
-            <p className="text-muted-foreground">{t('dashboard.myProducts.subtitle')}</p>
+            <h1 className="text-3xl font-bold font-headline">My Products</h1>
+            <p className="text-muted-foreground">Manage all your listed products here.</p>
         </div>
         <Button asChild>
           <Link href="/dashboard/products/new">
-            <PlusCircle className="mr-2 h-4 w-4" /> {t('dashboard.myProducts.addProduct')}
+            <PlusCircle className="mr-2 h-4 w-4" /> Add Product
           </Link>
         </Button>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>{t('dashboard.myProducts.allProducts')}</CardTitle>
-          <CardDescription>{t('dashboard.myProducts.allProductsDescription')}</CardDescription>
+          <CardTitle>All Products</CardTitle>
+          <CardDescription>A list of all products in your shop.</CardDescription>
         </CardHeader>
         <CardContent>
           {loading ? (
@@ -107,14 +105,14 @@ export default function DashboardProductsPage() {
                 <TableHeader>
                 <TableRow>
                     <TableHead className="hidden w-[100px] sm:table-cell">
-                    {t('dashboard.tableHeaders.image')}
+                    Image
                     </TableHead>
-                    <TableHead>{t('dashboard.tableHeaders.name')}</TableHead>
-                    <TableHead>{t('dashboard.tableHeaders.category')}</TableHead>
-                    <TableHead className="hidden md:table-cell text-right">{t('dashboard.tableHeaders.price')}</TableHead>
-                    <TableHead className="hidden md:table-cell text-right">{t('dashboard.tableHeaders.stock')}</TableHead>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Category</TableHead>
+                    <TableHead className="hidden md:table-cell text-right">Price</TableHead>
+                    <TableHead className="hidden md:table-cell text-right">Stock</TableHead>
                     <TableHead>
-                    <span className="sr-only">{t('dashboard.tableHeaders.actions')}</span>
+                    <span className="sr-only">Actions</span>
                     </TableHead>
                 </TableRow>
                 </TableHeader>
@@ -123,7 +121,7 @@ export default function DashboardProductsPage() {
                     <TableRow key={product.id}>
                     <TableCell className="hidden sm:table-cell">
                         <Image
-                        alt={language === 'hi' ? product.name_hi : product.name}
+                        alt={product.name}
                         className="aspect-square rounded-md object-cover"
                         height="64"
                         src={product.images[0]}
@@ -131,9 +129,9 @@ export default function DashboardProductsPage() {
                         data-ai-hint="product image"
                         />
                     </TableCell>
-                    <TableCell className="font-medium">{language === 'hi' ? product.name_hi : product.name}</TableCell>
+                    <TableCell className="font-medium">{product.name}</TableCell>
                     <TableCell>
-                        <Badge variant="outline">{language === 'hi' ? product.category_hi : product.category}</Badge>
+                        <Badge variant="outline">{product.category}</Badge>
                     </TableCell>
                     <TableCell className="hidden md:table-cell text-right">₹{product.price.toFixed(2)}</TableCell>
                     <TableCell className="hidden md:table-cell text-right">{product.stock}</TableCell>
@@ -146,16 +144,16 @@ export default function DashboardProductsPage() {
                             variant="ghost"
                             >
                             <MoreHorizontal className="h-4 w-4" />
-                            <span className="sr-only">{t('nav.toggleMenu')}</span>
+                            <span className="sr-only">Toggle Menu</span>
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>{t('dashboard.tableHeaders.actions')}</DropdownMenuLabel>
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
                              <DropdownMenuItem asChild>
-                                <Link href={`/dashboard/products/edit/${product.id}`}>{t('common.edit')}</Link>
+                                <Link href={`/dashboard/products/edit/${product.id}`}>Edit</Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem className="text-destructive" onClick={() => handleDeleteClick(product)}>
-                                {t('common.delete')}
+                                Delete
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                         </DropdownMenu>
@@ -174,7 +172,7 @@ export default function DashboardProductsPage() {
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
             <AlertDialogDescription>
                 This action cannot be undone. This will permanently delete the
-                product "{productToDelete && (language === 'hi' ? productToDelete.name_hi : productToDelete.name)}"
+                product "{productToDelete && productToDelete.name}"
                 and all of its data from our servers.
             </AlertDialogDescription>
             </AlertDialogHeader>

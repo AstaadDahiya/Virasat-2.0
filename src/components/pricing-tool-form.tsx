@@ -22,7 +22,6 @@ import {
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
-import { useLanguage } from "@/context/language-context";
 
 const formSchema = z.object({
   productName: z.string().min(3, { message: "Product name is required." }),
@@ -35,7 +34,6 @@ const formSchema = z.object({
 
 export function PricingToolForm() {
   const { toast } = useToast();
-  const { t } = useLanguage();
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<SuggestOptimalPricingOutput | null>(null);
 
@@ -58,8 +56,8 @@ export function PricingToolForm() {
       console.error(error);
       toast({
         variant: "destructive",
-        title: t('toasts.errorTitle'),
-        description: t('dashboard.aiTools.pricingOptimizer.toastPriceSuggestionError'),
+        title: "Error",
+        description: "Could not get price suggestion.",
       });
     } finally {
       setLoading(false);
@@ -75,8 +73,8 @@ export function PricingToolForm() {
             name="productName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t('dashboard.aiTools.pricingOptimizer.productName')}</FormLabel>
-                <FormControl><Input placeholder={t('dashboard.aiTools.pricingOptimizer.productNamePlaceholder')} {...field} /></FormControl>
+                <FormLabel>Product Name</FormLabel>
+                <FormControl><Input placeholder="e.g., Hand-Painted Blue Pottery Vase" {...field} /></FormControl>
                 <FormMessage />
               </FormItem>
             )}
@@ -87,7 +85,7 @@ export function PricingToolForm() {
                 name="materialsCost"
                 render={({ field }) => (
                 <FormItem>
-                    <FormLabel>{t('dashboard.aiTools.pricingOptimizer.materialsCostLabel')}</FormLabel>
+                    <FormLabel>Materials Cost (INR)</FormLabel>
                     <FormControl><Input type="number" placeholder="500" {...field} /></FormControl>
                     <FormMessage />
                 </FormItem>
@@ -98,7 +96,7 @@ export function PricingToolForm() {
                 name="laborCost"
                 render={({ field }) => (
                 <FormItem>
-                    <FormLabel>{t('dashboard.aiTools.pricingOptimizer.laborCostLabel')}</FormLabel>
+                    <FormLabel>Labor Cost (INR)</FormLabel>
                     <FormControl><Input type="number" placeholder="1200" {...field} /></FormControl>
                     <FormMessage />
                 </FormItem>
@@ -108,17 +106,17 @@ export function PricingToolForm() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <FormField control={form.control} name="marketDemand" render={({ field }) => (
                 <FormItem>
-                    <FormLabel>{t('dashboard.aiTools.pricingOptimizer.marketDemandLabel')}</FormLabel>
+                    <FormLabel>Market Demand</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                             <SelectTrigger>
-                                <SelectValue placeholder={t('dashboard.aiTools.pricingOptimizer.selectDemand')} />
+                                <SelectValue placeholder="Select demand" />
                             </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                            <SelectItem value="low">{t('dashboard.aiTools.pricingOptimizer.demandLow')}</SelectItem>
-                            <SelectItem value="medium">{t('dashboard.aiTools.pricingOptimizer.demandMedium')}</SelectItem>
-                            <SelectItem value="high">{t('dashboard.aiTools.pricingOptimizer.demandHigh')}</SelectItem>
+                            <SelectItem value="low">Low</SelectItem>
+                            <SelectItem value="medium">Medium</SelectItem>
+                            <SelectItem value="high">High</SelectItem>
                         </SelectContent>
                     </Select>
                     <FormMessage />
@@ -126,17 +124,17 @@ export function PricingToolForm() {
             )}/>
             <FormField control={form.control} name="artisanSkillLevel" render={({ field }) => (
                 <FormItem>
-                    <FormLabel>{t('dashboard.aiTools.pricingOptimizer.artisanSkillLabel')}</FormLabel>
+                    <FormLabel>Artisan Skill Level</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                             <SelectTrigger>
-                                <SelectValue placeholder={t('dashboard.aiTools.pricingOptimizer.selectSkillLevel')} />
+                                <SelectValue placeholder="Select skill level" />
                             </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                            <SelectItem value="beginner">{t('dashboard.aiTools.pricingOptimizer.skillBeginner')}</SelectItem>
-                            <SelectItem value="intermediate">{t('dashboard.aiTools.pricingOptimizer.skillIntermediate')}</SelectItem>
-                            <SelectItem value="expert">{t('dashboard.aiTools.pricingOptimizer.skillExpert')}</SelectItem>
+                            <SelectItem value="beginner">Beginner</SelectItem>
+                            <SelectItem value="intermediate">Intermediate</SelectItem>
+                            <SelectItem value="expert">Expert</SelectItem>
                         </SelectContent>
                     </Select>
                     <FormMessage />
@@ -144,17 +142,17 @@ export function PricingToolForm() {
             )}/>
             <FormField control={form.control} name="productQuality" render={({ field }) => (
                 <FormItem>
-                    <FormLabel>{t('dashboard.aiTools.pricingOptimizer.productQualityLabel')}</FormLabel>
+                    <FormLabel>Product Quality</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                             <SelectTrigger>
-                                <SelectValue placeholder={t('dashboard.aiTools.pricingOptimizer.selectQuality')} />
+                                <SelectValue placeholder="Select quality" />
                             </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                            <SelectItem value="standard">{t('dashboard.aiTools.pricingOptimizer.qualityStandard')}</SelectItem>
-                            <SelectItem value="high">{t('dashboard.aiTools.pricingOptimizer.qualityHigh')}</SelectItem>
-                            <SelectItem value="premium">{t('dashboard.aiTools.pricingOptimizer.qualityPremium')}</SelectItem>
+                            <SelectItem value="standard">Standard</SelectItem>
+                            <SelectItem value="high">High</SelectItem>
+                            <SelectItem value="premium">Premium</SelectItem>
                         </SelectContent>
                     </Select>
                     <FormMessage />
@@ -163,7 +161,7 @@ export function PricingToolForm() {
           </div>
           <Button type="submit" disabled={loading}>
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {loading ? t('dashboard.aiTools.pricingOptimizer.optimizing') : t('dashboard.aiTools.pricingOptimizer.suggestPrice')}
+            {loading ? "Optimizing..." : "Suggest Price"}
           </Button>
         </form>
       </Form>
@@ -171,7 +169,7 @@ export function PricingToolForm() {
       {loading && (
         <div className="space-y-4 pt-4 text-center">
             <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
-            <p className="text-muted-foreground">{t('dashboard.aiTools.pricingOptimizer.analyzingMarketData')}</p>
+            <p className="text-muted-foreground">Analyzing market data...</p>
         </div>
       )}
 
@@ -179,11 +177,11 @@ export function PricingToolForm() {
         <div className="pt-6">
           <div className="grid md:grid-cols-2 gap-6">
             <div className="text-center bg-primary text-primary-foreground p-6 rounded-lg">
-                <h3 className="text-lg font-semibold font-headline mb-2">{t('dashboard.aiTools.pricingOptimizer.suggestedPrice')}</h3>
+                <h3 className="text-lg font-semibold font-headline mb-2">Suggested Price</h3>
                 <p className="text-5xl font-bold">₹{result.suggestedPrice.toFixed(2)}</p>
             </div>
             <div className="p-6 rounded-md bg-secondary">
-                <h3 className="text-lg font-semibold font-headline mb-2">{t('dashboard.aiTools.pricingOptimizer.reasoning')}</h3>
+                <h3 className="text-lg font-semibold font-headline mb-2">AI Reasoning</h3>
                 <p className="text-secondary-foreground leading-relaxed text-sm">{result.reasoning}</p>
             </div>
           </div>

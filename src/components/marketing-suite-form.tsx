@@ -23,7 +23,6 @@ import { Loader2, Copy, Instagram, Facebook, Twitter } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { useLanguage } from "@/context/language-context";
 import { useData } from "@/context/data-context";
 
 const formSchema = z.object({
@@ -39,7 +38,6 @@ const TikTokIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 export function MarketingSuiteForm() {
   const { toast } = useToast();
-  const { t, language } = useLanguage();
   const { products } = useData();
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<GenerateMarketingContentOutput | null>(null);
@@ -57,14 +55,14 @@ export function MarketingSuiteForm() {
     try {
       const product = products.find(p => p.id === values.productId);
       if (!product) {
-          toast({ variant: "destructive", title: t('toastProductNotFound') });
+          toast({ variant: "destructive", title: "Product not found" });
           setLoading(false);
           return;
       }
 
       const output = await generateMarketingContent({
-          productName: language === 'hi' ? product.name_hi : product.name,
-          productDescription: language === 'hi' ? product.description_hi : product.description,
+          productName: product.name,
+          productDescription: product.description,
           targetAudience: values.targetAudience
       });
       setResult(output);
@@ -72,8 +70,8 @@ export function MarketingSuiteForm() {
       console.error(error);
       toast({
         variant: "destructive",
-        title: t('toastErrorTitle'),
-        description: t('toastErrorDescription'),
+        title: "Error",
+        description: "An unknown error occurred. Please try again.",
       });
     } finally {
       setLoading(false);
@@ -83,7 +81,7 @@ export function MarketingSuiteForm() {
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text);
     toast({
-      title: t('toastCopied'),
+      title: "Copied to clipboard!",
     });
   };
 
@@ -99,9 +97,9 @@ export function MarketingSuiteForm() {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <FormField control={form.control} name="productId" render={({ field }) => (
-              <FormItem><FormLabel>{t('product')}</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder={t('selectAProduct')} /></SelectTrigger></FormControl><SelectContent><SelectContent>
+              <FormItem><FormLabel>Product</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Select a product" /></SelectTrigger></FormControl><SelectContent><SelectContent>
                 {products.map(product => (
-                    <SelectItem key={product.id} value={product.id}>{language === 'hi' ? product.name_hi : product.name}</SelectItem>
+                    <SelectItem key={product.id} value={product.id}>{product.name}</SelectItem>
                 ))}
               </SelectContent></SelectContent></Select><FormMessage /></FormItem>
           )}/>
@@ -110,8 +108,8 @@ export function MarketingSuiteForm() {
             name="targetAudience"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t('targetAudience')}</FormLabel>
-                <FormControl><Input placeholder={t('targetAudiencePlaceholder')} {...field} /></FormControl>
+                <FormLabel>Target Audience</FormLabel>
+                <FormControl><Input placeholder="e.g., Young professionals, eco-conscious buyers, tourists" {...field} /></FormControl>
                 <FormMessage />
               </FormItem>
             )}
@@ -119,7 +117,7 @@ export function MarketingSuiteForm() {
 
           <Button type="submit" disabled={loading}>
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {loading ? t('generating') : t('generateContent')}
+            {loading ? "Generating..." : "Generate Content"}
           </Button>
         </form>
       </Form>
@@ -152,7 +150,7 @@ export function MarketingSuiteForm() {
             ))}
             <Card>
                 <CardHeader className="flex flex-row items-center justify-between">
-                    <CardTitle>{t('emailNewsletter')}</CardTitle>
+                    <CardTitle>Email Newsletter</CardTitle>
                     <Button variant="ghost" size="icon" onClick={() => handleCopy(result.emailNewsletter)}><Copy className="h-4 w-4" /></Button>
                 </CardHeader>
                 <CardContent>
@@ -161,7 +159,7 @@ export function MarketingSuiteForm() {
             </Card>
             <Card>
                 <CardHeader className="flex flex-row items-center justify-between">
-                    <CardTitle>{t('adCopy')}</CardTitle>
+                    <CardTitle>Ad Copy</CardTitle>
                      <Button variant="ghost" size="icon" onClick={() => handleCopy(result.adCopy)}><Copy className="h-4 w-4" /></Button>
                 </CardHeader>
                 <CardContent>

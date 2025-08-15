@@ -9,7 +9,6 @@ import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
 import { ProductCard } from './product-card';
 import { SearchIcon } from 'lucide-react';
-import { useLanguage } from '@/context/language-context';
 
 interface ProductSearchProps {
   products: Product[];
@@ -17,7 +16,6 @@ interface ProductSearchProps {
 }
 
 export function ProductSearch({ products, artisans }: ProductSearchProps) {
-  const { t, language } = useLanguage();
   const [searchTerm, setSearchTerm] = useState('');
   const [category, setCategory] = useState('all');
   const [artisan, setArtisan] = useState('all');
@@ -37,29 +35,25 @@ export function ProductSearch({ products, artisans }: ProductSearchProps) {
 
 
   const categories = useMemo(() => {
-    return [...new Set(products.map(p => language === 'hi' ? p.category_hi : p.category))]
-  }, [products, language]);
+    return [...new Set(products.map(p => p.category))]
+  }, [products]);
 
   const artisanNames = useMemo(() => {
-    return [...new Set(artisans.map(a => language === 'hi' ? a.name_hi : a.name))]
-  }, [artisans, language]);
+    return [...new Set(artisans.map(a => a.name))]
+  }, [artisans]);
 
 
   const filteredProducts = useMemo(() => {
     return products.filter(product => {
       const productArtisan = artisans.find(a => a.id === product.artisanId);
-      const name = language === 'hi' ? product.name_hi : product.name;
-      const description = language === 'hi' ? product.description_hi : product.description;
-      const productCategory = language === 'hi' ? product.category_hi : product.category;
-      const artisanName = language === 'hi' ? productArtisan?.name_hi : productArtisan?.name;
 
-      const matchesSearch = name.toLowerCase().includes(searchTerm.toLowerCase()) || description.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesCategory = category === 'all' || productCategory === category;
-      const matchesArtisan = artisan === 'all' || artisanName === artisan;
+      const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) || product.description.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory = category === 'all' || product.category === category;
+      const matchesArtisan = artisan === 'all' || productArtisan?.name === artisan;
       const matchesPrice = product.price >= priceRange[0] && product.price <= priceRange[1];
       return matchesSearch && matchesCategory && matchesArtisan && matchesPrice;
     });
-  }, [products, searchTerm, category, artisan, priceRange, language, artisans]);
+  }, [products, searchTerm, category, artisan, priceRange, artisans]);
 
   return (
     <div>
@@ -68,25 +62,25 @@ export function ProductSearch({ products, artisans }: ProductSearchProps) {
             <div className="relative">
                 <Input
                     type="text"
-                    placeholder={t("Search for products...")}
+                    placeholder={"Search for products..."}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pr-16"
                 />
                  <Button className="absolute right-1 top-1/2 -translate-y-1/2 h-8">
                     <SearchIcon className="h-4 w-4 mr-2"/>
-                    {t('Search')}
+                    Search
                 </Button>
             </div>
         </div>
         <div>
-          <label className="text-sm font-medium mb-2 block">{t('Category')}</label>
+          <label className="text-sm font-medium mb-2 block">Category</label>
           <Select value={category} onValueChange={setCategory}>
             <SelectTrigger>
-              <SelectValue placeholder={t('All Categories')} />
+              <SelectValue placeholder="All Categories" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">{t('All Categories')}</SelectItem>
+              <SelectItem value="all">All Categories</SelectItem>
               {categories.map(cat => (
                 <SelectItem key={cat} value={cat}>{cat}</SelectItem>
               ))}
@@ -94,13 +88,13 @@ export function ProductSearch({ products, artisans }: ProductSearchProps) {
           </Select>
         </div>
         <div>
-           <label className="text-sm font-medium mb-2 block">{t('Artisans')}</label>
+           <label className="text-sm font-medium mb-2 block">Artisan</label>
            <Select value={artisan} onValueChange={setArtisan}>
             <SelectTrigger>
-              <SelectValue placeholder={t('All Artisans')} />
+              <SelectValue placeholder="All Artisans" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">{t('All Artisans')}</SelectItem>
+              <SelectItem value="all">All Artisans</SelectItem>
               {artisanNames.map(name => (
                 <SelectItem key={name} value={name}>{name}</SelectItem>
               ))}
@@ -108,7 +102,7 @@ export function ProductSearch({ products, artisans }: ProductSearchProps) {
           </Select>
         </div>
         <div className="lg:col-span-2">
-          <label className="text-sm font-medium mb-2 block">{t('Price Range')}: <span className="font-semibold text-primary">₹{priceRange[0].toLocaleString()} - ₹{priceRange[1].toLocaleString()}</span></label>
+          <label className="text-sm font-medium mb-2 block">Price Range: <span className="font-semibold text-primary">₹{priceRange[0].toLocaleString()} - ₹{priceRange[1].toLocaleString()}</span></label>
           <Slider
             min={0}
             max={maxPrice}
@@ -128,8 +122,8 @@ export function ProductSearch({ products, artisans }: ProductSearchProps) {
         </div>
       ) : (
         <div className="text-center py-16 border rounded-lg bg-secondary">
-          <h3 className="text-2xl font-headline font-bold">{t('No Products Found')}</h3>
-          <p className="text-muted-foreground mt-2">{t("Try adjusting your search or filters to find what you're looking for.")}</p>
+          <h3 className="text-2xl font-headline font-bold">No Products Found</h3>
+          <p className="text-muted-foreground mt-2">Try adjusting your search or filters to find what you're looking for.</p>
         </div>
       )}
     </div>
