@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/context/language-context";
-import { Loader2, Upload, X, Languages } from "lucide-react";
+import { Loader2, Upload, X } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getProduct, updateProduct } from "@/services/firebase";
@@ -95,31 +95,28 @@ export function EditProductForm({ productId }: EditProductFormProps) {
     fetchProduct();
   }, [productId, form, toast, router]);
 
-  const handleTranslation = async (field: TranslatableField) => {
-    const englishValue = form.getValues(`${field}`);
-    const hindiValue = form.getValues(`${field}_hi`);
+  const handleAutoTranslation = async (field: TranslatableField, sourceLang: 'en' | 'hi') => {
+    const sourceFieldName = sourceLang === 'en' ? field : `${field}_hi`;
+    const targetFieldName = sourceLang === 'en' ? `${field}_hi` : field;
 
-    const toLanguage = englishValue && !hindiValue ? 'Hindi' : 'English';
-    const textToTranslate = toLanguage === 'Hindi' ? englishValue : hindiValue;
-    const targetField = toLanguage === 'Hindi' ? `${field}_hi` : `${field}`;
+    const sourceValue = form.getValues(sourceFieldName as any);
+    const targetValue = form.getValues(targetFieldName as any);
 
-    if (!textToTranslate) {
-      toast({ variant: 'destructive', title: "Nothing to translate", description: "Please enter some text in one of the fields first."});
-      return;
+    if (sourceValue && !targetValue) {
+      const toLanguage = sourceLang === 'en' ? 'Hindi' : 'English';
+      
+      setTranslating(prev => ({ ...prev, [field]: true }));
+      try {
+        const result = await translateText({ text: sourceValue, targetLanguage: toLanguage });
+        form.setValue(targetFieldName as any, result.translatedText, { shouldValidate: true });
+      } catch (error) {
+        console.error("Translation failed", error);
+        toast({ variant: "destructive", title: "Translation failed" });
+      } finally {
+        setTranslating(prev => ({ ...prev, [field]: false }));
+      }
     }
-
-    setTranslating(prev => ({...prev, [field]: true}));
-    try {
-      const result = await translateText({ text: textToTranslate, targetLanguage: toLanguage });
-      form.setValue(targetField as any, result.translatedText, { shouldValidate: true });
-    } catch(error) {
-      console.error("Translation failed", error);
-      toast({ variant: "destructive", title: "Translation failed" });
-    } finally {
-      setTranslating(prev => ({...prev, [field]: false}));
-    }
-  }
-
+  };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
@@ -185,12 +182,6 @@ export function EditProductForm({ productId }: EditProductFormProps) {
     }
   }
 
-  const renderTranslationButton = (field: TranslatableField) => (
-     <Button type="button" size="icon" variant="ghost" onClick={() => handleTranslation(field)} disabled={translating[field]}>
-        {translating[field] ? <Loader2 className="h-4 w-4 animate-spin" /> : <Languages className="h-4 w-4" />}
-     </Button>
-  )
-
   if(dataLoading) {
       return (
           <div className="space-y-6">
@@ -211,44 +202,44 @@ export function EditProductForm({ productId }: EditProductFormProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
             <FormField control={form.control} name="name" render={({ field }) => (
                 <FormItem>
                     <FormLabel>{t('productName')} (English)</FormLabel>
-                    <FormControl><Input placeholder="e.g., Hand-Painted Blue Pottery Vase" {...field} /></FormControl>
+                    <FormControl><Input placeholder="e.g., Hand-Painted Blue Pottery Vase" {...field} onBlur={() => handleAutoTranslation('name', 'en')} /></FormControl>
                     <FormMessage />
                 </FormItem>
             )}/>
-            <div className="flex gap-2">
-                <FormField control={form.control} name="name_hi" render={({ field }) => (
-                    <FormItem className="flex-grow">
-                        <FormLabel>{t('productName')} (हिंदी)</FormLabel>
-                        <FormControl><Input placeholder="उदा., हाथ से पेंट किया हुआ नीला मिट्टी का फूलदान" {...field} /></FormControl>
-                        <FormMessage />
-                    </FormItem>
-                )}/>
-                {renderTranslationButton("name")}
-            </div>
+            <FormField control={form.control} name="name_hi" render={({ field }) => (
+                <FormItem>
+                    <FormLabel className="flex items-center gap-2">
+                        {t('productName')} (हिंदी)
+                        {translating.name && <Loader2 className="h-4 w-4 animate-spin" />}
+                    </FormLabel>
+                    <FormControl><Input placeholder="उदा., हाथ से पेंट किया हुआ नीला मिट्टी का फूलदान" {...field} onBlur={() => handleAutoTranslation('name', 'hi')} /></FormControl>
+                    <FormMessage />
+                </FormItem>
+            )}/>
         </div>
         
-        <div className="space-y-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
             <FormField control={form.control} name="description" render={({ field }) => (
                 <FormItem>
                     <FormLabel>{t('productDescription')} (English)</FormLabel>
-                    <FormControl><Textarea placeholder="Describe your product..." {...field} /></FormControl>
+                    <FormControl><Textarea placeholder="Describe your product..." {...field} onBlur={() => handleAutoTranslation('description', 'en')} /></FormControl>
                     <FormMessage />
                 </FormItem>
             )}/>
-            <div className="flex gap-2 items-end">
-                <FormField control={form.control} name="description_hi" render={({ field }) => (
-                    <FormItem className="flex-grow">
-                        <FormLabel>{t('productDescription')} (हिंदी)</FormLabel>
-                        <FormControl><Textarea placeholder="अपने उत्पाद का वर्णन करें..." {...field} /></FormControl>
-                        <FormMessage />
-                    </FormItem>
-                )}/>
-                {renderTranslationButton("description")}
-            </div>
+            <FormField control={form.control} name="description_hi" render={({ field }) => (
+                <FormItem>
+                    <FormLabel className="flex items-center gap-2">
+                        {t('productDescription')} (हिंदी)
+                        {translating.description && <Loader2 className="h-4 w-4 animate-spin" />}
+                    </FormLabel>
+                    <FormControl><Textarea placeholder="अपने उत्पाद का वर्णन करें..." {...field} onBlur={() => handleAutoTranslation('description', 'hi')} /></FormControl>
+                    <FormMessage />
+                </FormItem>
+            )}/>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -268,46 +259,46 @@ export function EditProductForm({ productId }: EditProductFormProps) {
             )}/>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
             <FormField control={form.control} name="category" render={({ field }) => (
                 <FormItem>
                     <FormLabel>{t('tableHeaderCategory')} (English)</FormLabel>
-                    <FormControl><Input placeholder="e.g., Block-Printing" {...field} /></FormControl>
+                    <FormControl><Input placeholder="e.g., Block-Printing" {...field} onBlur={() => handleAutoTranslation('category', 'en')} /></FormControl>
                     <FormMessage />
                 </FormItem>
             )}/>
-            <div className="flex gap-2">
-                <FormField control={form.control} name="category_hi" render={({ field }) => (
-                    <FormItem className="flex-grow">
-                        <FormLabel>{t('tableHeaderCategory')} (हिंदी)</FormLabel>
-                        <FormControl><Input placeholder="उदा., ब्लॉक-प्रिंटिंग" {...field} /></FormControl>
-                        <FormMessage />
-                    </FormItem>
-                )}/>
-                {renderTranslationButton("category")}
-            </div>
+            <FormField control={form.control} name="category_hi" render={({ field }) => (
+                <FormItem>
+                    <FormLabel className="flex items-center gap-2">
+                        {t('tableHeaderCategory')} (हिंदी)
+                        {translating.category && <Loader2 className="h-4 w-4 animate-spin" />}
+                    </FormLabel>
+                    <FormControl><Input placeholder="उदा., ब्लॉक-प्रिंटिंग" {...field} onBlur={() => handleAutoTranslation('category', 'hi')} /></FormControl>
+                    <FormMessage />
+                </FormItem>
+            )}/>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
             <FormField control={form.control} name="materials" render={({ field }) => (
                 <FormItem>
                     <FormLabel>{t('productMaterials')} (English)</FormLabel>
-                    <FormControl><Input placeholder="Cotton Canvas, Natural Dyes" {...field} /></FormControl>
+                    <FormControl><Input placeholder="Cotton Canvas, Natural Dyes" {...field} onBlur={() => handleAutoTranslation('materials', 'en')} /></FormControl>
                      <p className="text-xs text-muted-foreground">Separate materials with a comma.</p>
                     <FormMessage />
                 </FormItem>
             )}/>
-             <div className="flex gap-2">
-                <FormField control={form.control} name="materials_hi" render={({ field }) => (
-                    <FormItem className="flex-grow">
-                        <FormLabel>{t('productMaterials')} (हिंदी)</FormLabel>
-                        <FormControl><Input placeholder="कॉटन कैनवास, प्राकृतिक रंग" {...field} /></FormControl>
-                        <p className="text-xs text-muted-foreground">सामग्री को अल्पविराम से अलग करें।</p>
-                        <FormMessage />
-                    </FormItem>
-                )}/>
-                {renderTranslationButton("materials")}
-            </div>
+            <FormField control={form.control} name="materials_hi" render={({ field }) => (
+                <FormItem>
+                    <FormLabel className="flex items-center gap-2">
+                        {t('productMaterials')} (हिंदी)
+                        {translating.materials && <Loader2 className="h-4 w-4 animate-spin" />}
+                    </FormLabel>
+                    <FormControl><Input placeholder="कॉटन कैनवास, प्राकृतिक रंग" {...field} onBlur={() => handleAutoTranslation('materials', 'hi')} /></FormControl>
+                    <p className="text-xs text-muted-foreground">सामग्री को अल्पविराम से अलग करें।</p>
+                    <FormMessage />
+                </FormItem>
+            )}/>
         </div>
         
          <FormField
