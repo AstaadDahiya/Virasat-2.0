@@ -36,26 +36,26 @@ export default function DashboardPage() {
   const quickStartSteps = [
       {
           step: 1,
-          title: "Complete Profile",
-          description: "Tell your story and connect with customers.",
+          title: t('quickStartStep1Title'),
+          description: t('quickStartStep1Description'),
           href: "/dashboard/settings"
       },
       {
           step: 2,
-          title: "Add Products",
-          description: "Upload your beautiful creations.",
+          title: t('quickStartStep2Title'),
+          description: t('quickStartStep2Description'),
           href: "/dashboard/products/new"
       },
       {
           step: 3,
-          title: "Market Your Shop",
-          description: "Use AI to create social media buzz.",
+          title: t('quickStartStep3Title'),
+          description: t('quickStartStep3Description'),
           href: "/dashboard/tools/marketing-suite"
       },
       {
           step: 4,
-          title: "Get Paid",
-          description: "Set up your payment details.",
+          title: t('quickStartStep4Title'),
+          description: t('quickStartStep4Description'),
           href: "/dashboard/settings"
       }
   ]
@@ -68,8 +68,8 @@ export default function DashboardPage() {
       </div>
       
        <div>
-        <h2 className="text-2xl font-bold font-headline">Quick Start Guide</h2>
-        <p className="text-muted-foreground mb-4">New to Virasat? Here are some quick steps to get your shop running.</p>
+        <h2 className="text-2xl font-bold font-headline">{t('quickStartGuideTitle')}</h2>
+        <p className="text-muted-foreground mb-4">{t('quickStartGuideSubtitle')}</p>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {quickStartSteps.map(step => (
                  <Card key={step.step} className="hover:bg-secondary/50 transition-colors">
@@ -133,8 +133,8 @@ export default function DashboardPage() {
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Sales Over Time</CardTitle>
-            <CardDescription>A look at your sales performance for the last 6 months.</CardDescription>
+            <CardTitle>{t('salesOverTimeTitle')}</CardTitle>
+            <CardDescription>{t('salesOverTimeDescription')}</CardDescription>
           </CardHeader>
           <CardContent>
              <ResponsiveContainer width="100%" height={300}>
@@ -154,8 +154,8 @@ export default function DashboardPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
-            <CardDescription>Updates on sales, reviews, and messages.</CardDescription>
+            <CardTitle>{t('recentActivityTitle')}</CardTitle>
+            <CardDescription>{t('recentActivityDescription')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-start gap-4">

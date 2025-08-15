@@ -116,6 +116,24 @@ export const translations: LanguageTranslations = {
     tableHeaderPrice: 'Price',
     tableHeaderStock: 'Stock',
 
+    // Dashboard - Quick Start Guide
+    quickStartGuideTitle: 'Quick Start Guide',
+    quickStartGuideSubtitle: 'New to Virasat? Here are some quick steps to get your shop running.',
+    quickStartStep1Title: 'Complete Profile',
+    quickStartStep1Description: 'Tell your story and connect with customers.',
+    quickStartStep2Title: 'Add Products',
+    quickStartStep2Description: 'Upload your beautiful creations.',
+    quickStartStep3Title: 'Market Your Shop',
+    quickStartStep3Description: 'Use AI to create social media buzz.',
+    quickStartStep4Title: 'Get Paid',
+    quickStartStep4Description: 'Set up your payment details.',
+
+    // Dashboard - Charts & Activity
+    salesOverTimeTitle: 'Sales Over Time',
+    salesOverTimeDescription: 'A look at your sales performance for the last 6 months.',
+    recentActivityTitle: 'Recent Activity',
+    recentActivityDescription: 'Updates on sales, reviews, and messages.',
+
     // Dashboard - Products
     myProducts: 'My Products',
     myProductsSubtitle: 'Manage your inventory and view product details.',
@@ -150,6 +168,7 @@ export const translations: LanguageTranslations = {
     aiTools: 'AI Tools',
     settings: 'Settings',
     backToSite: 'Back to Site',
+    analytics: 'Analytics',
 
     // Dashboard - Settings
     settingsTitle: 'Settings',
@@ -306,6 +325,36 @@ export const translations: LanguageTranslations = {
     toastItemAddedToCartDescription: 'Added {{name}} to your cart.',
     toastNotEnoughStockTitle: 'Not enough stock',
     toastNotEnoughStockDescription: 'You cannot add more than the {{stock}} items available.',
+    
+    // Public Handbook Page
+    handbookTitle: "The Virasat Artisan Handbook",
+    handbookSubtitle: "Your guide to mastering the platform and growing your business.",
+    handbookWelcomeTitle: "Welcome to the Virasat Family!",
+    handbookWelcomeContent: "We are thrilled to partner with you to bring your incredible crafts to a global audience. This handbook is your guide to mastering the platform, from setting up your digital storefront to leveraging our powerful AI tools to grow your business.",
+    handbookChapter1: "Chapter 1:",
+    handbookChapter1Title: "Getting Started",
+    handbookChapter1Subtitle: "Your journey on Virasat begins with setting up your unique identity.",
+    handbookStep1Title: "Complete Your Profile",
+    handbookStep1Content: "Your profile is your story. Upload a profile picture, write your bio, and share the history of your craft. Use our automatic translation feature to share your story in both English and Hindi effortlessly.",
+    handbookStep2Title: "Add Your First Product",
+    handbookStep2Content: "Showcase your creations. Upload high-quality images and write a compelling name and description. Our AI will handle the translation, making your products accessible to a wider audience.",
+    handbookChapter2: "Chapter 2:",
+    handbookChapter2Title: "AI Superpowers",
+    handbookChapter2Subtitle: "Virasat provides a suite of AI-powered tools designed to save you time and help you sell more.",
+    handbookAiStorytellerContent: "Transforms your spoken story into a professional product description. Just press \"Record,\" share your product's story, and let the AI write a beautiful description for you.",
+    handbookVisualEnhancerContent: "Creates realistic lifestyle photos of your products. Upload a clean photo, describe a scene, and the AI will generate a beautiful mockup.",
+    handbookMarketingSuiteContent: "Generates engaging social media posts, email newsletters, and ad copy. Select a product and target audience to get tailored marketing content.",
+    handbookPricingOptimizerContent: "Suggests the best price for your products based on market data. Enter your costs and let the AI recommend a competitive price.",
+    handbookTrendHarmonizerContent: "Analyzes current market trends and gives you ideas. Get a report on popular styles, colors, and patterns to adapt while staying true to your art.",
+    handbookChapter3: "Chapter 3:",
+    handbookChapter3Title: "Managing Your Business",
+    analytics: "Analytics",
+    shipping: "Shipping",
+    handbookAnalyticsContent: "Keep track of your shop’s performance. View your total revenue, see which products are selling best, and understand what your customers love.",
+    handbookShippingContent: "Our AI Logistics Hub takes the guesswork out of shipping. Get expert advice on packaging, find the best carriers, and book shipments with a single click.",
+    handbookReadyToJoinTitle: "Ready to Join?",
+    handbookReadyToJoinContent: "We are committed to your success and believe that by combining your incredible talent with our technology, we can build something truly special.",
+    createArtisanAccount: "Create Your Artisan Account",
 
 
     // Toasts
@@ -432,6 +481,25 @@ export const translations: LanguageTranslations = {
     tableHeaderPrice: 'कीमत',
     tableHeaderStock: 'स्टॉक',
 
+    // Dashboard - Quick Start Guide
+    quickStartGuideTitle: 'त्वरित आरंभ मार्गदर्शिका',
+    quickStartGuideSubtitle: 'विरासत में नए हैं? अपनी दुकान को चालू करने के लिए यहां कुछ त्वरित चरण दिए गए हैं।',
+    quickStartStep1Title: 'प्रोफ़ाइल पूरी करें',
+    quickStartStep1Description: 'अपनी कहानी बताएं और ग्राहकों से जुड़ें।',
+    quickStartStep2Title: 'उत्पाद जोड़ें',
+    quickStartStep2Description: 'अपनी सुंदर कृतियों को अपलोड करें।',
+    quickStartStep3Title: 'अपनी दुकान का विपणन करें',
+    quickStartStep3Description: 'सोशल मीडिया पर चर्चा पैदा करने के लिए एआई का उपयोग करें।',
+    quickStartStep4Title: 'भुगतान प्राप्त करें',
+    quickStartStep4Description: 'अपने भुगतान विवरण सेट करें।',
+    
+    // Dashboard - Charts & Activity
+    salesOverTimeTitle: 'समय के साथ बिक्री',
+    salesOverTimeDescription: 'पिछले 6 महीनों के लिए आपके बिक्री प्रदर्शन पर एक नज़र।',
+    recentActivityTitle: 'हाल की गतिविधि',
+    recentActivityDescription: 'बिक्री, समीक्षाओं और संदेशों पर अपडेट।',
+
+
     // Dashboard - Products
     myProducts: 'मेरे उत्पाद',
     myProductsSubtitle: 'अपनी इन्वेंट्री प्रबंधित करें और उत्पाद विवरण देखें।',
@@ -466,6 +534,7 @@ export const translations: LanguageTranslations = {
     aiTools: 'एआई उपकरण',
     settings: 'समायोजन',
     backToSite: 'साइट पर वापस',
+    analytics: 'एनालिटिक्स',
 
     // Dashboard - Settings
     settingsTitle: 'समायोजन',
@@ -622,6 +691,36 @@ export const translations: LanguageTranslations = {
     toastItemAddedToCartDescription: '{{name}} को आपकी कार्ट में जोड़ा गया।',
     toastNotEnoughStockTitle: 'पर्याप्त स्टॉक नहीं है',
     toastNotEnoughStockDescription: 'आप उपलब्ध {{stock}} आइटम से अधिक नहीं जोड़ सकते।',
+
+    // Public Handbook Page
+    handbookTitle: "विरासत कारीगर हैंडबुक",
+    handbookSubtitle: "प्लेटफॉर्म पर महारत हासिल करने और अपने व्यवसाय को बढ़ाने के लिए आपकी मार्गदर्शिका।",
+    handbookWelcomeTitle: "विरासत परिवार में आपका स्वागत है!",
+    handbookWelcomeContent: "हम आपके अविश्वसनीय शिल्पों को वैश्विक दर्शकों तक लाने के लिए आपके साथ साझेदारी करके रोमांचित हैं। यह हैंडबुक आपके डिजिटल स्टोरफ्रंट को स्थापित करने से लेकर आपके व्यवसाय को बढ़ाने के लिए हमारे शक्तिशाली एआई टूल का लाभ उठाने तक, प्लेटफॉर्म पर महारत हासिल करने के लिए आपकी मार्गदर्शिका है।",
+    handbookChapter1: "अध्याय 1:",
+    handbookChapter1Title: "शुरुआत करना",
+    handbookChapter1Subtitle: "विरासत पर आपकी यात्रा आपकी अनूठी पहचान स्थापित करने के साथ शुरू होती है।",
+    handbookStep1Title: "अपनी प्रोफ़ाइल पूरी करें",
+    handbookStep1Content: "आपकी प्रोफ़ाइल आपकी कहानी है। एक प्रोफ़ाइल चित्र अपलोड करें, अपनी जीवनी लिखें, और अपने शिल्प का इतिहास साझा करें। अंग्रेजी और हिंदी दोनों में अपनी कहानी को सहजता से साझा करने के लिए हमारी स्वचालित अनुवाद सुविधा का उपयोग करें।",
+    handbookStep2Title: "अपना पहला उत्पाद जोड़ें",
+    handbookStep2Content: "अपनी कृतियों का प्रदर्शन करें। उच्च-गुणवत्ता वाली छवियां अपलोड करें और एक आकर्षक नाम और विवरण लिखें। हमारा एआई अनुवाद को संभाल लेगा, जिससे आपके उत्पाद व्यापक दर्शकों के लिए सुलभ हो जाएंगे।",
+    handbookChapter2: "अध्याय 2:",
+    handbookChapter2Title: "एआई महाशक्तियाँ",
+    handbookChapter2Subtitle: "विरासत आपको समय बचाने और अधिक बेचने में मदद करने के लिए डिज़ाइन किए गए एआई-संचालित टूल का एक सूट प्रदान करता है।",
+    handbookAiStorytellerContent: "आपकी बोली गई कहानी को एक पेशेवर उत्पाद विवरण में बदल देता है। बस \"रिकॉर्ड\" दबाएं, अपने उत्पाद की कहानी साझा करें, और एआई को आपके लिए एक सुंदर विवरण लिखने दें।",
+    handbookVisualEnhancerContent: "आपके उत्पादों की यथार्थवादी जीवन शैली की तस्वीरें बनाता है। एक साफ तस्वीर अपलोड करें, एक दृश्य का वर्णन करें, और एआई एक सुंदर मॉकअप उत्पन्न करेगा।",
+    handbookMarketingSuiteContent: "आकर्षक सोशल मीडिया पोस्ट, ईमेल न्यूज़लेटर और विज्ञापन प्रतिलिपि उत्पन्न करता है। अनुरूप विपणन सामग्री प्राप्त करने के लिए एक उत्पाद और लक्षित दर्शक चुनें।",
+    handbookPricingOptimizerContent: "बाजार के आंकड़ों के आधार पर आपके उत्पादों के लिए सर्वोत्तम मूल्य का सुझाव देता है। अपनी लागत दर्ज करें और एआई को प्रतिस्पर्धी मूल्य की सिफारिश करने दें।",
+    handbookTrendHarmonizerContent: "वर्तमान बाजार के रुझानों का विश्लेषण करता है और आपको विचार देता है। अपनी कला के प्रति सच्चे रहते हुए अनुकूलन के लिए लोकप्रिय शैलियों, रंगों और पैटर्न पर एक रिपोर्ट प्राप्त करें।",
+    handbookChapter3: "अध्याय 3:",
+    handbookChapter3Title: "अपने व्यवसाय का प्रबंधन",
+    analytics: "एनालिटिक्स",
+    shipping: "शिपिंग",
+    handbookAnalyticsContent: "अपनी दुकान के प्रदर्शन पर नज़र रखें। अपना कुल राजस्व देखें, देखें कि कौन से उत्पाद सबसे अच्छे बिक रहे हैं, और समझें कि आपके ग्राहक क्या पसंद करते हैं।",
+    handbookShippingContent: "हमारा एआई लॉजिस्टिक्स हब शिपिंग से अनुमान को दूर करता है। पैकेजिंग पर विशेषज्ञ सलाह प्राप्त करें, सर्वश्रेष्ठ वाहक खोजें, और एक क्लिक के साथ शिपमेंट बुक करें।",
+    handbookReadyToJoinTitle: "शामिल होने के लिए तैयार हैं?",
+    handbookReadyToJoinContent: "हम आपकी सफलता के लिए प्रतिबद्ध हैं और मानते हैं कि आपकी अविश्वसनीय प्रतिभा को हमारी तकनीक के साथ जोड़कर, हम कुछ वास्तव में विशेष बना सकते हैं।",
+    createArtisanAccount: "अपना कारीगर खाता बनाएं",
 
     // Toasts
     toastErrorTitle: 'एक त्रुटि हुई',
