@@ -13,12 +13,22 @@ const storage = getStorage();
 const deleteImage = async (imageUrl: string) => {
     if (!imageUrl || imageUrl.includes('placehold.co')) return;
     try {
-        const imageRef = ref(storage, imageUrl);
+        // Firebase storage URLs are in the format: https://firebasestorage.googleapis.com/v0/b/your-bucket/o/path%2Fto%2Ffile.jpg?alt=media&token=...
+        // We need to extract the path: `path/to/file.jpg`
+        const decodedUrl = decodeURIComponent(imageUrl);
+        const path = decodedUrl.substring(decodedUrl.indexOf('/o/') + 3, decodedUrl.indexOf('?alt=media'));
+        
+        if (!path) {
+            console.warn(`Could not extract path from image URL: ${imageUrl}`);
+            return;
+        }
+
+        const imageRef = ref(storage, path);
         await deleteObject(imageRef);
         console.log(`Deleted image: ${imageUrl}`);
     } catch (error: any) {
         if (error.code !== 'storage/object-not-found') {
-            console.error("Error deleting image from Firebase Storage:", error);
+            console.error(`Error deleting image from Firebase Storage: ${imageUrl}`, error);
         }
     }
 }

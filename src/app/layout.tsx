@@ -1,14 +1,10 @@
-
 import type { Metadata } from "next";
 import { Inter } from 'next/font/google';
 import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
 import { cn } from "@/lib/utils";
-import { DataProvider } from "@/context/data-context";
-import { AuthProvider } from "@/context/auth-context";
-import { ThemeProvider } from "@/components/theme-provider";
-import { CartProvider } from "@/context/cart-context";
-import { LanguageProvider } from "@/context/language-context";
+import { Providers } from "@/components/providers";
+
 
 export const metadata: Metadata = {
   title: "VIRASAT",
@@ -33,23 +29,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={cn("min-h-screen bg-background font-sans antialiased", inter.variable)}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="light"
-          enableSystem={false}
-          disableTransitionOnChange
-        >
-          <AuthProvider>
-            <DataProvider>
-              <LanguageProvider>
-                <CartProvider>
-                  {children}
-                </CartProvider>
-              </LanguageProvider>
-            </DataProvider>
-          </AuthProvider>
+        <Providers>
+          {children}
           <Toaster />
-        </ThemeProvider>
+        </Providers>
       </body>
     </html>
   );
