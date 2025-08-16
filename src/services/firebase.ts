@@ -11,28 +11,23 @@ import { getLogisticsAdvice as getLogisticsAdviceFlow } from "@/ai/flows/logisti
 const storage = getStorage();
 
 const deleteImage = async (imageUrl: string) => {
-    if (!imageUrl || imageUrl.includes('placehold.co') || !imageUrl.includes('firebasestorage.googleapis.com')) {
+    // Ignore placeholder images
+    if (!imageUrl || !imageUrl.startsWith('https://firebasestorage.googleapis.com')) {
         return;
     }
     try {
+        // Create a reference from the full URL
         const imageRef = ref(storage, imageUrl);
         await deleteObject(imageRef);
     } catch (error: any) {
+        // A common error is 'object-not-found', which we can safely ignore
+        // as it means the file is already gone.
         if (error.code === 'storage/object-not-found') {
+            console.warn(`Image to delete was not found: ${imageUrl}`);
             return; 
         }
-        console.error(`Failed to delete image with full URL, will try by path. Error: ${error.message}`);
-        try {
-            // Fallback for URLs that might be encoded or in a different format
-            const path = new URL(imageUrl).pathname.split('/o/')[1].split('?')[0];
-            const decodedPath = decodeURIComponent(path);
-            const imageRefFromPath = ref(storage, decodedPath);
-            await deleteObject(imageRefFromPath);
-        } catch (fallbackError: any) {
-            console.error(`Fallback deletion by path also failed for URL: ${imageUrl}`, fallbackError);
-            // We don't re-throw here to allow the main operation (e.g., profile update) to continue
-            // if only the image deletion fails. The new image is already uploaded.
-        }
+        // Log other errors but don't re-throw, to allow the main operation to proceed.
+        console.error(`Failed to delete image: ${imageUrl}. Error: ${error.message}`);
     }
 }
 
@@ -201,7 +196,7 @@ export const getArtisan = async (id: string): Promise<Artisan | null> => {
         const docRef = doc(db, 'artisans', id);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
-            return { id: docSnap.id, ...docSnap.data() } as Artisan;
+            return { id: docSnap.id, ...doc.data() } as Artisan;
         } else {
             console.log("No such artisan!");
             return null;
@@ -233,7 +228,11 @@ export const ensureArtisanProfile = async (user: User): Promise<void> => {
 };
 
 
-export const updateArtisanProfile = async (artisanId: string, data: Partial<Omit<Artisan, 'id' | 'profileImage'>>, newImageFile?: File): Promise<string | null> => {
+export const updateArtisanProfile = async (
+    artisanId: string, 
+    data: Omit<Artisan, 'id' | 'profileImage'>, 
+    newImageFile?: File
+): Promise<void> => {
     const artisanRef = doc(db, 'artisans', artisanId);
     
     try {
@@ -244,23 +243,20 @@ export const updateArtisanProfile = async (artisanId: string, data: Partial<Omit
 
         const existingData = docSnap.data() as Artisan;
         const updateData: { [key: string]: any } = { ...data };
-        let newImageUrl: string | null = null;
 
+        // If a new image file is provided, upload it and update the URL
         if (newImageFile) {
-            const uploadedUrls = await uploadImages([newImageFile], artisanId);
-            if (uploadedUrls && uploadedUrls.length > 0) {
-                newImageUrl = uploadedUrls[0];
-                updateData.profileImage = newImageUrl;
-                
-                if (existingData.profileImage) {
-                    await deleteImage(existingData.profileImage);
-                }
+            const storageRef = ref(storage, `profileImages/${artisanId}/${newImageFile.name}`);
+            const snapshot = await uploadBytes(storageRef, newImageFile);
+            updateData.profileImage = await getDownloadURL(snapshot.ref);
+
+            // After a successful upload, delete the old image if it's not a placeholder
+            if (existingData.profileImage) {
+                await deleteImage(existingData.profileImage);
             }
         }
         
         await updateDoc(artisanRef, updateData);
-
-        return newImageUrl;
 
     } catch (error) {
         console.error("Error updating artisan profile:", error);
@@ -345,5 +341,3 @@ export const getShipments = async (artisanId: string): Promise<Shipment[]> => {
         throw new Error("Failed to get shipments");
     }
 }
-
-    

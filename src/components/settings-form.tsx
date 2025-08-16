@@ -19,7 +19,6 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2, Upload } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "@/context/auth-context";
-import { Artisan } from "@/lib/types";
 import Image from "next/image";
 import { getArtisan, updateArtisanProfile } from "@/services/firebase";
 
@@ -28,7 +27,7 @@ const formSchema = z.object({
   bio: z.string().min(10, "Bio must be at least 10 characters"),
   craft: z.string().min(2, "Craft is required"),
   location: z.string().min(2, "Location is required"),
-  profileImage: z.any().optional(),
+  profileImage: z.any().optional(), // Can be a File object or a URL string
 });
 
 export function SettingsForm() {
@@ -65,7 +64,7 @@ export function SettingsForm() {
             }
         }
       } catch (error: any) {
-        toast({ variant: 'destructive', title: "Error", description: error.message });
+        toast({ variant: 'destructive', title: "Error loading profile", description: error.message });
       } finally {
         setDataLoading(false);
       }
@@ -95,16 +94,12 @@ export function SettingsForm() {
       const { profileImage, ...updateData } = values;
       const newImageFile = profileImage instanceof File ? profileImage : undefined;
 
-      const newImageUrl = await updateArtisanProfile(user.uid, updateData, newImageFile);
+      await updateArtisanProfile(user.uid, updateData, newImageFile);
       
       toast({ title: "Profile updated successfully!" });
 
-      if (newImageUrl) {
-        setPreview(newImageUrl);
-      }
-
     } catch (error: any) {
-        toast({ variant: 'destructive', title: "Error", description: error.message || "Failed to update profile." });
+        toast({ variant: 'destructive', title: "Error updating profile", description: error.message || "An unexpected error occurred." });
     } finally {
         setIsSubmitting(false);
     }
