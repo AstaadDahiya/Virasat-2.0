@@ -2,26 +2,11 @@
 "use server";
 
 import { db } from "@/lib/firebase/config";
-import { addDoc, collection, doc, getDoc, getDocs, query, serverTimestamp, setDoc, updateDoc, writeBatch, Timestamp, deleteDoc, where, orderBy } from "firebase/firestore";
+import { addDoc, collection, doc, getDoc, getDocs, query, serverTimestamp, setDoc, updateDoc, writeBatch, Timestamp, deleteDoc, where, orderBy, limit } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import type { Artisan, Product, ShipmentData, LogisticsInput, LogisticsOutput, ProductFormData, Shipment } from "@/lib/types";
 import type { User } from 'firebase/auth';
 import { getLogisticsAdvice as getLogisticsAdviceFlow } from "@/ai/flows/logistics-advisor";
-
-// --- START: Server-Side Caching ---
-interface Cache<T> {
-    data: T | null;
-    timestamp: number | null;
-    expiryMs: number;
-}
-
-const productsCache: Cache<Product[]> = { data: null, timestamp: null, expiryMs: 5 * 60 * 1000 }; // 5 minutes
-const artisansCache: Cache<Artisan[]> = { data: null, timestamp: null, expiryMs: 15 * 60 * 1000 }; // 15 minutes
-
-const isCacheValid = <T>(cache: Cache<T>): boolean => {
-    return cache.data !== null && cache.timestamp !== null && (Date.now() - cache.timestamp < cache.expiryMs);
-}
-// --- END: Server-Side Caching ---
 
 const storage = getStorage();
 
@@ -74,7 +59,6 @@ export const addProduct = async (productData: Omit<Product, 'id' | 'images' | 'a
         };
         
         const docRef = await addDoc(collection(db, "products"), productToAdd);
-        productsCache.data = null; // Invalidate cache
         return docRef.id;
     } catch (e) {
         console.error("Error in addProduct function: ", e);
@@ -110,7 +94,6 @@ export const updateProduct = async (productId: string, productData: ProductFormD
     };
 
     await updateDoc(productRef, dataToUpdate);
-    productsCache.data = null; // Invalidate cache
 }
 
 
@@ -131,8 +114,6 @@ export const deleteProduct = async (productId: string): Promise<void> => {
         }
 
         await deleteDoc(productRef);
-        productsCache.data = null; // Invalidate cache
-
     } catch (e) {
         console.error("Error deleting product: ", e);
         throw e instanceof Error ? e : new Error("Failed to delete product due to an unexpected error.");
@@ -140,14 +121,15 @@ export const deleteProduct = async (productId: string): Promise<void> => {
 };
 
 
-export const getProducts = async (): Promise<Product[]> => {
-    if (isCacheValid(productsCache)) {
-        console.log("Returning cached products");
-        return productsCache.data!;
-    }
+export const getProducts = async (queryLimit?: number): Promise<Product[]> => {
     try {
-        console.log("Fetching products from Firestore");
-        const q = query(collection(db, 'products'), orderBy('createdAt', 'desc'));
+        let q;
+        if (queryLimit) {
+            q = query(collection(db, 'products'), orderBy('createdAt', 'desc'), limit(queryLimit));
+        } else {
+            q = query(collection(db, 'products'), orderBy('createdAt', 'desc'));
+        }
+        
         const querySnapshot = await getDocs(q);
         const products = querySnapshot.docs.map(doc => {
             const data = doc.data();
@@ -156,8 +138,6 @@ export const getProducts = async (): Promise<Product[]> => {
             }
             return { id: doc.id, ...data } as Product;
         });
-        productsCache.data = products;
-        productsCache.timestamp = Date.now();
         return products;
     } catch (e) {
         console.error("Error getting documents: ", e);
@@ -167,11 +147,6 @@ export const getProducts = async (): Promise<Product[]> => {
 
 export const getProduct = async (id: string): Promise<Product | null> => {
     try {
-        const cachedProduct = productsCache.data?.find(p => p.id === id);
-        if (cachedProduct) {
-            return cachedProduct;
-        }
-
         const docRef = doc(db, 'products', id);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
@@ -190,18 +165,17 @@ export const getProduct = async (id: string): Promise<Product | null> => {
     }
 };
 
-export const getArtisans = async (): Promise<Artisan[]> => {
-    if (isCacheValid(artisansCache)) {
-        console.log("Returning cached artisans");
-        return artisansCache.data!;
-    }
+export const getArtisans = async (queryLimit?: number): Promise<Artisan[]> => {
      try {
-        console.log("Fetching artisans from Firestore");
-        const q = query(collection(db, 'artisans'));
+        let q;
+        if (queryLimit) {
+            q = query(collection(db, 'artisans'), limit(queryLimit));
+        } else {
+            q = query(collection(db, 'artisans'));
+        }
+
         const querySnapshot = await getDocs(q);
         const artisans = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Artisan));
-        artisansCache.data = artisans;
-        artisansCache.timestamp = Date.now();
         return artisans;
     } catch (e) {
         console.error("Error getting documents: ", e);
@@ -211,11 +185,6 @@ export const getArtisans = async (): Promise<Artisan[]> => {
 
 export const getArtisan = async (id: string): Promise<Artisan | null> => {
     try {
-        const cachedArtisan = artisansCache.data?.find(a => a.id === id);
-        if (cachedArtisan) {
-            return cachedArtisan;
-        }
-
         const docRef = doc(db, 'artisans', id);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
@@ -243,7 +212,6 @@ export const ensureArtisanProfile = async (user: User): Promise<void> => {
                 location: 'Not specified',
                 profileImage: `https://placehold.co/100x100.png`,
             });
-            artisansCache.data = null; // Invalidate cache
         } catch (error) {
             console.error('Error creating artisan profile:', error);
             throw new Error('Database error creating new user profile.');
@@ -277,7 +245,6 @@ export const updateArtisanProfile = async (artisanId: string, data: Partial<Omit
     }
 
     await updateDoc(artisanRef, updateData);
-    artisansCache.data = null; // Invalidate cache
     return imageUrl || "";
 }
 

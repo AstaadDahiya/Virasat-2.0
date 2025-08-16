@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -9,12 +10,18 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { ArrowRight, Loader2 } from "lucide-react";
 import { useData } from "@/context/data-context";
+import { useEffect } from "react";
 
 export default function Home() {
-  const { products, artisans, loading } = useData();
+  const { products, artisans, loading, fetchInitialData } = useData();
+  
+  useEffect(() => {
+    fetchInitialData('featured');
+  }, [fetchInitialData]);
 
-  const featuredProducts = products.slice(0, 4);
-  const featuredArtisans = artisans.slice(0, 3);
+
+  const featuredProducts = products;
+  const featuredArtisans = artisans;
 
   return (
     <div className="flex min-h-screen flex-col">
