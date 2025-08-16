@@ -1,4 +1,5 @@
 
+
 "use server";
 
 import { db } from "@/lib/firebase/config";
@@ -20,7 +21,7 @@ const getBlobServiceClient = () => {
 };
 
 const getContainerClient = () => {
-    const containerName = process.env.AZURE_STORAGE_CONTAINER_NAME;
+    const containerName = "images";
     if (!containerName) {
         throw new Error("Azure Storage container name is not configured.");
     }
@@ -28,50 +29,55 @@ const getContainerClient = () => {
     return blobServiceClient.getContainerClient(containerName);
 }
 
-const uploadImagesToAzure = async (images: File[], artisanId: string): Promise<string[]> => {
-    if (!images || images.length === 0) return [];
-    
+const uploadImageToAzure = async (image: File, folder: string, artisanId: string): Promise<string> => {
     try {
         const containerClient = getContainerClient();
         await containerClient.createIfNotExists({ access: 'blob' });
 
-        const uploadPromises = images.map(async (file) => {
-            const blobName = `products/${artisanId}/${uuidv4()}-${file.name}`;
-            const blockBlobClient = containerClient.getBlockBlobClient(blobName);
-            
-            // Convert File to Buffer for upload
-            const arrayBuffer = await file.arrayBuffer();
-            const buffer = Buffer.from(arrayBuffer);
+        const blobName = `${folder}/${artisanId}/${uuidv4()}-${image.name}`;
+        const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+        
+        const arrayBuffer = await image.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
 
-            await blockBlobClient.uploadData(buffer, {
-                blobHTTPHeaders: { blobContentType: file.type }
-            });
-            return blockBlobClient.url;
+        await blockBlobClient.uploadData(buffer, {
+            blobHTTPHeaders: { blobContentType: image.type }
         });
-
-        return await Promise.all(uploadPromises);
+        return blockBlobClient.url;
     } catch (error) {
-        console.error("Error uploading to Azure Blob Storage:", error);
-        throw new Error("Failed to upload images to Azure.");
+        console.error(`Error uploading to Azure Blob Storage in folder ${folder}:`, error);
+        throw new Error(`Failed to upload image to Azure.`);
     }
+};
+
+
+const uploadImagesToAzure = async (images: File[], artisanId: string): Promise<string[]> => {
+    if (!images || images.length === 0) return [];
+    const uploadPromises = images.map(file => uploadImageToAzure(file, 'products', artisanId));
+    return await Promise.all(uploadPromises);
 };
 
 const deleteImageFromAzure = async (imageUrl: string) => {
     if (!imageUrl || !imageUrl.includes('.blob.core.windows.net')) {
-        console.log("Skipping deletion of non-Azure image URL.");
+        console.log("Skipping deletion of non-Azure image URL:", imageUrl);
         return;
     }
 
     try {
         const containerClient = getContainerClient();
-        // Extract blob name from URL
         const url = new URL(imageUrl);
-        const blobName = url.pathname.split('/').slice(2).join('/'); // remove container name from path
+        const blobName = url.pathname.substring(containerClient.containerName.length + 2); //  /containerName/blobName
+        
+        if (!blobName) {
+            console.warn("Could not determine blob name from URL:", imageUrl);
+            return;
+        }
+
         const blockBlobClient = containerClient.getBlockBlobClient(blobName);
         await blockBlobClient.deleteIfExists();
     } catch (error) {
         console.error(`Failed to delete image from Azure: ${imageUrl}. Error:`, error);
-        // Don't re-throw, just log the error. We don't want to fail the whole operation if a single image deletion fails.
+        // Do not re-throw, just log the error. We don't want to fail the whole operation if a single image deletion fails.
     }
 };
 
@@ -265,32 +271,35 @@ export const updateArtisanProfile = async (
     existingImageUrl?: string | null
 ): Promise<void> => {
     const artisanRef = doc(db, 'artisans', artisanId);
-    const updateData: { [key: string]: any } = { ...data };
+    let updateData: { [key: string]: any } = { ...data };
+    let newImageUrl: string | null = null;
 
     try {
+        // Step 1: Upload a new image if one is provided
         if (newImageFile) {
-            const containerClient = getContainerClient();
-            await containerClient.createIfNotExists({ access: 'blob' });
-            const blobName = `profileImages/${artisanId}/${uuidv4()}-${newImageFile.name}`;
-            const blockBlobClient = containerClient.getBlockBlobClient(blobName);
-            
-            const arrayBuffer = await newImageFile.arrayBuffer();
-            const buffer = Buffer.from(arrayBuffer);
-
-            await blockBlobClient.uploadData(buffer, {
-                blobHTTPHeaders: { blobContentType: newImageFile.type }
-            });
-            updateData.profileImage = blockBlobClient.url;
+            newImageUrl = await uploadImageToAzure(newImageFile, 'profileImages', artisanId);
+            updateData.profileImage = newImageUrl;
         }
-        
-        await updateDoc(artisanRef, updateData);
 
-        // Only delete the old image if a new one was successfully uploaded and saved.
-        if (newImageFile && existingImageUrl) {
-            await deleteImageFromAzure(existingImageUrl);
+        // Step 2: Update the Firestore document
+        await setDoc(artisanRef, updateData, { merge: true });
+
+        // Step 3: Delete the old image from Azure ONLY IF a new one was uploaded and the DB was updated successfully
+        if (newImageUrl && existingImageUrl) {
+             // Don't delete the placeholder image
+            if (!existingImageUrl.startsWith("https://placehold.co")) {
+                await deleteImageFromAzure(existingImageUrl);
+            }
         }
     } catch (error) {
         console.error("Error updating artisan profile:", error);
+        
+        // If profile update fails, and we uploaded a new image, try to delete the newly uploaded image to prevent orphans.
+        if (newImageUrl) {
+            console.log("Attempting to clean up newly uploaded image due to profile update failure...");
+            await deleteImageFromAzure(newImageUrl);
+        }
+        
         throw new Error(`Failed to update profile: ${error instanceof Error ? error.message : "Unknown error"}`);
     }
 }
@@ -372,3 +381,4 @@ export const getShipments = async (artisanId: string): Promise<Shipment[]> => {
         throw new Error("Failed to get shipments");
     }
 }
+
