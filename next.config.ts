@@ -50,7 +50,9 @@ const nextConfig: NextConfig = {
     ],
   },
   serverExternalPackages: [],
-  env: {}
+  env: {
+    GEMINI_API_KEY: process.env.GEMINI_API_KEY,
+  }
 };
 
 export default nextConfig;
