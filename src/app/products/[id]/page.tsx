@@ -27,7 +27,7 @@ export default function ProductDetailPage() {
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const { addToCart } = useCart();
-  const { t, addTranslationKeys, language } = useLanguage();
+  const { t, language } = useLanguage();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -39,17 +39,6 @@ export default function ProductDetailPage() {
           setProduct(productData);
           const artisanData = await getArtisan(productData.artisanId);
           setArtisan(artisanData);
-          // Add texts for translation
-          const keysToTranslate = [
-              productData.name, 
-              productData.description, 
-              productData.category,
-              ...productData.materials
-          ];
-          if(artisanData) {
-              keysToTranslate.push(artisanData.name);
-          }
-          addTranslationKeys(keysToTranslate);
         } else {
           notFound();
         }
@@ -62,7 +51,7 @@ export default function ProductDetailPage() {
     };
 
     fetchData();
-  }, [id, addTranslationKeys]);
+  }, [id]);
 
   const handleAddToCart = () => {
     if (product) {
