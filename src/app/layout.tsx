@@ -44,7 +44,7 @@ export default function RootLayout({
               <LanguageProvider>
                 <CartProvider>
                   {children}
-                </CartartProvider>
+                </CartProvider>
               </LanguageProvider>
             </DataProvider>
           </AuthProvider>
