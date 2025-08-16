@@ -49,7 +49,7 @@ const nextConfig: NextConfig = {
       }
     ],
   },
-  serverExternalPackages: [],
+  serverExternalPackages: ['@azure/ai-text-translation', '@azure/core-auth'],
   env: {
     AZURE_TRANSLATOR_KEY: process.env.AZURE_TRANSLATOR_KEY,
     AZURE_TRANSLATOR_ENDPOINT: process.env.AZURE_TRANSLATOR_ENDPOINT,

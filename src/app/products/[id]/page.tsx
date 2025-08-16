@@ -27,7 +27,7 @@ export default function ProductDetailPage() {
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const { addToCart } = useCart();
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -78,7 +78,7 @@ export default function ProductDetailPage() {
   const productName = t(product.name);
 
   return (
-    <div className="flex min-h-screen flex-col" lang={language}>
+    <div className="flex min-h-screen flex-col">
       <SiteHeader />
       <main className="flex-1 py-12 md:py-20">
         <div className="container mx-auto px-4">
