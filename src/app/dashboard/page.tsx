@@ -66,8 +66,7 @@ export default function DashboardPage() {
       </div>
       
        <div>
-        <h2 className="text-2xl font-bold font-headline">Quick Start Guide</h2>
-        <p className="text-muted-foreground mb-4">Follow these steps to get your shop up and running.</p>
+        <h2 className="text-2xl font-bold font-headline mb-4">Quick Start Guide</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {quickStartSteps.map(step => (
                  <Card key={step.step} className="hover:bg-secondary/50 transition-colors">

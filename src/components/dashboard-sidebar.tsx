@@ -1,17 +1,13 @@
 
 "use client";
 
-import {
-  SidebarHeader,
-  SidebarContent,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarFooter,
-  useSidebar,
-  SidebarGroup,
-  SidebarGroupLabel
-} from "@/components/ui/sidebar";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { Button } from "./ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { Logo } from "./logo";
+import { useAuth } from "@/context/auth-context";
+import { ThemeToggle } from "./theme-toggle";
 import {
   LayoutGrid,
   Box,
@@ -29,171 +25,97 @@ import {
   LineChart,
   BookOpen
 } from "lucide-react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Button } from "./ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { Logo } from "./logo";
-import { useAuth } from "@/context/auth-context";
-import { ThemeToggle } from "./theme-toggle";
+import { cn } from "@/lib/utils";
 
 export function DashboardSidebar() {
   const pathname = usePathname();
-  const { state } = useSidebar();
   const { user, signOut } = useAuth();
 
-
   const mainMenuItems = [
-    {
-      href: "/dashboard",
-      label: "Dashboard Overview",
-      icon: LayoutGrid,
-    },
-     {
-      href: "/dashboard/analytics",
-      label: 'Analytics',
-      icon: LineChart,
-    },
-    {
-      href: "/dashboard/products",
-      label: "My Products",
-      icon: Box,
-    },
-    {
-      href: "/dashboard/shipments",
-      label: 'Shipments',
-      icon: Package,
-    },
+    { href: "/dashboard", label: "Dashboard Overview", icon: LayoutGrid },
+    { href: "/dashboard/analytics", label: 'Analytics', icon: LineChart },
+    { href: "/dashboard/products", label: "My Products", icon: Box },
+    { href: "/dashboard/shipments", label: 'Shipments', icon: Package },
   ];
   
   const aiToolsItems = [
-     {
-      href: "/dashboard/tools/description-generator",
-      label: 'AI Storyteller',
-      icon: WandSparkles,
-    },
-    {
-      href: "/dashboard/tools/pricing-optimizer",
-      label: "Pricing Optimizer",
-      icon: DollarSign,
-    },
-    {
-      href: "/dashboard/tools/marketing-suite",
-      label: 'Marketing Suite',
-      icon: Megaphone,
-    },
-    {
-      href: "/dashboard/tools/visual-enhancer",
-      label: 'Visual Enhancer',
-      icon: Camera,
-    },
-    {
-      href: "/dashboard/tools/trend-harmonizer",
-      label: 'Trend Harmonizer',
-      icon: TrendingUp,
-    },
-     {
-      href: "/dashboard/tools/logistics-hub",
-      label: 'Logistics Hub',
-      icon: Ship,
-    },
+    { href: "/dashboard/tools/description-generator", label: 'AI Storyteller', icon: WandSparkles },
+    { href: "/dashboard/tools/pricing-optimizer", label: "Pricing Optimizer", icon: DollarSign },
+    { href: "/dashboard/tools/marketing-suite", label: 'Marketing Suite', icon: Megaphone },
+    { href: "/dashboard/tools/visual-enhancer", label: 'Visual Enhancer', icon: Camera },
+    { href: "/dashboard/tools/trend-harmonizer", label: 'Trend Harmonizer', icon: TrendingUp },
+    { href: "/dashboard/tools/logistics-hub", label: 'Logistics Hub', icon: Ship },
   ];
 
-  const isActive = (href: string) => {
-    return pathname === href;
-  };
+  const isActive = (href: string) => pathname === href;
 
   return (
-    <>
-      <SidebarHeader>
-        <div className="flex items-center gap-2">
-          <Link href="/" className="flex items-center space-x-2 text-primary">
+    <aside className="w-64 flex-shrink-0 border-r bg-secondary text-secondary-foreground hidden md:flex flex-col">
+      <div className="p-4 border-b">
+         <Link href="/" className="flex items-center space-x-2 text-primary">
             <Logo size={80}/>
+            <h1 className="font-bold text-2xl font-headline text-primary">VIRASAT</h1>
           </Link>
-          {state === "expanded" && (
-            <Link href="/">
-              <h1 className="font-bold text-2xl font-headline text-primary">VIRASAT</h1>
-            </Link>
-          )}
-        </div>
-      </SidebarHeader>
-
-      <SidebarContent className="p-2">
-        <SidebarMenu>
-            <SidebarGroup>
-                <SidebarGroupLabel>Dashboard</SidebarGroupLabel>
-                {mainMenuItems.map((item) => (
-                    <SidebarMenuItem key={item.href}>
-                    <SidebarMenuButton
-                        asChild
-                        isActive={isActive(item.href)}
-                        tooltip={{ children: item.label }}
-                    >
-                        <Link href={item.href}>
-                        <item.icon />
-                        <span>{item.label}</span>
-                        </Link>
-                    </SidebarMenuButton>
-                    </SidebarMenuItem>
-                ))}
-            </SidebarGroup>
-            <SidebarGroup>
-                 <SidebarGroupLabel>AI Tools</SidebarGroupLabel>
-                 {aiToolsItems.map((item) => (
-                    <SidebarMenuItem key={item.href}>
-                    <SidebarMenuButton
-                        asChild
-                        isActive={isActive(item.href)}
-                        tooltip={{ children: item.label }}
-                    >
-                        <Link href={item.href}>
-                        <item.icon />
-                        <span>{item.label}</span>
-                        </Link>
-                    </SidebarMenuButton>
-                    </SidebarMenuItem>
-                ))}
-            </SidebarGroup>
-        </SidebarMenu>
-      </SidebarContent>
-
-      <SidebarFooter className="p-2">
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <div className="flex justify-between items-center w-full">
-              <SidebarMenuButton asChild isActive={pathname === '/dashboard/settings'} tooltip={{ children: "Settings" }} className="flex-grow">
-                <Link href="/dashboard/settings">
-                  <Cog />
-                  <span>Settings</span>
+      </div>
+      <nav className="flex-1 p-4 space-y-4 overflow-y-auto">
+        <div>
+          <h3 className="text-xs font-semibold uppercase text-muted-foreground tracking-wider mb-2">Dashboard</h3>
+          <div className="space-y-1">
+            {mainMenuItems.map((item) => (
+              <Button key={item.href} asChild variant={isActive(item.href) ? "default" : "ghost"} className="w-full justify-start">
+                <Link href={item.href}>
+                  <item.icon className="mr-2 h-4 w-4" />
+                  {item.label}
                 </Link>
-              </SidebarMenuButton>
-               {state === 'expanded' && <ThemeToggle />}
-            </div>
-          </SidebarMenuItem>
-           <SidebarMenuItem>
-            <SidebarMenuButton asChild tooltip={{ children: "Back to Site" }}>
-              <Link href="/">
-                <Home />
-                <span>Back to Site</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-        <div className="p-2 flex items-center gap-2 mt-2 border-t">
+              </Button>
+            ))}
+          </div>
+        </div>
+         <div>
+          <h3 className="text-xs font-semibold uppercase text-muted-foreground tracking-wider mb-2">AI Tools</h3>
+          <div className="space-y-1">
+            {aiToolsItems.map((item) => (
+              <Button key={item.href} asChild variant={isActive(item.href) ? "default" : "ghost"} className="w-full justify-start">
+                <Link href={item.href}>
+                  <item.icon className="mr-2 h-4 w-4" />
+                  {item.label}
+                </Link>
+              </Button>
+            ))}
+          </div>
+        </div>
+      </nav>
+      <div className="p-4 border-t mt-auto">
+         <div className="flex items-center gap-2 mb-4">
           <Avatar className="h-10 w-10">
             <AvatarImage src="https://placehold.co/100x100.png" alt="User" data-ai-hint="indian man portrait"/>
             <AvatarFallback>{user?.email?.charAt(0).toUpperCase()}</AvatarFallback>
           </Avatar>
-          {state === 'expanded' && user && (
+          {user && (
             <div className="flex-1">
               <p className="text-sm font-semibold truncate">{user.email}</p>
             </div>
           )}
-          <Button variant="ghost" size="icon" className="group-data-[collapsible=icon]:hidden" onClick={signOut}>
+          <Button variant="ghost" size="icon" onClick={signOut}>
             <LogOut className="h-5 w-5"/>
           </Button>
         </div>
-      </SidebarFooter>
-    </>
+        <div className="flex justify-between items-center w-full">
+            <Button asChild variant="ghost" className="justify-start flex-grow">
+              <Link href="/dashboard/settings">
+                  <Cog />
+                  <span>Settings</span>
+                </Link>
+            </Button>
+            <ThemeToggle />
+        </div>
+        <Button asChild variant="ghost" className="w-full justify-start mt-1">
+            <Link href="/">
+                <Home />
+                <span>Back to Site</span>
+            </Link>
+        </Button>
+      </div>
+    </aside>
   );
 }
