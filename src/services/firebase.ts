@@ -12,11 +12,14 @@ const storage = getStorage();
 
 const deleteImage = async (imageUrl: string | null | undefined) => {
     if (!imageUrl || !imageUrl.startsWith('https://firebasestorage.googleapis.com')) {
-        console.log("Skipping deletion of placeholder or invalid image URL.");
+        console.log("Skipping deletion of placeholder or non-Firebase image URL.");
         return;
     }
     try {
-        const imageRef = ref(storage, imageUrl);
+        // Correctly decode the URL and extract the path
+        const decodedUrl = decodeURIComponent(imageUrl);
+        const path = decodedUrl.substring(decodedUrl.indexOf('/o/') + 3, decodedUrl.indexOf('?'));
+        const imageRef = ref(storage, path);
         await deleteObject(imageRef);
     } catch (error: any) {
         if (error.code === 'storage/object-not-found') {
@@ -33,7 +36,6 @@ const uploadImages = async (images: File[], artisanId: string): Promise<string[]
     try {
         const uploadPromises = images.map(async (file) => {
             const imageRef = ref(storage, `products/${artisanId}/${Date.now()}-${file.name}`);
-            // Explicitly set the content type for robustness
             const metadata = { contentType: file.type };
             const snapshot = await uploadBytes(imageRef, file, metadata);
             return await getDownloadURL(snapshot.ref);
@@ -236,16 +238,19 @@ export const updateArtisanProfile = async (
     const updateData: { [key: string]: any } = { ...data };
 
     try {
+        let newImageUrl: string | null = null;
         if (newImageFile) {
             const storageRef = ref(storage, `profileImages/${artisanId}/${Date.now()}-${newImageFile.name}`);
             const metadata = { contentType: newImageFile.type };
             const snapshot = await uploadBytes(storageRef, newImageFile, metadata);
-            updateData.profileImage = await getDownloadURL(snapshot.ref);
+            newImageUrl = await getDownloadURL(snapshot.ref);
+            updateData.profileImage = newImageUrl;
         }
         
         await updateDoc(artisanRef, updateData);
 
-        if (newImageFile && existingImageUrl) {
+        // Only delete the old image if a new one was successfully uploaded and saved.
+        if (newImageUrl && existingImageUrl) {
             await deleteImage(existingImageUrl);
         }
     } catch (error) {
