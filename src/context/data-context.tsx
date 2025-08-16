@@ -99,7 +99,8 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     };
     
     loadInitialData();
-  }, [fetchData]);
+     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const refreshData = useCallback(async () => {
     await fetchData(false);
