@@ -220,32 +220,35 @@ export const ensureArtisanProfile = async (user: User): Promise<void> => {
 };
 
 
-export const updateArtisanProfile = async (artisanId: string, data: Partial<Omit<Artisan, 'id' | 'profileImage'>>, newImageFile?: File): Promise<string> => {
+export const updateArtisanProfile = async (artisanId: string, data: Partial<Omit<Artisan, 'id' | 'profileImage'>>, newImageFile?: File): Promise<void> => {
     const artisanRef = doc(db, 'artisans', artisanId);
-    let imageUrl: string | undefined = undefined;
-
-    const docSnap = await getDoc(artisanRef);
-    if(docSnap.exists()) {
-        imageUrl = docSnap.data().profileImage;
-    }
-
-    if (newImageFile) {
-        const urls = await uploadImages([newImageFile], artisanId);
-        if(urls.length > 0) {
-            if(imageUrl) {
-                await deleteImage(imageUrl);
-            }
-            imageUrl = urls[0];
-        }
-    }
     
-    const updateData: any = { ...data };
-    if (imageUrl) {
-        updateData.profileImage = imageUrl;
-    }
+    try {
+        const docSnap = await getDoc(artisanRef);
+        if (!docSnap.exists()) {
+            throw new Error("Artisan profile not found.");
+        }
 
-    await updateDoc(artisanRef, updateData);
-    return imageUrl || "";
+        const existingData = docSnap.data() as Artisan;
+        const updateData: any = { ...data };
+
+        if (newImageFile) {
+            const [newImageUrl] = await uploadImages([newImageFile], artisanId);
+            if (newImageUrl) {
+                updateData.profileImage = newImageUrl;
+                // Delete the old image only after the new one is successfully uploaded
+                if (existingData.profileImage) {
+                    await deleteImage(existingData.profileImage);
+                }
+            }
+        }
+        
+        await updateDoc(artisanRef, updateData);
+
+    } catch (error) {
+        console.error("Error updating artisan profile:", error);
+        throw new Error("Failed to update profile.");
+    }
 }
 
 

@@ -89,14 +89,18 @@ export function SettingsForm() {
     setLoading(true);
     
     try {
-        const newImageFile = values.profileImage instanceof File ? values.profileImage : undefined;
         const { profileImage, ...updateData } = values;
+        const newImageFile = profileImage instanceof File ? profileImage : undefined;
 
-        const newImageUrl = await updateArtisanProfile(user.uid, updateData, newImageFile);
-        if(newImageUrl) {
-            setPreview(newImageUrl);
-        }
+        await updateArtisanProfile(user.uid, updateData, newImageFile);
+        
         toast({ title: "Profile updated successfully!" });
+
+        // Refetch data to show the new image if it was updated
+        const updatedArtisan = await getArtisan(user.uid);
+        if (updatedArtisan?.profileImage) {
+            setPreview(updatedArtisan.profileImage);
+        }
 
     } catch (error: any) {
         toast({ variant: 'destructive', title: "Error", description: error.message });
