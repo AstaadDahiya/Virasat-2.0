@@ -3,50 +3,80 @@
 
 import { db } from "@/lib/firebase/config";
 import { addDoc, collection, doc, getDoc, getDocs, query, serverTimestamp, setDoc, updateDoc, writeBatch, Timestamp, deleteDoc, where, orderBy, limit } from "firebase/firestore";
-import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import type { Artisan, Product, ShipmentData, LogisticsInput, LogisticsOutput, ProductFormData, Shipment } from "@/lib/types";
 import type { User } from 'firebase/auth';
 import { getLogisticsAdvice as getLogisticsAdviceFlow } from "@/ai/flows/logistics-advisor";
+import { BlobServiceClient } from "@azure/storage-blob";
+import { v4 as uuidv4 } from 'uuid';
 
-const storage = getStorage();
+// --- Azure Blob Storage Logic ---
 
-const deleteImage = async (imageUrl: string | null | undefined) => {
-    if (!imageUrl || !imageUrl.startsWith('https://firebasestorage.googleapis.com')) {
-        console.log("Skipping deletion of placeholder or non-Firebase image URL.");
-        return;
+const getBlobServiceClient = () => {
+    const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
+    if (!connectionString) {
+        throw new Error("Azure Storage connection string is not configured.");
     }
-    try {
-        // Correctly decode the URL and extract the path
-        const decodedUrl = decodeURIComponent(imageUrl);
-        const path = decodedUrl.substring(decodedUrl.indexOf('/o/') + 3, decodedUrl.indexOf('?'));
-        const imageRef = ref(storage, path);
-        await deleteObject(imageRef);
-    } catch (error: any) {
-        if (error.code === 'storage/object-not-found') {
-            console.warn(`Image to delete was not found: ${imageUrl}`);
-        } else {
-            console.error(`Failed to delete image: ${imageUrl}. Error:`, error);
-        }
-    }
+    return BlobServiceClient.fromConnectionString(connectionString);
 };
 
-const uploadImages = async (images: File[], artisanId: string): Promise<string[]> => {
+const getContainerClient = () => {
+    const containerName = process.env.AZURE_STORAGE_CONTAINER_NAME;
+    if (!containerName) {
+        throw new Error("Azure Storage container name is not configured.");
+    }
+    const blobServiceClient = getBlobServiceClient();
+    return blobServiceClient.getContainerClient(containerName);
+}
+
+const uploadImagesToAzure = async (images: File[], artisanId: string): Promise<string[]> => {
     if (!images || images.length === 0) return [];
     
     try {
+        const containerClient = getContainerClient();
+        await containerClient.createIfNotExists({ access: 'blob' });
+
         const uploadPromises = images.map(async (file) => {
-            const imageRef = ref(storage, `products/${artisanId}/${Date.now()}-${file.name}`);
-            const metadata = { contentType: file.type };
-            const snapshot = await uploadBytes(imageRef, file, metadata);
-            return await getDownloadURL(snapshot.ref);
+            const blobName = `products/${artisanId}/${uuidv4()}-${file.name}`;
+            const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+            
+            // Convert File to Buffer for upload
+            const arrayBuffer = await file.arrayBuffer();
+            const buffer = Buffer.from(arrayBuffer);
+
+            await blockBlobClient.uploadData(buffer, {
+                blobHTTPHeaders: { blobContentType: file.type }
+            });
+            return blockBlobClient.url;
         });
 
         return await Promise.all(uploadPromises);
     } catch (error) {
-        console.error("Error uploading to Firebase Storage:", error);
-        throw new Error("Failed to upload images.");
+        console.error("Error uploading to Azure Blob Storage:", error);
+        throw new Error("Failed to upload images to Azure.");
     }
 };
+
+const deleteImageFromAzure = async (imageUrl: string) => {
+    if (!imageUrl || !imageUrl.includes('.blob.core.windows.net')) {
+        console.log("Skipping deletion of non-Azure image URL.");
+        return;
+    }
+
+    try {
+        const containerClient = getContainerClient();
+        // Extract blob name from URL
+        const url = new URL(imageUrl);
+        const blobName = url.pathname.split('/').slice(2).join('/'); // remove container name from path
+        const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+        await blockBlobClient.deleteIfExists();
+    } catch (error) {
+        console.error(`Failed to delete image from Azure: ${imageUrl}. Error:`, error);
+        // Don't re-throw, just log the error. We don't want to fail the whole operation if a single image deletion fails.
+    }
+};
+
+
+// --- Product Logic ---
 
 export const addProduct = async (productData: Omit<Product, 'id' | 'images' | 'artisanId' | 'createdAt'>, images: File[], artisanId: string): Promise<string> => {
     if (!artisanId) {
@@ -57,7 +87,7 @@ export const addProduct = async (productData: Omit<Product, 'id' | 'images' | 'a
     }
     
     try {
-        const imageUrls = await uploadImages(images, artisanId);
+        const imageUrls = await uploadImagesToAzure(images, artisanId);
         
         const productToAdd = {
             ...productData,
@@ -84,13 +114,13 @@ export const updateProduct = async (productId: string, productData: ProductFormD
     const existingProduct = docSnap.data() as Product;
 
     const artisanId = existingProduct.artisanId || "unknown-artisan";
-    const newImageUrls = newImageFiles.length > 0 ? await uploadImages(newImageFiles, artisanId) : [];
+    const newImageUrls = newImageFiles.length > 0 ? await uploadImagesToAzure(newImageFiles, artisanId) : [];
 
     const finalImageUrls = productData.images.filter(img => typeof img === 'string') as string[];
     const imagesToDelete = initialImageUrls.filter(url => !finalImageUrls.includes(url));
     
     if (imagesToDelete.length > 0) {
-        await Promise.all(imagesToDelete.map(url => deleteImage(url)));
+        await Promise.all(imagesToDelete.map(url => deleteImageFromAzure(url)));
     }
 
     const allImageUrls = [...finalImageUrls, ...newImageUrls];
@@ -104,7 +134,6 @@ export const updateProduct = async (productId: string, productData: ProductFormD
     await updateDoc(productRef, dataToUpdate);
 }
 
-
 export const deleteProduct = async (productId: string): Promise<void> => {
     try {
         const productRef = doc(db, 'products', productId);
@@ -117,7 +146,7 @@ export const deleteProduct = async (productId: string): Promise<void> => {
         const product = productSnap.data() as Product;
         
         if (product.images && product.images.length > 0) {
-            const deletePromises = product.images.map(url => deleteImage(url));
+            const deletePromises = product.images.map(url => deleteImageFromAzure(url));
             await Promise.all(deletePromises);
         }
 
@@ -127,7 +156,6 @@ export const deleteProduct = async (productId: string): Promise<void> => {
         throw e instanceof Error ? e : new Error("Failed to delete product due to an unexpected error.");
     }
 };
-
 
 export const getProducts = async (queryLimit?: number): Promise<Product[]> => {
     try {
@@ -173,6 +201,9 @@ export const getProduct = async (id: string): Promise<Product | null> => {
     }
 };
 
+
+// --- Artisan Logic ---
+
 export const getArtisans = async (queryLimit?: number): Promise<Artisan[]> => {
      try {
         let q;
@@ -196,7 +227,7 @@ export const getArtisan = async (id: string): Promise<Artisan | null> => {
         const docRef = doc(db, 'artisans', id);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
-            return { id: docSnap.id, ...doc.data() } as Artisan;
+            return { id: docSnap.id, ...docSnap.data() } as Artisan;
         } else {
             console.log("No such artisan!");
             return null;
@@ -227,7 +258,6 @@ export const ensureArtisanProfile = async (user: User): Promise<void> => {
     }
 };
 
-
 export const updateArtisanProfile = async (
     artisanId: string, 
     data: Omit<Artisan, 'id' | 'profileImage'>, 
@@ -238,20 +268,26 @@ export const updateArtisanProfile = async (
     const updateData: { [key: string]: any } = { ...data };
 
     try {
-        let newImageUrl: string | null = null;
         if (newImageFile) {
-            const storageRef = ref(storage, `profileImages/${artisanId}/${Date.now()}-${newImageFile.name}`);
-            const metadata = { contentType: newImageFile.type };
-            const snapshot = await uploadBytes(storageRef, newImageFile, metadata);
-            newImageUrl = await getDownloadURL(snapshot.ref);
-            updateData.profileImage = newImageUrl;
+            const containerClient = getContainerClient();
+            await containerClient.createIfNotExists({ access: 'blob' });
+            const blobName = `profileImages/${artisanId}/${uuidv4()}-${newImageFile.name}`;
+            const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+            
+            const arrayBuffer = await newImageFile.arrayBuffer();
+            const buffer = Buffer.from(arrayBuffer);
+
+            await blockBlobClient.uploadData(buffer, {
+                blobHTTPHeaders: { blobContentType: newImageFile.type }
+            });
+            updateData.profileImage = blockBlobClient.url;
         }
         
         await updateDoc(artisanRef, updateData);
 
         // Only delete the old image if a new one was successfully uploaded and saved.
-        if (newImageUrl && existingImageUrl) {
-            await deleteImage(existingImageUrl);
+        if (newImageFile && existingImageUrl) {
+            await deleteImageFromAzure(existingImageUrl);
         }
     } catch (error) {
         console.error("Error updating artisan profile:", error);
@@ -260,10 +296,11 @@ export const updateArtisanProfile = async (
 }
 
 
+// --- AI and Logistics Logic ---
+
 export async function getLogisticsAdvice(input: LogisticsInput): Promise<LogisticsOutput> {
     return getLogisticsAdviceFlow(input);
 }
-
 
 export const saveShipment = async (shipmentData: ShipmentData, artisanId: string): Promise<void> => {
     if (!artisanId) {
@@ -298,7 +335,6 @@ export const saveShipment = async (shipmentData: ShipmentData, artisanId: string
     if (shipmentData.aiCustomsDeclaration) {
         shipmentToSave.ai_customs_declaration = shipmentData.aiCustomsDeclaration;
     }
-
 
     try {
         await addDoc(collection(db, "shipments"), shipmentToSave);
