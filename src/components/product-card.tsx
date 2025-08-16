@@ -7,13 +7,14 @@ import type { Product, Artisan } from '@/lib/types';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import React from 'react';
 
 interface ProductCardProps {
   product: Product;
   artisans: Artisan[];
 }
 
-export function ProductCard({ product, artisans }: ProductCardProps) {
+export const ProductCard = React.memo(function ProductCard({ product, artisans }: ProductCardProps) {
   const artisan = artisans.find(a => a.id === product.artisanId);
 
   return (
@@ -50,4 +51,4 @@ export function ProductCard({ product, artisans }: ProductCardProps) {
       </CardFooter>
     </Card>
   );
-}
+});

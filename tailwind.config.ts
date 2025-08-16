@@ -1,3 +1,4 @@
+
 import type {Config} from 'tailwindcss';
 
 export default {
@@ -18,7 +19,7 @@ export default {
     extend: {
       fontFamily: {
         sans: [
-          'var(--font-sans)',
+          'var(--font-inter)',
           '-apple-system',
           'BlinkMacSystemFont',
           'Segoe UI',
@@ -27,8 +28,8 @@ export default {
           'Arial',
           'sans-serif',
         ],
-        body: ['var(--font-alegreya)', 'serif'],
-        headline: ['var(--font-alegreya)', 'serif'],
+        body: ['var(--font-inter)', 'serif'],
+        headline: ['var(--font-inter)', 'serif'],
         code: ['monospace'],
       },
       colors: {

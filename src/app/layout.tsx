@@ -1,6 +1,6 @@
 
 import type { Metadata } from "next";
-import { Alegreya } from 'next/font/google';
+import { Inter } from 'next/font/google';
 import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
 import { cn } from "@/lib/utils";
@@ -18,10 +18,10 @@ export const metadata: Metadata = {
   },
 };
 
-const alegreya = Alegreya({
+const inter = Inter({
   subsets: ['latin'],
   display: 'swap',
-  variable: '--font-alegreya',
+  variable: '--font-inter',
 });
 
 
@@ -32,7 +32,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={cn("min-h-screen bg-background font-sans antialiased", alegreya.variable)}>
+      <body className={cn("min-h-screen bg-background font-sans antialiased", inter.variable)}>
         <ThemeProvider
           attribute="class"
           defaultTheme="light"

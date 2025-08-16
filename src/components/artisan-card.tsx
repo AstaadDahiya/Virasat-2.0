@@ -7,12 +7,13 @@ import type { Artisan } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from './ui/button';
 import { MapPin } from 'lucide-react';
+import React from 'react';
 
 interface ArtisanCardProps {
   artisan: Artisan;
 }
 
-export function ArtisanCard({ artisan }: ArtisanCardProps) {
+export const ArtisanCard = React.memo(function ArtisanCard({ artisan }: ArtisanCardProps) {
   return (
     <Card className="overflow-hidden rounded-lg shadow-md transition-shadow hover:shadow-xl text-center">
       <CardHeader className="p-0 items-center">
@@ -42,4 +43,4 @@ export function ArtisanCard({ artisan }: ArtisanCardProps) {
       </CardFooter>
     </Card>
   );
-}
+});
