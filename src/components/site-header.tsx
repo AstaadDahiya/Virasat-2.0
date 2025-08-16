@@ -13,6 +13,8 @@ import { ThemeToggle } from "./theme-toggle";
 import { useCart } from "@/context/cart-context";
 import { useState } from "react";
 import { CartDrawer } from "./cart-drawer";
+import { useLanguage, languages } from "@/context/language-context";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -24,6 +26,7 @@ export function SiteHeader() {
   const pathname = usePathname();
   const { cartCount } = useCart();
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const { setLanguage, language: currentLanguage } = useLanguage();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -51,6 +54,25 @@ export function SiteHeader() {
 
         <div className="flex flex-1 items-center justify-end space-x-1">
            <ThemeToggle />
+           <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                    <Globe />
+                    <span className="sr-only">Change language</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  {languages.map((lang) => (
+                    <DropdownMenuItem
+                      key={lang.code}
+                      onClick={() => setLanguage(lang.code)}
+                      className={cn(currentLanguage === lang.code && "font-bold")}
+                    >
+                      {lang.name}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+            </DropdownMenu>
            <Button variant="ghost" size="icon" asChild>
              <Link href="/products/search">
                 <Search />

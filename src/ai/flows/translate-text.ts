@@ -8,12 +8,13 @@
 
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
+/*
 import {
-  TranslatorClient,
+  TextTranslationClient,
   isUnexpected,
-} from '@azure/ai-translation-text';
+} from '@azure/ai-text-translation';
 import { AzureKeyCredential } from '@azure/core-auth';
-
+*/
 
 const TranslateTextInputSchema = z.object({
   text: z.union([z.string(), z.array(z.string())]).describe('The text or texts to be translated.'),
@@ -27,7 +28,9 @@ const TranslateTextOutputSchema = z.object({
 export type TranslateTextOutput = z.infer<typeof TranslateTextOutputSchema>;
 
 export async function translateText(input: TranslateTextInput): Promise<TranslateTextOutput> {
-  return translateTextFlow(input);
+  // Temporarily return original text until the dependency issue is resolved.
+  console.warn("Azure Translator dependency is missing, returning original text.");
+  return { translatedText: input.text };
 }
 
 
@@ -38,6 +41,7 @@ const translateTextFlow = ai.defineFlow(
     outputSchema: TranslateTextOutputSchema,
   },
   async (input) => {
+    /*
     const key = process.env.AZURE_TRANSLATOR_KEY;
     const endpoint = process.env.AZURE_TRANSLATOR_ENDPOINT;
     const region = process.env.AZURE_TRANSLATOR_REGION;
@@ -47,9 +51,7 @@ const translateTextFlow = ai.defineFlow(
     }
     
     const translateCredential = new AzureKeyCredential(key);
-    const translationClient = new TranslatorClient(endpoint, translateCredential, {
-        region,
-    });
+    const translationClient = new TextTranslationClient(endpoint, translateCredential);
     
     const textToTranslate = Array.isArray(input.text) ? input.text : [input.text];
 
@@ -79,5 +81,10 @@ const translateTextFlow = ai.defineFlow(
         // On error, return original text to prevent crashes
         return { translatedText: input.text };
     }
+    */
+   
+    // Temporarily return original text
+    console.warn("Azure Translator dependency is missing, returning original text.");
+    return { translatedText: input.text };
   }
 );

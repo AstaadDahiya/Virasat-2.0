@@ -7,4 +7,4 @@ import '@/ai/flows/generate-marketing-content.ts';
 import '@/ai/flows/generate-lifestyle-mockup.ts';
 import '@/ai/flows/harmonize-trends.ts';
 import '@/ai/flows/logistics-advisor.ts';
-import '@/ai/flows/translate-text.ts';
+// import '@/ai/flows/translate-text.ts';

@@ -17,6 +17,7 @@ import { Product, Artisan } from "@/lib/types";
 import { getProduct, getArtisan } from "@/services/firebase";
 import { useCart } from "@/context/cart-context";
 import { Input } from "@/components/ui/input";
+import { useLanguage } from "@/context/language-context";
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -26,6 +27,7 @@ export default function ProductDetailPage() {
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const { addToCart } = useCart();
+  const { t, addTranslationKeys, language } = useLanguage();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -37,6 +39,16 @@ export default function ProductDetailPage() {
           setProduct(productData);
           const artisanData = await getArtisan(productData.artisanId);
           setArtisan(artisanData);
+          // Add texts for translation
+          addTranslationKeys([
+              productData.name, 
+              productData.description, 
+              productData.category,
+              ...productData.materials
+          ]);
+          if(artisanData) {
+              addTranslationKeys([artisanData.name]);
+          }
         } else {
           notFound();
         }
@@ -49,7 +61,7 @@ export default function ProductDetailPage() {
     };
 
     fetchData();
-  }, [id]);
+  }, [id, addTranslationKeys]);
 
   const handleAddToCart = () => {
     if (product) {
@@ -73,10 +85,10 @@ export default function ProductDetailPage() {
     notFound();
   }
 
-  const productName = product.name;
+  const productName = t(product.name);
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-screen flex-col" lang={language}>
       <SiteHeader />
       <main className="flex-1 py-12 md:py-20">
         <div className="container mx-auto px-4">
@@ -85,7 +97,7 @@ export default function ProductDetailPage() {
             
             <div className="flex flex-col">
               <div>
-                <Badge variant="secondary">{product.category}</Badge>
+                <Badge variant="secondary">{t(product.category)}</Badge>
                 <h1 className="font-headline text-3xl md:text-4xl font-bold mt-2">{productName}</h1>
                 <div className="mt-4 flex items-center gap-4">
                   <p className="text-3xl font-bold text-primary">₹{product.price.toFixed(2)}</p>
@@ -94,7 +106,7 @@ export default function ProductDetailPage() {
                     <span className="text-muted-foreground text-sm ml-1">(12 reviews)</span>
                   </div>
                 </div>
-                <p className="text-muted-foreground mt-4 leading-relaxed">{product.description}</p>
+                <p className="text-muted-foreground mt-4 leading-relaxed">{t(product.description)}</p>
               </div>
 
               <Separator className="my-6" />
@@ -102,7 +114,7 @@ export default function ProductDetailPage() {
               <div>
                 <h3 className="font-headline text-lg font-semibold mb-2">Materials</h3>
                 <ul className="list-disc list-inside text-muted-foreground space-y-1">
-                  {product.materials.map(material => <li key={material}>{material}</li>)}
+                  {product.materials.map(material => <li key={material}>{t(material)}</li>)}
                 </ul>
               </div>
 
@@ -128,7 +140,7 @@ export default function ProductDetailPage() {
                     </Avatar>
                     <div>
                       <p className="text-sm text-muted-foreground">Sold by</p>
-                      <Link href={`/artisans/${artisan.id}`} className="font-semibold text-accent hover:underline font-headline text-lg">{artisan.name}</Link>
+                      <Link href={`/artisans/${artisan.id}`} className="font-semibold text-accent hover:underline font-headline text-lg">{t(artisan.name)}</Link>
                     </div>
                   </div>
                 )}

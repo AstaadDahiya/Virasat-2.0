@@ -8,6 +8,7 @@ import { DataProvider } from "@/context/data-context";
 import { AuthProvider } from "@/context/auth-context";
 import { ThemeProvider } from "@/components/theme-provider";
 import { CartProvider } from "@/context/cart-context";
+import { LanguageProvider } from "@/context/language-context";
 
 export const metadata: Metadata = {
   title: "VIRASAT",
@@ -39,11 +40,13 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <AuthProvider>
-              <DataProvider>
+            <DataProvider>
+              <LanguageProvider>
                 <CartProvider>
                   {children}
                 </CartProvider>
-              </DataProvider>
+              </LanguageProvider>
+            </DataProvider>
           </AuthProvider>
           <Toaster />
         </ThemeProvider>

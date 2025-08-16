@@ -50,7 +50,7 @@ const nextConfig: NextConfig = {
     ],
   },
   experimental: {
-    serverComponentsExternalPackages: ['@azure/ai-translation-text'],
+    serverComponentsExternalPackages: [],
   },
   env: {
     AZURE_TRANSLATOR_KEY: process.env.AZURE_TRANSLATOR_KEY,
