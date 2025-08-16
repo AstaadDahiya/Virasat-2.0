@@ -60,7 +60,7 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
         });
         return changed ? newSet : prev;
     });
-  }, []);
+  }, [setTranslationKeys]);
 
   useEffect(() => {
     const translateAll = async () => {
