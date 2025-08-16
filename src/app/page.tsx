@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -23,7 +22,7 @@ export default function Home() {
       <main className="flex-1">
         <section className="relative h-[60vh] w-full text-white">
           <Image
-            src="https://cdn.corenexis.com/images/virasat/indian-market-panorama.webp"
+            src="https://i.ibb.co/pP9M94M/image.png"
             alt="Artisan crafts"
             fill
             className="absolute z-0 object-cover"
