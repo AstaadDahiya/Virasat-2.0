@@ -50,7 +50,7 @@ export function DashboardSidebar() {
   const isActive = (href: string) => pathname === href;
 
   return (
-    <aside className="w-64 flex-shrink-0 border-r bg-secondary text-secondary-foreground hidden md:flex flex-col">
+    <aside className="w-64 flex-shrink-0 border-r bg-secondary text-secondary-foreground hidden md:flex flex-col fixed inset-y-0 left-0">
       <div className="p-4 border-b">
          <Link href="/" className="flex items-center space-x-2 text-primary">
             <Logo size={80}/>
@@ -92,7 +92,7 @@ export function DashboardSidebar() {
             <AvatarFallback>{user?.email?.charAt(0).toUpperCase()}</AvatarFallback>
           </Avatar>
           {user && (
-            <div className="flex-1">
+            <div className="flex-1 overflow-hidden">
               <p className="text-sm font-semibold truncate">{user.email}</p>
             </div>
           )}
@@ -103,7 +103,7 @@ export function DashboardSidebar() {
         <div className="flex justify-between items-center w-full">
             <Button asChild variant="ghost" className="justify-start flex-grow">
               <Link href="/dashboard/settings">
-                  <Cog />
+                  <Cog className="mr-2"/>
                   <span>Settings</span>
                 </Link>
             </Button>
@@ -111,7 +111,7 @@ export function DashboardSidebar() {
         </div>
         <Button asChild variant="ghost" className="w-full justify-start mt-1">
             <Link href="/">
-                <Home />
+                <Home className="mr-2" />
                 <span>Back to Site</span>
             </Link>
         </Button>
