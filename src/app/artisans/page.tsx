@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import { SiteHeader } from "@/components/site-header";
@@ -7,14 +6,9 @@ import { SiteFooter } from "@/components/site-footer";
 import { ArtisanCard } from "@/components/artisan-card";
 import { useData } from "@/context/data-context";
 import { Loader2 } from "lucide-react";
-import { useEffect } from "react";
 
 export default function ArtisansPage() {
-  const { artisans, loading, fetchInitialData } = useData();
-
-  useEffect(() => {
-    fetchInitialData('all');
-  }, [fetchInitialData]);
+  const { artisans, loading } = useData();
 
   return (
     <div className="flex min-h-screen flex-col">

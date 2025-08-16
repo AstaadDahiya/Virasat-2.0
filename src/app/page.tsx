@@ -10,18 +10,12 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { ArrowRight, Loader2 } from "lucide-react";
 import { useData } from "@/context/data-context";
-import { useEffect } from "react";
 
 export default function Home() {
-  const { products, artisans, loading, fetchInitialData } = useData();
+  const { products, artisans, loading } = useData();
   
-  useEffect(() => {
-    fetchInitialData('featured');
-  }, [fetchInitialData]);
-
-
-  const featuredProducts = products;
-  const featuredArtisans = artisans;
+  const featuredProducts = products.slice(0, 4);
+  const featuredArtisans = artisans.slice(0, 3);
 
   return (
     <div className="flex min-h-screen flex-col">
