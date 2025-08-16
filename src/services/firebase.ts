@@ -18,16 +18,14 @@ const deleteImage = async (imageUrl: string | null | undefined) => {
     try {
         const imageRef = ref(storage, imageUrl);
         await deleteObject(imageRef);
-        console.log(`Successfully deleted image: ${imageUrl}`);
     } catch (error: any) {
         if (error.code === 'storage/object-not-found') {
-            console.warn(`Image to delete was not found, it may have already been deleted: ${imageUrl}`);
+            console.warn(`Image to delete was not found: ${imageUrl}`);
         } else {
             console.error(`Failed to delete image: ${imageUrl}. Error:`, error);
         }
     }
 };
-
 
 const uploadImages = async (images: File[], artisanId: string): Promise<string[]> => {
     if (!images || images.length === 0) return [];
@@ -35,7 +33,9 @@ const uploadImages = async (images: File[], artisanId: string): Promise<string[]
     try {
         const uploadPromises = images.map(async (file) => {
             const imageRef = ref(storage, `products/${artisanId}/${Date.now()}-${file.name}`);
-            const snapshot = await uploadBytes(imageRef, file);
+            // Explicitly set the content type for robustness
+            const metadata = { contentType: file.type };
+            const snapshot = await uploadBytes(imageRef, file, metadata);
             return await getDownloadURL(snapshot.ref);
         });
 
@@ -233,27 +233,21 @@ export const updateArtisanProfile = async (
     existingImageUrl?: string | null
 ): Promise<void> => {
     const artisanRef = doc(db, 'artisans', artisanId);
-    
-    try {
-        const updateData: { [key: string]: any } = { ...data };
+    const updateData: { [key: string]: any } = { ...data };
 
-        // If a new image file is provided, upload it and get the new URL
+    try {
         if (newImageFile) {
-            const storageRef = ref(storage, `profileImages/${artisanId}/${newImageFile.name}`);
-            const snapshot = await uploadBytes(storageRef, newImageFile);
+            const storageRef = ref(storage, `profileImages/${artisanId}/${Date.now()}-${newImageFile.name}`);
+            const metadata = { contentType: newImageFile.type };
+            const snapshot = await uploadBytes(storageRef, newImageFile, metadata);
             updateData.profileImage = await getDownloadURL(snapshot.ref);
         }
         
-        // Update the document in Firestore
         await updateDoc(artisanRef, updateData);
 
-        // If we uploaded a new image, we should now delete the old one.
-        // We do this *after* the database is updated to ensure we don't delete the old image
-        // if the database write fails.
         if (newImageFile && existingImageUrl) {
             await deleteImage(existingImageUrl);
         }
-
     } catch (error) {
         console.error("Error updating artisan profile:", error);
         throw new Error(`Failed to update profile: ${error instanceof Error ? error.message : "Unknown error"}`);
