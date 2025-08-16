@@ -26,10 +26,8 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  const fetchData = useCallback(async (isInitialLoad = false) => {
-    if (isInitialLoad) {
-      setLoading(true);
-    }
+  const fetchData = useCallback(async () => {
+    setLoading(true);
     try {
       setError(null);
       
@@ -40,19 +38,14 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
 
       setProducts(productsData);
       setArtisans(artisansData);
-
-      localStorage.setItem('products', JSON.stringify(productsData));
-      localStorage.setItem('artisans', JSON.stringify(artisansData));
       
       if (user) {
         try {
             const shipmentsData = await getShipments(user.uid);
             setShipments(shipmentsData);
-            localStorage.setItem('shipments', JSON.stringify(shipmentsData));
         } catch (shipmentError) {
             console.error("Could not fetch shipments, Firestore index might be missing:", shipmentError);
             setShipments([]); 
-            localStorage.setItem('shipments', JSON.stringify([]));
         }
       }
     } catch (err) {
@@ -63,47 +56,16 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
           setError(new Error('An unknown error occurred'));
       }
     } finally {
-      if (isInitialLoad) {
-        setLoading(false);
-      }
+      setLoading(false);
     }
   }, [user]);
 
   useEffect(() => {
-    const loadInitialData = async () => {
-      setLoading(true);
-      try {
-        const cachedProducts = localStorage.getItem('products');
-        const cachedArtisans = localStorage.getItem('artisans');
-        const cachedShipments = localStorage.getItem('shipments');
-        
-        // Use cached data for initial fast render, then fetch fresh data.
-        if (cachedProducts && cachedArtisans) {
-          setProducts(JSON.parse(cachedProducts));
-          setArtisans(JSON.parse(cachedArtisans));
-          if(cachedShipments) setShipments(JSON.parse(cachedShipments));
-          setLoading(false); 
-          await fetchData(false); 
-        } else {
-          await fetchData(true);
-        }
-      } catch (err) {
-        console.error("Failed to fetch initial data:", err);
-        if (err instanceof Error) {
-          setError(err);
-        } else {
-          setError(new Error('An unknown error occurred'));
-        }
-        setLoading(false);
-      }
-    };
-    
-    loadInitialData();
-     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    fetchData();
+  }, [fetchData]);
 
   const refreshData = useCallback(async () => {
-    await fetchData(false);
+    await fetchData();
   }, [fetchData]);
 
 

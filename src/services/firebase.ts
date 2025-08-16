@@ -7,10 +7,21 @@ import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "fire
 import type { Artisan, Product, ShipmentData, LogisticsInput, LogisticsOutput, ProductFormData, Shipment } from "@/lib/types";
 import type { User } from 'firebase/auth';
 import { getLogisticsAdvice as getLogisticsAdviceFlow } from "@/ai/flows/logistics-advisor";
-import { products as seedProductsData, artisans as seedArtisansData } from "@/lib/data";
 
-// Defines the shape of the data coming from the form, excluding fields that are handled separately.
-type ProductInsertData = Omit<Product, 'id' | 'images' | 'artisanId' | 'createdAt'>;
+// --- START: Server-Side Caching ---
+interface Cache<T> {
+    data: T | null;
+    timestamp: number | null;
+    expiryMs: number;
+}
+
+const productsCache: Cache<Product[]> = { data: null, timestamp: null, expiryMs: 5 * 60 * 1000 }; // 5 minutes
+const artisansCache: Cache<Artisan[]> = { data: null, timestamp: null, expiryMs: 15 * 60 * 1000 }; // 15 minutes
+
+const isCacheValid = <T>(cache: Cache<T>): boolean => {
+    return cache.data !== null && cache.timestamp !== null && (Date.now() - cache.timestamp < cache.expiryMs);
+}
+// --- END: Server-Side Caching ---
 
 const storage = getStorage();
 
@@ -44,7 +55,7 @@ const uploadImages = async (images: File[], artisanId: string): Promise<string[]
     }
 };
 
-export const addProduct = async (productData: ProductInsertData, images: File[], artisanId: string): Promise<string> => {
+export const addProduct = async (productData: Omit<Product, 'id' | 'images' | 'artisanId' | 'createdAt'>, images: File[], artisanId: string): Promise<string> => {
     if (!artisanId) {
         throw new Error("Authentication required. You must be logged in to add a product.");
     }
@@ -63,6 +74,7 @@ export const addProduct = async (productData: ProductInsertData, images: File[],
         };
         
         const docRef = await addDoc(collection(db, "products"), productToAdd);
+        productsCache.data = null; // Invalidate cache
         return docRef.id;
     } catch (e) {
         console.error("Error in addProduct function: ", e);
@@ -98,6 +110,7 @@ export const updateProduct = async (productId: string, productData: ProductFormD
     };
 
     await updateDoc(productRef, dataToUpdate);
+    productsCache.data = null; // Invalidate cache
 }
 
 
@@ -118,6 +131,7 @@ export const deleteProduct = async (productId: string): Promise<void> => {
         }
 
         await deleteDoc(productRef);
+        productsCache.data = null; // Invalidate cache
 
     } catch (e) {
         console.error("Error deleting product: ", e);
@@ -127,7 +141,12 @@ export const deleteProduct = async (productId: string): Promise<void> => {
 
 
 export const getProducts = async (): Promise<Product[]> => {
+    if (isCacheValid(productsCache)) {
+        console.log("Returning cached products");
+        return productsCache.data!;
+    }
     try {
+        console.log("Fetching products from Firestore");
         const q = query(collection(db, 'products'), orderBy('createdAt', 'desc'));
         const querySnapshot = await getDocs(q);
         const products = querySnapshot.docs.map(doc => {
@@ -137,6 +156,8 @@ export const getProducts = async (): Promise<Product[]> => {
             }
             return { id: doc.id, ...data } as Product;
         });
+        productsCache.data = products;
+        productsCache.timestamp = Date.now();
         return products;
     } catch (e) {
         console.error("Error getting documents: ", e);
@@ -146,6 +167,11 @@ export const getProducts = async (): Promise<Product[]> => {
 
 export const getProduct = async (id: string): Promise<Product | null> => {
     try {
+        const cachedProduct = productsCache.data?.find(p => p.id === id);
+        if (cachedProduct) {
+            return cachedProduct;
+        }
+
         const docRef = doc(db, 'products', id);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
@@ -165,10 +191,17 @@ export const getProduct = async (id: string): Promise<Product | null> => {
 };
 
 export const getArtisans = async (): Promise<Artisan[]> => {
+    if (isCacheValid(artisansCache)) {
+        console.log("Returning cached artisans");
+        return artisansCache.data!;
+    }
      try {
+        console.log("Fetching artisans from Firestore");
         const q = query(collection(db, 'artisans'));
         const querySnapshot = await getDocs(q);
         const artisans = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Artisan));
+        artisansCache.data = artisans;
+        artisansCache.timestamp = Date.now();
         return artisans;
     } catch (e) {
         console.error("Error getting documents: ", e);
@@ -177,7 +210,12 @@ export const getArtisans = async (): Promise<Artisan[]> => {
 };
 
 export const getArtisan = async (id: string): Promise<Artisan | null> => {
-     try {
+    try {
+        const cachedArtisan = artisansCache.data?.find(a => a.id === id);
+        if (cachedArtisan) {
+            return cachedArtisan;
+        }
+
         const docRef = doc(db, 'artisans', id);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
@@ -205,6 +243,7 @@ export const ensureArtisanProfile = async (user: User): Promise<void> => {
                 location: 'Not specified',
                 profileImage: `https://placehold.co/100x100.png`,
             });
+            artisansCache.data = null; // Invalidate cache
         } catch (error) {
             console.error('Error creating artisan profile:', error);
             throw new Error('Database error creating new user profile.');
@@ -238,6 +277,7 @@ export const updateArtisanProfile = async (artisanId: string, data: Partial<Omit
     }
 
     await updateDoc(artisanRef, updateData);
+    artisansCache.data = null; // Invalidate cache
     return imageUrl || "";
 }
 
@@ -318,48 +358,3 @@ export const getShipments = async (artisanId: string): Promise<Shipment[]> => {
         throw new Error("Failed to get shipments");
     }
 }
-
-export const seedDatabase = async (): Promise<void> => {
-    const productsCollection = collection(db, 'products');
-    const productsSnapshot = await getDocs(query(productsCollection));
-    
-    if (!productsSnapshot.empty) {
-        console.log("Database already seeded. Skipping.");
-        return;
-    }
-    
-    console.log("Database needs seeding, proceeding...");
-    const batch = writeBatch(db);
-    
-    const artisanIdMap = new Map<string, string>();
-
-    // Remove _hi fields before seeding
-    const artisansToSeed = seedArtisansData.map(({ name_hi, bio_hi, location_hi, craft_hi, ...rest }) => rest);
-    
-    for (const artisanData of artisansToSeed) {
-        const tempId = `artisan-${artisansToSeed.indexOf(artisanData) + 1}`;
-        const artisanRef = doc(collection(db, 'artisans'));
-        batch.set(artisanRef, artisanData);
-        artisanIdMap.set(tempId, artisanRef.id);
-    }
-    
-    // Remove _hi fields before seeding
-    const productsToSeed = seedProductsData.map(({ name_hi, description_hi, category_hi, materials_hi, ...rest }) => rest);
-
-    for (const productData of productsToSeed) {
-        const productRef = doc(collection(db, 'products'));
-        const finalArtisanId = artisanIdMap.get(productData.artisanId);
-        if (finalArtisanId) {
-            const productWithRealArtisanId = { ...productData, artisanId: finalArtisanId, createdAt: serverTimestamp() };
-            batch.set(productRef, productWithRealArtisanId);
-        }
-    }
-    
-    try {
-        await batch.commit();
-        console.log("Database seeding complete for products and artisans!");
-    } catch (error) {
-        console.error("Error committing the seed data: ", error);
-        throw new Error("Failed to seed database.");
-    }
-};

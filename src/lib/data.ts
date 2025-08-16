@@ -32,7 +32,7 @@ export const artisans: Omit<Artisan, 'id'>[] = [
   },
 ];
 
-export const products: Omit<Product, 'id'>[] = [
+export const products: Omit<Product, 'id' | 'createdAt'>[] = [
   {
     name: 'Hand-Blocked Table Runner',
     description: 'A beautifully handcrafted table runner, perfect for adding a touch of Rajasthani elegance to your dining table. Features a classic floral motif in indigo and white.',
