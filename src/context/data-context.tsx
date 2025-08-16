@@ -27,6 +27,9 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   const [error, setError] = useState<Error | null>(null);
 
   const fetchData = useCallback(async () => {
+    // Prevent fetching if already loading
+    if (loading) return;
+
     setLoading(true);
     try {
       setError(null);
@@ -47,6 +50,9 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
             console.error("Could not fetch shipments, Firestore index might be missing:", shipmentError);
             setShipments([]); 
         }
+      } else {
+        // Clear shipments if user logs out
+        setShipments([]);
       }
     } catch (err) {
       console.error("Failed to refresh network data:", err);
@@ -58,11 +64,11 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, [user, loading]); // Depend on user and loading state
 
   useEffect(() => {
     fetchData();
-  }, [fetchData]);
+  }, [user]); // Fetch data only when user changes
 
   const refreshData = useCallback(async () => {
     await fetchData();

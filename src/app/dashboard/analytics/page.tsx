@@ -77,14 +77,12 @@ export default function AnalyticsPage() {
     const revenueData = groupDataByTime(shipments, 'createdAt', 'declared_value', 'day');
 
     const categorySales: { [key: string]: number } = {};
+    const productCategoryMap = new Map(products.map(p => [p.id, p.category]));
+
     shipments.forEach(shipment => {
-        const product = products.find(p => p.id === shipment.product_id);
-        if (product) {
-            const categoryName = product.category;
-            if (!categorySales[categoryName]) {
-                categorySales[categoryName] = 0;
-            }
-            categorySales[categoryName]++;
+        const categoryName = productCategoryMap.get(shipment.product_id);
+        if (categoryName) {
+            categorySales[categoryName] = (categorySales[categoryName] || 0) + 1;
         }
     });
 

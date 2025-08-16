@@ -125,10 +125,6 @@ export function EditProductForm({ productId }: EditProductFormProps) {
         
         const productData = {
             ...values,
-            name_hi: '', // These fields are no longer used
-            description_hi: '',
-            category_hi: '',
-            materials_hi: [],
             materials: values.materials.split(',').map(m => m.trim()),
         };
 
