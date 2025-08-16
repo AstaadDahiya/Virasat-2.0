@@ -13,19 +13,18 @@ const storage = getStorage();
 const deleteImage = async (imageUrl: string) => {
     if (!imageUrl || imageUrl.includes('placehold.co')) return;
     try {
-        // Firebase storage URLs are in the format: https://firebasestorage.googleapis.com/v0/b/your-bucket/o/path%2Fto%2Ffile.jpg?alt=media&token=...
-        // We need to extract the path: `path/to/file.jpg`
         const decodedUrl = decodeURIComponent(imageUrl);
-        const path = decodedUrl.substring(decodedUrl.indexOf('/o/') + 3, decodedUrl.indexOf('?alt=media'));
+        const pathStartIndex = decodedUrl.indexOf('/o/') + 3;
+        const pathEndIndex = decodedUrl.indexOf('?alt=media');
         
-        if (!path) {
+        if (pathStartIndex === -1 || pathEndIndex === -1) {
             console.warn(`Could not extract path from image URL: ${imageUrl}`);
             return;
         }
 
+        const path = decodedUrl.substring(pathStartIndex, pathEndIndex);
         const imageRef = ref(storage, path);
         await deleteObject(imageRef);
-        console.log(`Deleted image: ${imageUrl}`);
     } catch (error: any) {
         if (error.code !== 'storage/object-not-found') {
             console.error(`Error deleting image from Firebase Storage: ${imageUrl}`, error);
@@ -230,7 +229,7 @@ export const ensureArtisanProfile = async (user: User): Promise<void> => {
 };
 
 
-export const updateArtisanProfile = async (artisanId: string, data: Partial<Omit<Artisan, 'id' | 'profileImage'>>, newImageFile?: File): Promise<void> => {
+export const updateArtisanProfile = async (artisanId: string, data: Partial<Omit<Artisan, 'id' | 'profileImage'>>, newImageFile?: File): Promise<string | null> => {
     const artisanRef = doc(db, 'artisans', artisanId);
     
     try {
@@ -240,20 +239,25 @@ export const updateArtisanProfile = async (artisanId: string, data: Partial<Omit
         }
 
         const existingData = docSnap.data() as Artisan;
-        const updateData: any = { ...data };
+        const updateData: { [key: string]: any } = { ...data };
+        let newImageUrl: string | null = null;
 
         if (newImageFile) {
-            const [newImageUrl] = await uploadImages([newImageFile], artisanId);
-            if (newImageUrl) {
+            const uploadedUrls = await uploadImages([newImageFile], artisanId);
+            if (uploadedUrls && uploadedUrls.length > 0) {
+                newImageUrl = uploadedUrls[0];
                 updateData.profileImage = newImageUrl;
-                // Delete the old image only after the new one is successfully uploaded
                 if (existingData.profileImage) {
                     await deleteImage(existingData.profileImage);
                 }
             }
         }
         
-        await updateDoc(artisanRef, updateData);
+        if (Object.keys(updateData).length > 0) {
+          await updateDoc(artisanRef, updateData);
+        }
+
+        return newImageUrl;
 
     } catch (error) {
         console.error("Error updating artisan profile:", error);

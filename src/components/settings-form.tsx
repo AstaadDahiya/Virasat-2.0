@@ -34,8 +34,8 @@ const formSchema = z.object({
 export function SettingsForm() {
   const { toast } = useToast();
   const { user, loading: authLoading } = useAuth();
-  const [loading, setLoading] = useState(true);
-  const [artisan, setArtisan] = useState<Artisan | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [dataLoading, setDataLoading] = useState(true);
   const [preview, setPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -52,14 +52,13 @@ export function SettingsForm() {
   useEffect(() => {
     const fetchArtisan = async () => {
       if (!user) {
-        setLoading(false);
+        setDataLoading(false);
         return;
       }
-      setLoading(true);
+      setDataLoading(true);
       try {
         const artisanData = await getArtisan(user.uid);
         if (artisanData) {
-            setArtisan(artisanData);
             form.reset(artisanData);
             if (artisanData.profileImage) {
               setPreview(artisanData.profileImage);
@@ -68,7 +67,7 @@ export function SettingsForm() {
       } catch (error: any) {
         toast({ variant: 'destructive', title: "Error", description: error.message });
       } finally {
-        setLoading(false);
+        setDataLoading(false);
       }
     };
     if (user) {
@@ -85,31 +84,33 @@ export function SettingsForm() {
   };
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    if (!user) return;
-    setLoading(true);
+    if (!user) {
+      toast({ variant: 'destructive', title: "Error", description: "You must be logged in to update your profile." });
+      return;
+    };
+
+    setIsSubmitting(true);
     
     try {
-        const { profileImage, ...updateData } = values;
-        const newImageFile = profileImage instanceof File ? profileImage : undefined;
+      const { profileImage, ...updateData } = values;
+      const newImageFile = profileImage instanceof File ? profileImage : undefined;
 
-        await updateArtisanProfile(user.uid, updateData, newImageFile);
-        
-        toast({ title: "Profile updated successfully!" });
+      const newImageUrl = await updateArtisanProfile(user.uid, updateData, newImageFile);
+      
+      toast({ title: "Profile updated successfully!" });
 
-        // Refetch data to show the new image if it was updated
-        const updatedArtisan = await getArtisan(user.uid);
-        if (updatedArtisan?.profileImage) {
-            setPreview(updatedArtisan.profileImage);
-        }
+      if (newImageUrl) {
+        setPreview(newImageUrl);
+      }
 
     } catch (error: any) {
-        toast({ variant: 'destructive', title: "Error", description: error.message });
+        toast({ variant: 'destructive', title: "Error", description: error.message || "Failed to update profile." });
     } finally {
-        setLoading(false);
+        setIsSubmitting(false);
     }
   }
 
-  if (authLoading || loading) {
+  if (authLoading || dataLoading) {
       return <div className="flex justify-center p-8"><Loader2 className="animate-spin" /></div>
   }
 
@@ -140,9 +141,9 @@ export function SettingsForm() {
             <FormItem><FormLabel>Location (City, State)</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
         )}/>
 
-        <Button type="submit" disabled={loading}>
-          {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          {loading ? "Updating..." : "Update Profile"}
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          {isSubmitting ? "Updating..." : "Update Profile"}
         </Button>
       </form>
     </Form>
