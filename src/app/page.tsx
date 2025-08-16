@@ -22,7 +22,7 @@ export default function Home() {
       <main className="flex-1">
         <section className="relative h-[60vh] w-full text-white">
           <Image
-            src="https://i.ibb.co/pP9M94M/image.png"
+            src="https://placehold.co/1200x500.png"
             alt="Artisan crafts"
             fill
             className="absolute z-0 object-cover"
