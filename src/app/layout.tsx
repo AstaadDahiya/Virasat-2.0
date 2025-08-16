@@ -35,8 +35,8 @@ export default function RootLayout({
       <body className={cn("min-h-screen bg-background font-sans antialiased", alegreya.variable)}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
-          enableSystem
+          defaultTheme="light"
+          enableSystem={false}
           disableTransitionOnChange
         >
           <AuthProvider>
@@ -44,7 +44,7 @@ export default function RootLayout({
               <LanguageProvider>
                 <CartProvider>
                   {children}
-                </CartProvider>
+                </CartartProvider>
               </LanguageProvider>
             </DataProvider>
           </AuthProvider>
