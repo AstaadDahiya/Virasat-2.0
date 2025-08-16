@@ -21,26 +21,49 @@ interface DataContextType {
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
 export const DataProvider = ({ children }: { children: ReactNode }) => {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const pathname = usePathname();
   const [products, setProducts] = useState<Product[]>([]);
   const [artisans, setArtisans] = useState<Artisan[]>([]);
   const [shipments, setShipments] = useState<Shipment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+  const [hasDashboardData, setHasDashboardData] = useState(false);
 
-  const fetchShipments = useCallback(async () => {
-    if (user) {
-        try {
-            const shipmentsData = await getShipments(user.uid);
-            setShipments(shipmentsData);
-        } catch (shipmentError) {
-            console.error("Could not fetch shipments, Firestore index might be missing:", shipmentError);
-            setShipments([]); 
-        }
-      } else {
+  const fetchDashboardData = useCallback(async () => {
+    if (!user) {
+        setProducts([]);
+        setArtisans([]);
         setShipments([]);
+        setHasDashboardData(false);
+        setLoading(false);
+        return;
+    };
+    
+    setLoading(true);
+    try {
+      setError(null);
+      const [productsData, artisansData, shipmentsData] = await Promise.all([
+        getProducts(),
+        getArtisans(),
+        getShipments(user.uid),
+      ]);
+
+      setProducts(productsData);
+      setArtisans(artisansData);
+      setShipments(shipmentsData);
+      setHasDashboardData(true);
+
+    } catch (err) {
+      console.error("Failed to fetch dashboard data:", err);
+       if (err instanceof Error) {
+          setError(err);
+      } else {
+          setError(new Error('An unknown error occurred'));
       }
+    } finally {
+      setLoading(false);
+    }
   }, [user]);
 
   const fetchInitialData = useCallback(async (type: 'all' | 'featured' = 'all') => {
@@ -72,37 +95,16 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const refreshData = useCallback(async () => {
-      setLoading(true);
-      try {
-        setError(null);
-        const [productsData, artisansData] = await Promise.all([
-            getProducts(),
-            getArtisans(),
-        ]);
-        setProducts(productsData);
-        setArtisans(artisansData);
-        await fetchShipments();
-      } catch (err) {
-         console.error("Failed to refresh data:", err);
-         if (err instanceof Error) {
-            setError(err);
-        } else {
-            setError(new Error('An unknown error occurred'));
-        }
-      } finally {
-        setLoading(false);
-      }
-  }, [fetchShipments]);
+      // This function will now essentially re-run the main dashboard data fetch.
+      await fetchDashboardData();
+  }, [fetchDashboardData]);
   
    useEffect(() => {
-    if(pathname.startsWith('/dashboard')) {
-        refreshData();
+    // Only fetch dashboard data if we are in the dashboard, we have a user, and we haven't fetched it yet.
+    if(pathname.startsWith('/dashboard') && user && !hasDashboardData && !authLoading) {
+        fetchDashboardData();
     }
-  }, [pathname, refreshData]);
-
-  useEffect(() => {
-    fetchShipments();
-  }, [user, fetchShipments]);
+  }, [pathname, user, hasDashboardData, fetchDashboardData, authLoading]);
 
 
   const value = {
