@@ -11,20 +11,27 @@ import { getLogisticsAdvice as getLogisticsAdviceFlow } from "@/ai/flows/logisti
 const storage = getStorage();
 
 const deleteImage = async (imageUrl: string) => {
-    // Ignore placeholder images
     if (!imageUrl || imageUrl.includes('placehold.co') || !imageUrl.includes('firebasestorage.googleapis.com')) {
         return;
     }
-
     try {
-        // Create a reference from the full HTTPS URL
         const imageRef = ref(storage, imageUrl);
         await deleteObject(imageRef);
     } catch (error: any) {
-        // It's okay if the object doesn't exist, we can ignore that error.
-        if (error.code !== 'storage/object-not-found') {
-            console.error(`Error deleting image from Firebase Storage: ${imageUrl}`, error);
-            // We don't throw here, as we want to allow the rest of the update to proceed.
+        if (error.code === 'storage/object-not-found') {
+            return; 
+        }
+        console.error(`Failed to delete image with full URL, will try by path. Error: ${error.message}`);
+        try {
+            // Fallback for URLs that might be encoded or in a different format
+            const path = new URL(imageUrl).pathname.split('/o/')[1].split('?')[0];
+            const decodedPath = decodeURIComponent(path);
+            const imageRefFromPath = ref(storage, decodedPath);
+            await deleteObject(imageRefFromPath);
+        } catch (fallbackError: any) {
+            console.error(`Fallback deletion by path also failed for URL: ${imageUrl}`, fallbackError);
+            // We don't re-throw here to allow the main operation (e.g., profile update) to continue
+            // if only the image deletion fails. The new image is already uploaded.
         }
     }
 }
@@ -239,24 +246,20 @@ export const updateArtisanProfile = async (artisanId: string, data: Partial<Omit
         const updateData: { [key: string]: any } = { ...data };
         let newImageUrl: string | null = null;
 
-        // If a new image is provided, upload it and prepare to delete the old one.
         if (newImageFile) {
             const uploadedUrls = await uploadImages([newImageFile], artisanId);
             if (uploadedUrls && uploadedUrls.length > 0) {
                 newImageUrl = uploadedUrls[0];
                 updateData.profileImage = newImageUrl;
                 
-                // If there was an old image, delete it from storage.
                 if (existingData.profileImage) {
                     await deleteImage(existingData.profileImage);
                 }
             }
         }
         
-        // Update the Firestore document with the new text data and potentially new image URL.
         await updateDoc(artisanRef, updateData);
 
-        // Return the URL of the new image so the UI can update.
         return newImageUrl;
 
     } catch (error) {
@@ -342,3 +345,5 @@ export const getShipments = async (artisanId: string): Promise<Shipment[]> => {
         throw new Error("Failed to get shipments");
     }
 }
+
+    
