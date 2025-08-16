@@ -36,6 +36,7 @@ export function SettingsForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [dataLoading, setDataLoading] = useState(true);
   const [preview, setPreview] = useState<string | null>(null);
+  const [existingImageUrl, setExistingImageUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -61,6 +62,7 @@ export function SettingsForm() {
             form.reset(artisanData);
             if (artisanData.profileImage) {
               setPreview(artisanData.profileImage);
+              setExistingImageUrl(artisanData.profileImage);
             }
         }
       } catch (error: any) {
@@ -94,7 +96,7 @@ export function SettingsForm() {
       const { profileImage, ...updateData } = values;
       const newImageFile = profileImage instanceof File ? profileImage : undefined;
 
-      await updateArtisanProfile(user.uid, updateData, newImageFile);
+      await updateArtisanProfile(user.uid, updateData, newImageFile, existingImageUrl);
       
       toast({ title: "Profile updated successfully!" });
 

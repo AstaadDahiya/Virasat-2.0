@@ -10,26 +10,24 @@ import { getLogisticsAdvice as getLogisticsAdviceFlow } from "@/ai/flows/logisti
 
 const storage = getStorage();
 
-const deleteImage = async (imageUrl: string) => {
-    // Ignore placeholder images
+const deleteImage = async (imageUrl: string | null | undefined) => {
     if (!imageUrl || !imageUrl.startsWith('https://firebasestorage.googleapis.com')) {
+        console.log("Skipping deletion of placeholder or invalid image URL.");
         return;
     }
     try {
-        // Create a reference from the full URL
         const imageRef = ref(storage, imageUrl);
         await deleteObject(imageRef);
+        console.log(`Successfully deleted image: ${imageUrl}`);
     } catch (error: any) {
-        // A common error is 'object-not-found', which we can safely ignore
-        // as it means the file is already gone.
         if (error.code === 'storage/object-not-found') {
-            console.warn(`Image to delete was not found: ${imageUrl}`);
-            return; 
+            console.warn(`Image to delete was not found, it may have already been deleted: ${imageUrl}`);
+        } else {
+            console.error(`Failed to delete image: ${imageUrl}. Error:`, error);
         }
-        // Log other errors but don't re-throw, to allow the main operation to proceed.
-        console.error(`Failed to delete image: ${imageUrl}. Error: ${error.message}`);
     }
-}
+};
+
 
 const uploadImages = async (images: File[], artisanId: string): Promise<string[]> => {
     if (!images || images.length === 0) return [];
@@ -231,36 +229,34 @@ export const ensureArtisanProfile = async (user: User): Promise<void> => {
 export const updateArtisanProfile = async (
     artisanId: string, 
     data: Omit<Artisan, 'id' | 'profileImage'>, 
-    newImageFile?: File
+    newImageFile?: File,
+    existingImageUrl?: string | null
 ): Promise<void> => {
     const artisanRef = doc(db, 'artisans', artisanId);
     
     try {
-        const docSnap = await getDoc(artisanRef);
-        if (!docSnap.exists()) {
-            throw new Error("Artisan profile not found.");
-        }
-
-        const existingData = docSnap.data() as Artisan;
         const updateData: { [key: string]: any } = { ...data };
 
-        // If a new image file is provided, upload it and update the URL
+        // If a new image file is provided, upload it and get the new URL
         if (newImageFile) {
             const storageRef = ref(storage, `profileImages/${artisanId}/${newImageFile.name}`);
             const snapshot = await uploadBytes(storageRef, newImageFile);
             updateData.profileImage = await getDownloadURL(snapshot.ref);
-
-            // After a successful upload, delete the old image if it's not a placeholder
-            if (existingData.profileImage) {
-                await deleteImage(existingData.profileImage);
-            }
         }
         
+        // Update the document in Firestore
         await updateDoc(artisanRef, updateData);
+
+        // If we uploaded a new image, we should now delete the old one.
+        // We do this *after* the database is updated to ensure we don't delete the old image
+        // if the database write fails.
+        if (newImageFile && existingImageUrl) {
+            await deleteImage(existingImageUrl);
+        }
 
     } catch (error) {
         console.error("Error updating artisan profile:", error);
-        throw new Error("Failed to update profile.");
+        throw new Error(`Failed to update profile: ${error instanceof Error ? error.message : "Unknown error"}`);
     }
 }
 
