@@ -60,7 +60,7 @@ A centralized command center for artisans to manage every aspect of their busine
 * **Frontend:** Next.js, React, TypeScript, Tailwind CSS
 * **Backend:** Node.js, Express.js, Python (for AI microservices)
 * **Database:** PostgreSQL, Redis (for caching/queues)
-* **AI/ML:** TensorFlow, PyTorch, OpenAI API, Scikit-learn
+* **AI/ML:** TensorFlow, PyTorch, Gemini API, Scikit-learn
 * **Infrastructure:** Docker, Kubernetes
 * **Cloud Provider:** AWS (S3, EC2, RDS) / GCP
 
